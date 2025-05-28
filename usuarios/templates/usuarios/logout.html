@@ -1,0 +1,13 @@
+{% extends "base/base.html" %}
+{% block title %}
+    Logout
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-body text-center">
+            <h2>Você saiu da sua conta</h2>
+            <p>Obrigado por usar o DocFinance!</p>
+            <a href="{% url 'login' %}" class="btn btn-primary">Entrar novamente</a>
+        </div>
+    </div>
+{% endblock content %}

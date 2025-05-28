@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+{% block title %}
+    Token Expirado
+{% endblock title %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h4>Link de Ativação Expirado</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">{{ mensagem }}</p>
+                        <p>O link de ativação que você utilizou está expirado. Os links de ativação são válidos por 24 horas.</p>
+                        <p>Por favor, entre em contato com o administrador do sistema para solicitar um novo link de ativação.</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary">Voltar para Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

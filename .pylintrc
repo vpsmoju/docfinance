@@ -1,0 +1,11 @@
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=config.settings
+ignore=migrations
+python-path=.
+
+[MESSAGES CONTROL]
+disable=C0111,E0401,E0015,R0903,C0103,django-not-configured,R0901,W0012,E0013,E1101
+
+[DJANGO]
+django_settings_module=config.settings

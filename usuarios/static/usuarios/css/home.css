@@ -1,0 +1,24 @@
+/* Estilos para a página home */
+.card {
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card .fa-3x {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .fa-3x {
+    transform: scale(1.2);
+}
+
+.jumbotron {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 2rem !important;
+}

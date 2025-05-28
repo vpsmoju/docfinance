@@ -1,0 +1,42 @@
+:root {
+    --primary: #006633;
+    --secondary: #008542;
+    --accent: #FFD700;
+}
+
+#header {
+    background: var(--primary);
+    color: #fff;
+}
+
+#branding h1 {
+    color: var(--accent);
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: var(--secondary);
+}
+
+div.breadcrumbs {
+    background: var(--secondary);
+}
+
+a:link, a:visited {
+    color: var(--primary);
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--primary);
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: var(--secondary);
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: var(--secondary);
+}
+
+.button.default:hover, input[type=submit].default:hover {
+    background: var(--primary);
+}

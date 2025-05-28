@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+    <meta name="description"
+          content="DocFinance - Sistema de Gestão Financeira da Prefeitura de Moju">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords"
+              content="documentos financeiros, gerenciamento financeiro, sistema financeiro, finanças, documentos, gestão financeira">
+        <title>
+            {% block title %}
+                DocFinance - Prefeitura de Moju
+            {% endblock title %}
+        </title>
+        <!-- Favicon -->
+        <link rel="icon"
+              href="{% static 'img/logo_moju.png' %}"
+              type="image/x-icon">
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+              rel="stylesheet">
+        <!-- Font Awesome -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- jQuery Mask -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+        <!-- Nosso CSS personalizado -->
+        <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+        <link href="{% static 'css/main.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'documentos/css/print.css' %}">
+        <script src="{% static 'js/notifications.js' %}"></script>
+        {% block extra_css %}
+        {% endblock extra_css %}
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+                <div class="container">
+                    <a class="navbar-brand"
+                       href="{% if user.is_authenticated %}{% url 'documentos:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+                        <img src="{% static 'img/DocFinance3.png' %}?v=2"
+                             alt="DocFinance"
+                             height="60"
+                             width="100">
+                        DocFinance
+                    </a>
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'documentos:dashboard' %}">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'documentos:list' %}">Documentos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'fornecedores:fornecedor_list' %}">Fornecedores</a>
+                                </li>
+                                {% if user.is_staff %}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle"
+                                           href="#"
+                                           id="relatoriosDropdown"
+                                           role="button"
+                                           data-bs-toggle="dropdown"
+                                           aria-expanded="false">Relatórios</a>
+                                        <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:dashboard' %}">Dashboard</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:secretaria' %}">Por Secretaria</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:recurso' %}">Por Recurso</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:financeiro' %}">Financeiro</a>
+                                            </li>
+                                            <!-- Adicione seu novo relatório aqui -->
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:pagamentos' %}">Pagamentos</a>
+                                            </li>
+                                            <!-- Fim do novo relatório -->
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'relatorios:exportar_excel' %}">Exportar Excel</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'relatorios:filtro_encaminhamento' %}">Encaminhamentos</a>
+                                    </li>
+                                    <!-- Novo menu Admin -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle"
+                                           href="#"
+                                           id="adminDropdown"
+                                           role="button"
+                                           data-bs-toggle="dropdown"
+                                           aria-expanded="false">Administração</a>
+                                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'listar_usuarios' %}">Usuários</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'listar_usuarios_pendentes' %}">Usuários Pendentes</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'listar_logs' %}">Log do Sistema</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                        <ul class="navbar-nav ms-auto">
+                            {% if user.is_authenticated %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle"
+                                       href="#"
+                                       role="button"
+                                       data-bs-toggle="dropdown">
+                                        {% if user.perfil.foto %}
+                                            <img src="{{ user.perfil.foto.url }}"
+                                                 alt="Foto de perfil"
+                                                 class="rounded-circle me-1"
+                                                 width="50"
+                                                 height="50">
+                                        {% else %}
+                                            <i class="bi bi-person-circle me-1"></i>
+                                        {% endif %}
+                                        {{ user.username }}
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'perfil' %}">Meu Perfil</a>
+                                        </li>
+                                        {% comment %}<li><a class="dropdown-item" href="{% url 'editar_perfil' %}">Editar Perfil</a></li>{% endcomment %}
+                                        {% comment %} <li><a class="dropdown-item" href="{% url 'alterar_senha' %}">Alterar Senha</a></li> {% endcomment %}
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item">Sair</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'login' %}">Entrar</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'registro' %}">Registrar</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <main class="container my-4">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show {% if 'success' in message.tags %}alert-success-custom{% endif %}"
+                             role="alert">
+                            {{ message|safe }}
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Fechar"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}
+            {% endblock content %}
+        </main>
+        <footer class="py-3 mt-5">
+            <div class="container text-center">
+                <p>© {% now "Y" %} DocFinance - Prefeitura de Moju. Todos os direitos reservados.</p>
+            </div>
+        </footer>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        {% block extra_js %}
+        {% endblock extra_js %}
+    </body>
+</html>

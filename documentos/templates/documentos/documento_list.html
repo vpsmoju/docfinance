@@ -1,0 +1,160 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}
+    Documentos | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    <i class="bi bi-file-earmark-text me-2"></i>Documentos
+                </h3>
+                <a href="{% url 'documentos:create' %}"
+                   class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Novo Documento
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <!-- Barra de pesquisa -->
+                <form method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Buscar por número, fornecedor ou descrição..."
+                               value="{{ request.GET.search|default:'' }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search me-1"></i>Buscar
+                        </button>
+                        {% if request.GET.search %}
+                            <a href="{% url 'documentos:list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Limpar
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+                <!-- Tabela de documentos -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Número</th>
+                                <th>Secretaria</th>
+                                <th>Fornecedor</th>
+                                <th>Data Documento</th>
+                                <th>Data Pagamento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for documento in object_list %}
+                                <tr>
+                                    <td>{{ documento.numero }}</td>
+                                    <td>{{ documento.get_secretaria_display|default:"-" }}</td>
+                                    <td>
+                                        <a href="{% url 'fornecedores:fornecedor_detail' documento.fornecedor.id %}">{{ documento.fornecedor }}</a>
+                                    </td>
+                                    <td>{{ documento.data_documento|date:"d/m/Y" }}</td>
+                                    <td>{{ documento.data_pagamento|date:"d/m/Y"|default:"-" }}</td>
+                                    <td>R$ {{ documento.valor_documento|currency_br }}</td>
+                                    <td>
+                                        {% if documento.status == 'PEN' %}
+                                            <span class="badge bg-warning text-dark">Pendente</span>
+                                        {% elif documento.status == 'PAG' %}
+                                            <span class="badge bg-success">Pago</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Atrasado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'documentos:detail' documento.id %}"
+                                               class="btn btn-info"
+                                               title="Detalhes">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'documentos:update' documento.id %}"
+                                               class="btn btn-warning"
+                                               title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            {% if perms.documentos.delete_documento %}
+                                                <a href="{% url 'documentos:delete' documento.id %}"
+                                                   class="btn btn-danger"
+                                                   title="Excluir">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">Nenhum documento encontrado.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Paginação -->
+                {% if is_paginated %}
+                    <nav aria-label="Paginação de documentos">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                       aria-label="Primeira">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                       aria-label="Anterior">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">{{ num }}</a>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                       aria-label="Próxima">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                       aria-label="Última">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'documentos/css/documentos.css' %}">
+{% endblock extra_css %}

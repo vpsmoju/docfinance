@@ -1,0 +1,51 @@
+/* Estilos gerais do layout */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
+}
+
+/* Estilos para a página inicial */
+.jumbotron {
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    background-color: #e9ecef;
+    border-radius: 0.3rem;
+}
+
+/* Estilos para formulários */
+.form-error {
+    color: #dc3545;
+}
+
+/* Estilos para tabelas */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.alert-success-custom {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.logout-form {
+    display: inline;
+}

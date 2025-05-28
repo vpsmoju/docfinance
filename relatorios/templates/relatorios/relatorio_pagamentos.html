@@ -1,0 +1,149 @@
+{% extends "relatorios/relatorio_base.html" %}
+{% load custom_filters %}
+{% block relatorio_titulo %}
+    Relatório de Pagamentos
+{% endblock relatorio_titulo %}
+{% block filtros %}
+    {{ block.super }}
+    <div class="col-md-3 mb-2">
+        <label for="secretaria" class="form-label">Secretaria</label>
+        <select id="secretaria" name="secretaria" class="form-select">
+            <option value="" {% if not secretaria_selecionada %}selected{% endif %}>Todas</option>
+            {% for sec_choice, sec_name in secretaria_choices %}
+                <option value="{{ sec_choice }}"
+                        {% if secretaria_selecionada == sec_choice %}selected{% endif %}>{{ sec_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock filtros %}
+{% block relatorio_conteudo %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Resumo de Pagamentos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total de Documentos</h6>
+                                    <h3 class="mb-0">{{ total_geral.quantidade }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Valor Bruto</h6>
+                                    <h3 class="mb-0">R$ {{ total_geral.total|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Descontos (ISS+IR)</h6>
+                                    <h3 class="mb-0">R$ {{ total_geral.total_iss|add:total_geral.total_irrf|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Valor Líquido</h6>
+                                    <h3 class="mb-0">R$ {{ total_geral.total_liquido|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for secretaria_code, secretaria_data in secretarias_dados.items %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ secretaria_data.secretaria_nome }}</h5>
+                        <div>
+                            <span class="badge bg-light text-dark">Documentos: {{ secretaria_data.quantidade }}</span>
+                            <span class="badge bg-light text-dark">Total: R$ {{ secretaria_data.total|currency_br }}</span>
+                            <span class="badge bg-light text-dark">Líquido: R$ {{ secretaria_data.total_liquido|currency_br }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% for recurso in secretaria_data.recursos %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ recurso.recurso_nome }}</h6>
+                                    <div>
+                                        <span class="badge bg-light text-dark">Documentos: {{ recurso.quantidade }}</span>
+                                        <span class="badge bg-light text-dark">Total: R$ {{ recurso.total|currency_br }}</span>
+                                        <span class="badge bg-light text-dark">Líquido: R$ {{ recurso.total_liquido|currency_br }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Fornecedor</th>
+                                                    <th>Descrição/Dados Bancários</th>
+                                                    <th class="text-end">Valor Bruto</th>
+                                                    <th class="text-end">ISS</th>
+                                                    <th class="text-end">IR</th>
+                                                    <th class="text-end">Valor Líquido</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for doc in recurso.documentos %}
+                                                    <tr>
+                                                        <td>{{ doc.fornecedor.nome }}</td>
+                                                        <td>{{ doc.descricao|default:"-" }}</td>
+                                                        <td class="text-end">R$ {{ doc.valor_documento|currency_br }}</td>
+                                                        <td class="text-end">R$ {{ doc.valor_iss|currency_br }}</td>
+                                                        <td class="text-end">R$ {{ doc.valor_irrf|currency_br }}</td>
+                                                        <td class="text-end">R$ {{ doc.valor_liquido|currency_br }}</td>
+                                                        <td>
+                                                            {% if doc.status == 'PEN' %}
+                                                                <span class="badge bg-warning">Pendente</span>
+                                                            {% elif doc.status == 'PAG' %}
+                                                                <span class="badge bg-success">Pago</span>
+                                                            {% else %}
+                                                                <span class="badge bg-danger">Atrasado</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot class="table-dark">
+                                                <tr>
+                                                    <th colspan="2">Total</th>
+                                                    <th class="text-end">R$ {{ recurso.total|currency_br }}</th>
+                                                    <th class="text-end">R$ {{ recurso.total_iss|currency_br }}</th>
+                                                    <th class="text-end">R$ {{ recurso.total_irrf|currency_br }}</th>
+                                                    <th class="text-end">R$ {{ recurso.total_liquido|currency_br }}</th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">Nenhum documento encontrado para os filtros selecionados.</div>
+    {% endfor %}
+{% endblock relatorio_conteudo %}
+
+{% block tipo_relatorio %}pagamentos{% endblock tipo_relatorio %}
+{% block tipo_relatorio_excel %}pagamentos{% endblock tipo_relatorio_excel %}

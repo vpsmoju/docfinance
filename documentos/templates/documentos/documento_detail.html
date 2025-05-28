@@ -1,0 +1,152 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}
+    Documento {{ object.numero }} | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    <i class="bi bi-file-earmark-text me-2"></i>Documento: {{ object.numero }}
+                </h3>
+                <div>
+                    <a href="{% url 'documentos:update' object.pk %}"
+                       class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                    {% if perms.documentos.delete_documento %}
+                        <a href="{% url 'documentos:delete' object.pk %}"
+                           class="btn btn-outline-light btn-sm me-2">
+                            <i class="bi bi-trash me-1"></i>Excluir
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'documentos:list' %}"
+                       class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Voltar
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row justify-content-around">
+                    <div class="col-md-5">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Informações Básicas</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">nº do Protocolo</dt>
+                            <dd class="col-sm-8">
+                                {{ object.numero }}
+                            </dd>
+                            <dt class="col-sm-4 mt-2">nº da NF/Recibo</dt>
+                            <dd class="col-sm-8 mt-2">
+                                {% if object.tipo == 'REC' %}
+                                    {{ object.numero }}
+                                {% else %}
+                                    {{ object.numero_documento }}
+                                {% endif %}
+                            </dd>
+                            <dt class="col-sm-4 mt-2">Tipo</dt>
+                            <dd class="col-sm-8 mt-2">
+                                {{ object.get_tipo_display }}
+                            </dd>
+                            <dt class="col-sm-4 mt-2">Fornecedor</dt>
+                            <dd class="col-sm-8 mt-2">
+                                <a href="{% url 'fornecedores:fornecedor_detail' object.fornecedor.id %}">{{ object.fornecedor }}</a>
+                            </dd>
+                            <dt class="col-sm-4 mt-2">Status</dt>
+                            <dd class="col-sm-8 mt-2">
+                                {% if object.status == 'PEN' %}
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                {% elif object.status == 'PAG' %}
+                                    <span class="badge bg-success">Pago</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Atrasado</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-5">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Datas</h5>
+                        <dl class="row">
+                            <dt class="col-sm-5">Data do Documento</dt>
+                            <dd class="col-sm-7">
+                                {{ object.data_documento|date:"d/m/Y" }}
+                            </dd>
+                            <dt class="col-sm-5 mt-2">Data de Entrada</dt>
+                            <dd class="col-sm-7 mt-2">
+                                {{ object.data_entrada|date:"d/m/Y \à\s H:i" }}
+                            </dd>
+                            {% if object.data_baixa %}
+                                <div class="col-12 mt-2 mb-2 d-flex justify-content-center">
+                                    <hr class="border-secondary w-70">
+                                </div>
+                            {% endif %}
+                            <dt class="col-sm-5 mt-2">Data de Pagamento</dt>
+                            <dd class="col-sm-7 mt-2">
+                                {{ object.data_pagamento|date:"d/m/Y"|default:"-" }}
+                            </dd>
+                            {% if object.data_baixa %}
+                                <dt class="col-sm-5 mt-2">Data da Baixa</dt>
+                                <dd class="col-sm-7 mt-2">
+                                    {{ object.data_baixa|date:"d/m/Y \à\s H:i" }}
+                                </dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+                <div class="row mt-4 justify-content-around">
+                    <div class="col-md-5">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Descrição</h5>
+                        <p>{{ object.descricao|linebreaks|default:"Sem descrição" }}</p>
+                        <!-- Alocação Orçamentária -->
+                        <div class="mt-4 p-3 bg-light rounded border">
+                            <h5 class="text-primary border-bottom pb-2 mb-3">Alocação Orçamentária</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Secretaria</dt>
+                                <dd class="col-sm-8">
+                                    {% if object.secretaria %}
+                                        <span class="badge bg-info text-dark">{{ object.get_secretaria_display }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </dd>
+                                <dt class="col-sm-4 mt-2">Recurso</dt>
+                                <dd class="col-sm-8 mt-2">
+                                    {% if object.recurso %}
+                                        <span class="badge bg-success">{{ object.get_recurso_display }}</span>
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Valores</h5>
+                        <dl class="row">
+                            <dt class="col-sm-5">Valor do Documento</dt>
+                            <dd class="col-sm-7">
+                                <span class="text-success fw-bold">R$ {{ object.valor_documento|currency_br }}</span>
+                            </dd>
+                            <dt class="col-sm-5 mt-2">ISS</dt>
+                            <dd class="col-sm-7 mt-2">
+                                <span class="text-danger">R$ {{ object.valor_iss|currency_br }}</span>
+                            </dd>
+                            <dt class="col-sm-5 mt-2">IRRF</dt>
+                            <dd class="col-sm-7 mt-2">
+                                <span class="text-danger">R$ {{ object.valor_irrf|currency_br }}</span>
+                            </dd>
+                            <dt class="col-sm-5 mt-2">Valor Líquido</dt>
+                            <dd class="col-sm-7 mt-2">
+                                <span class="text-primary fw-bold">R$ {{ object.valor_liquido|currency_br }}</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'documentos/css/documentos.css' %}">
+{% endblock extra_css %}

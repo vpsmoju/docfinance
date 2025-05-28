@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <meta name="keywords"
+          content="DocFinance, ativação de conta, gestão financeira, finanças pessoais, plataforma financeira">
+    <meta name="description"
+          content="Email de ativação de conta do DocFinance - Ative sua conta para começar a usar nossa plataforma de gestão financeira.">
+    <head>
+        <meta charset="UTF-8">
+        <title>Ative sua conta no DocFinance</title>
+        <style>{% include 'usuarios/email_styles.html' %}</style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>DocFinance</h1>
+            </div>
+            <div class="content">
+                <h2>Olá, {{ user.first_name }}!</h2>
+                <p>Obrigado por se registrar no DocFinance. Para ativar sua conta, clique no botão abaixo:</p>
+                <div style="text-align: center;">
+                    <a href="{{ activation_link }}" class="button">Ativar Minha Conta</a>
+                </div>
+                <p>Ou copie e cole o seguinte link no seu navegador:</p>
+                <p>{{ activation_link }}</p>
+                <p>Se você não se registrou no DocFinance, por favor ignore este e-mail.</p>
+                <p>
+                    Atenciosamente,
+                    <br>
+                    Equipe DocFinance
+                </p>
+            </div>
+            <div class="footer">
+                <p>Este é um e-mail automático, por favor não responda.</p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+/* Estilos para os campos de valores financeiros */
+.input-group-valores {
+    max-width: 180px; /* Largura máxima para os grupos de entrada */
+    margin-left: auto; /* Alinha à direita */
+    margin-right: 0; /* Garante que não haja margem à direita */
+}
+
+/* Estilo para as labels dos campos informações básicas */
+.lado-esquerdo .form-label {
+    font-weight: bold;
+}
+
+/* Estilo para as labels dos campos de valores */
+.lado-direito .form-label {
+    margin-left: 90px; /* Adiciona margem à esquerda das labels */
+    font-weight: bold;
+}
+
+/* Altura reduzida para o campo de descrição */
+.campo-descricao-reduzida {
+    height: 80px !important; /* Altura reduzida para 3 linhas aproximadamente */
+    min-height: 80px;
+}
+
+/* Estilo para campos obrigatórios */
+.required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 4px;
+}
+
+/* Ajuste para campos de formulário */
+.input-group.flex-nowrap input,
+.input-group.flex-nowrap select,
+.input-group.flex-nowrap textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0; /* Importante para evitar overflow */
+}
+
+/* Adicionando os paddings específicos para o formulário */
+#lado-esquerdo, .lado-esquerdo {
+    padding-right: 25px;
+    padding-left: 0;
+}
+
+#lado-direito, .lado-direito {
+    padding-right: 0;
+    padding-left: 25px;
+}

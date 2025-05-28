@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% load widget_tweaks %}
+{% block title %}
+    Perfil
+{% endblock title %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Informações do Usuário</h3>
+                </div>
+                <div class="card-body text-center">
+                    {% if user.perfil.foto %}
+                        <img src="{{ user.perfil.foto.url }}"
+                             alt="Foto de perfil"
+                             class="rounded-circle img-fluid mb-3 profile-photo"
+                             width="150"
+                             height="150">
+                    {% else %}
+                        <img src="https://via.placeholder.com/150"
+                             alt="Foto de perfil padrão"
+                             class="rounded-circle img-fluid mb-3"
+                             width="150"
+                             height="150">
+                    {% endif %}
+                    <h4>{{ user.get_full_name }}</h4>
+                    <p>{{ user.email }}</p>
+                    {% if user.perfil.telefone %}<p>Telefone: {{ user.perfil.telefone }}</p>{% endif %}
+                    {% if user.perfil.matricula %}<p>Matrícula: {{ user.perfil.matricula }}</p>{% endif %}
+                    {% if user.perfil.cpf %}<p>CPF: {{ user.perfil.cpf }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Atualizar Perfil</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in perfil_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field|add_class:"form-control" }}
+                                {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Atualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

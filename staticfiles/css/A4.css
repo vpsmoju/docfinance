@@ -1,0 +1,42 @@
+/* Configurações para impressão em formato A4 */
+
+/* Configuração básica do container para visualização em tela */
+.relatorio-container {
+    max-width: 210mm;
+    margin: 0 auto;
+}
+
+/* Configurações para impressão */
+@media print {
+    /* Ocultar elementos na impressão */
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Configuração da página */
+    @page {
+        size: A4;
+        margin: 1cm 0.5cm 1cm 0.5cm;
+    }
+    
+    /* Força o navegador a usar as margens definidas */
+    html, body {
+        height: 99%;
+        /* Remover overflow: hidden que pode estar causando problemas */
+        /* overflow: hidden; */
+    }
+    
+    /* Desativa qualquer escala automática do navegador */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        max-width: 100% !important;
+    }
+    
+    /* Força a largura total do conteúdo */
+    .container, .container-fluid, .row, .col, div {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}

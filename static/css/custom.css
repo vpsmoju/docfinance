@@ -1,0 +1,177 @@
+:root {
+    /* Cores principais baseadas na logo da Prefeitura de Moju */
+    --primary: #006633;      /* Verde escuro */
+    --secondary: #008542;    /* Verde médio */
+    --accent: #FFD700;       /* Dourado/amarelo do brasão */
+    --primary-fg: #fff;      /* Texto branco sobre fundos coloridos */
+    
+    /* Cores de interface */
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-medium-color: #444;
+    --body-loud-color: #000;
+    
+    /* Cabeçalho */
+    --header-color: #fff;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--primary);
+    --header-link-color: var(--primary-fg);
+    
+    /* Navegação */
+    --breadcrumbs-fg: #e0f0e8;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--secondary);
+    
+    /* Links */
+    --link-fg: #006633;
+    --link-hover-color: #008542;
+    --link-selected-fg: var(--secondary);
+    
+    /* Bordas e separadores */
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
+    
+    /* Mensagens */
+    --message-success-bg: #d4edda;
+    --message-warning-bg: #fff3cd;
+    --message-error-bg: #f8d7da;
+    
+    /* Botões */
+    --button-fg: #fff;
+    --button-bg: var(--primary);
+    --button-hover-bg: var(--secondary);
+    --default-button-bg: var(--secondary);
+    --default-button-hover-bg: var(--primary);
+    --close-button-bg: #747474;
+    --close-button-hover-bg: #333;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
+}
+
+/* Estilos adicionais para elementos específicos */
+.navbar {
+    background-color: var(--primary) !important;
+}
+.navbar-brand {
+    padding: 0;
+}
+
+.btn-outline-primary {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-outline-light {
+    color: cyan; /* cor do texto do botão */
+    border-color: cyan; /* cor da borda do botão */
+    /* background-color: var(--primary-fg); cor de fundo do botão */
+}
+.btn-outline-light:hover {
+    color: var(--primary-fg); /* cor do texto quando o botão é passado */
+    border-color: var(--primary); /* cor da borda quando o botão é passado */
+    background-color: var(--primary); /* cor de fundo quando o botão é passado */
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.card-header {
+    background-color: var(--secondary);
+    color: white;
+}
+
+/* Estilo para o rodapé */
+footer {
+    background-color: var(--primary);
+    color: white;
+    flex-shrink: 0;
+}
+
+/* Estilo para links no rodapé */
+footer a {
+    color: var(--accent);
+}
+
+/* Estilo para o parágrafo do rodapé */
+footer p {
+    margin: 0;
+}
+
+/* Estilo para o título principal */
+.main-title {
+    color: var(--primary);
+}
+
+/* Estilo para mensagens de proteção do admin */
+.admin-protection-alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 5px solid #dc3545;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.admin-protection-alert i {
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #dc3545;
+}
+
+/* Animação para destacar a mensagem */
+@keyframes highlight {
+    0% { background-color: #f8d7da; }
+    50% { background-color: #f5c6cb; }
+    100% { background-color: #f8d7da; }
+}
+
+.admin-protection-alert {
+    animation: highlight 2s ease-in-out;
+}
+
+/* Estilo para ícones nos cards */
+.card .fa-3x {
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .fa-3x {
+    transform: scale(1.2);
+}
+
+.card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* texto dos números dentro dos cards do DASHBOARD */
+/* .card-text {
+    color: #6c757d;
+} */

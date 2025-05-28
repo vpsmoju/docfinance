@@ -1,0 +1,34 @@
+/* Estilos para o card de fornecedores */
+/* .fornecedor-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+} */
+
+/* .section-title {
+    color: var(--primary);
+    font-weight: 500;
+} */
+
+/* Estilo para campos obrigatórios */
+.required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 4px;
+}
+
+/* Ajuste para campos de formulário */
+.input-group.flex-nowrap input,
+.input-group.flex-nowrap select,
+.input-group.flex-nowrap textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0; /* Importante para evitar overflow */
+}
+
+/* Controle de altura para o campo de endereço */
+#id_endereco {
+    height: calc(1.5em + 0.75rem + 2px) !important;
+    min-height: unset !important;
+    resize: none;
+}

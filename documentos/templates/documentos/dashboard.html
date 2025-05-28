@@ -1,0 +1,149 @@
+{% extends "base/base.html" %}
+{% block title %}
+    Dashboard | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="row">
+        <!-- Cards de Resumo -->
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Documentos Pendentes</h5>
+                    <h2 class="card-text">{{ total_pendentes }}</h2>
+                    <p>Valor Total: R$ {{ valor_pendente|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Documentos Pagos</h5>
+                    <h2 class="card-text">{{ total_pagos }}</h2>
+                    <p>Valor Total: R$ {{ valor_pago|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Documentos Atrasados</h5>
+                    <h2 class="card-text">{{ total_atrasados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Documentos</h5>
+                    <h2 class="card-text">{{ total_pendentes|add:total_pagos|add:total_atrasados }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Gráficos -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Documentos por Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Valores por Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="valoresChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Últimos Documentos -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Últimos Documentos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fornecedor</th>
+                            <th>Data Pagamento</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in ultimos_documentos %}
+                            <tr>
+                                <td>{{ doc.numero }}</td>
+                                <td>{{ doc.fornecedor }}</td>
+                                <td>{{ doc.data_pagamento }}</td>
+                                <td>R$ {{ doc.valor_liquido }}</td>
+                                <td>
+                                    {% if doc.status == 'PEN' %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% elif doc.status == 'PAG' %}
+                                        <span class="badge bg-success">Pago</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Atrasado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'documentos:detail' doc.pk %}"
+                                       class="btn btn-sm btn-info">Ver</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% block extra_js %}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+    // Gráfico de Status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Pendentes', 'Pagos', 'Atrasados'],
+            datasets: [{
+                data: [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
+                backgroundColor: ['#ffc107', '#198754', '#dc3545']
+            }]
+        }
+    });
+
+    // Gráfico de Valores
+    const valoresCtx = document.getElementById('valoresChart').getContext('2d');
+    new Chart(valoresCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Pendente', 'Pago'],
+            datasets: [{
+                label: 'Valor Total (R$)',
+                data: [{{ valor_pendente }}, {{ valor_pago }}],
+                backgroundColor: ['#ffc107', '#198754']
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+        </script>
+    {% endblock extra_js %}
+{% endblock content %}

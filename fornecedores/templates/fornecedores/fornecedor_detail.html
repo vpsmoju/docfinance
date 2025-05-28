@@ -1,0 +1,154 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load fornecedor_filters %}
+{% block title %}
+    {{ fornecedor.nome }} | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card fornecedor-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    <i class="bi bi-person-vcard me-2"></i>Detalhes do Fornecedor
+                </h3>
+                <div>
+                    <a href="{% url 'fornecedores:fornecedor_update' fornecedor.id %}"
+                       class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                    <a href="{% url 'fornecedores:fornecedor_list' %}"
+                       class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Voltar para lista
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Informações Básicas</h5>
+                        <div class="mb-4">
+                            <p class="mb-1">
+                                <strong>Nome:</strong>
+                            </p>
+                            <p class="bg-light p-2 rounded">{{ fornecedor.nome }}</p>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Tipo:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.get_tipo_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>CNPJ/CPF:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.cnpj_cpf }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Informações de Contato</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Email:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.email|default:"Não informado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Telefone:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.telefone|default:"Não informado" }}</p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <p class="mb-1">
+                                <strong>Endereço:</strong>
+                            </p>
+                            <p class="bg-light p-2 rounded">{{ fornecedor.endereco|default:"Não informado"|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nova seção de Dados Bancários -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Dados Bancários</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Banco:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.banco|default:"Não informado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Tipo de Conta:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.get_tipo_conta_display|default:"Não informado" }}</p>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Agência:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.agencia|format_agencia|default:"Não informado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Conta:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.conta|format_conta|default:"Não informado" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5 class="section-title border-bottom pb-2 mb-3">Informações do Sistema</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Data de Cadastro:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.data_criacao|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1">
+                                    <strong>Última Atualização:</strong>
+                                </p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'fornecedores:fornecedor_delete' fornecedor.id %}"
+                       class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Excluir Fornecedor
+                    </a>
+                    <a href="{% url 'fornecedores:fornecedor_update' fornecedor.id %}"
+                       class="btn btn-primary">
+                        <i class="bi bi-pencil me-1"></i>Editar Fornecedor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet"
+          href="{% static 'fornecedores/css/fornecedores.css' %}">
+{% endblock extra_css %}
+{% block extra_js %}
+    <script>
+        $(document).ready(function(){
+            $('#id_agencia').mask('0000-0');
+            $('#id_conta').mask('0000000000-0');
+        });
+    </script>
+{% endblock extra_js %}

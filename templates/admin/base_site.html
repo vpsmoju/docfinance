@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}
+    {{ title }} | DocFinance - Prefeitura de Moju
+{% endblock title %}
+{% block extrastyle %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/admin_custom.css' %}">
+{% endblock extrastyle %}
+{% block branding %}
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">DocFinance - Prefeitura de Moju</a>
+    </h1>
+{% endblock branding %}

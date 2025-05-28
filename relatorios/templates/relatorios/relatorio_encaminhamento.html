@@ -1,0 +1,115 @@
+{% extends "base/base.html" %}
+{% load custom_filters %}
+{% load static %}
+{% block title %}
+    Relatório de Encaminhamento para Controle Interno
+{% endblock title %}
+{% block content %}
+    <div class="container mt-4 no-print">
+        <div class="row mb-3 justify-content-center">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="numeroOficio">Número do Ofício:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="numeroOficio"
+                           placeholder="Número do ofício">
+                </div>
+            </div>
+            <div class="col-md-5 text-end">
+                <button type="button" id="printReport" class="btn btn-primary no-print">
+                    <i class="bi bi-printer"></i> Imprimir Relatório
+                </button>
+                <a href="{% url 'relatorios:filtro_encaminhamento' %}"
+                   class="btn btn-secondary no-print">Voltar</a>
+            </div>
+        </div>
+    </div>
+    <div class="relatorio-container">
+        <div class="card">
+            <div class="card-body">
+                <div class="relatorio-header">
+                    <img src="{% static 'img/brasao_moju.png' %}"
+                         alt="Brasão de Moju"
+                         width="15%"
+                         height="80">
+                    <h5>PREFEITURA MUNICIPAL DE MOJU</h5>
+                    <h6>SECRETARIA MUNICIPAL DE FAZENDA</h6>
+                    <p class="mb-0">Departamento Financeiro</p>
+                    <hr>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between">
+                        <p class="texto-esquerda">
+                            Ofício Nº <span id="numeroOficioTexto">_____</span>/<span id="anoOficio">____</span>/DIREF
+                        </p>
+                        <p class="texto-direita" id="dataAtual">Moju(PA), ____ de ____________ de ______.</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <p class="mb-1 texto-esquerda">AO CONTROLE INTERNO</p>
+                    <p class="mb-1 texto-esquerda">
+                        <strong>{{ destinatario|default:"RODRIGO BASTOS DE LIMA" }}</strong>
+                    </p>
+                    <p class="texto-esquerda">Controlador Municipal</p>
+                </div>
+                <div class="mb-4">
+                    <p class="texto-esquerda texto-tabulado-duplo">Prezado Controlador,</p>
+                    <p class="texto-justificado texto-tabulado-duplo">
+                        Ao cumprimentá-lo, de ordem da Secretaria Municipal de Fazenda, sirvo-me do presente expediente para encaminhar a esta controladoria as seguintes solicitações de despesas:
+                    </p>
+                </div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="texto-centro">Fornecedor</th>
+                                <th class="texto-centro">Nº Nota Fiscal/Recibo</th>
+                                <th class="texto-centro">Valor</th>
+                                <th class="texto-centro">Referência/Mês</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documentos %}
+                                <tr>
+                                    <td>{{ doc.fornecedor.nome }}</td>
+                                    <td class="texto-centro">{{ doc.numero_documento }}</td>
+                                    <td class="texto-direita">R$ {{ doc.valor_documento|currency_br }}</td>
+                                    <td class="texto-centro">{{ doc.data_documento|date:"F/Y"|capfirst }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Nenhum documento encontrado.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mb-4">
+                    <p class="texto-justificado texto-tabulado-duplo">
+                        No caso da(s) despesa(s) ser(em) considerada(s) apta(s) para pagamento, peço que retorne de volta a este departamento financeiro.
+                    </p>
+                    <p class="texto-justificado texto-tabulado-duplo">Cordialmente,</p>
+                </div>
+                <!-- Espaçador adicional -->
+                <div class="espacador-assinatura"></div>
+                <div class="text-center mt-5 assinatura-compacta">
+                    <p class="linha-assinatura mb-0">__________________________________________</p>
+                    <p class="mb-0">
+                        <strong>{{ secretario_nome|default:"CARLOS EDUARDO ALVES DA SILVA" }}</strong>
+                    </p>
+                    <p class="mb-0">Secretário Municipal de Fazenda</p>
+                    <p>Decreto: {{ secretario_decreto|default:"008/2023" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block extra_css %}
+        <link rel="stylesheet" href="{% static 'relatorios/css/relatorios.css' %}">
+        <link rel="stylesheet" href="{% static 'relatorios/css/A4.css' %}">
+    {% endblock extra_css %}
+    {% block extra_js %}
+        <script src="{% static 'relatorios/js/config_print.js' %}"></script>
+        <script src="{% static 'relatorios/js/num_oficio.js' %}"></script>
+    {% endblock extra_js %}
+{% endblock content %}

@@ -1,0 +1,84 @@
+/* Classe utilitária para esconder elementos */
+.d-none {
+    display: none;
+}
+
+/* Estilos personalizados para mensagens */
+.alert {
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo específico para mensagens de sucesso ou erro */
+.alert-success {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Estilos para formulários */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Exibição de tela transparente de notificação */
+.toast-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 15px 25px;
+    border-radius: 5px;
+    z-index: 9999;
+    max-width: 80%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeInCenter 14s ease-in-out forwards;
+}
+
+@keyframes fadeInCenter {
+    0% { 
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    7% { 
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% { 
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+}

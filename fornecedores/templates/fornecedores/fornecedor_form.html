@@ -1,0 +1,174 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Fornecedor | DocFinance
+    {% else %}
+        Novo Fornecedor | DocFinance
+    {% endif %}
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card fornecedor-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    {% if form.instance.pk %}
+                        <i class="bi bi-pencil-square me-2"></i>Editar Fornecedor
+                    {% else %}
+                        <i class="bi bi-plus-circle me-2"></i>Novo Fornecedor
+                    {% endif %}
+                </h3>
+                <a href="{% url 'fornecedores:fornecedor_list' %}"
+                   class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar para lista
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <!-- Informações Básicas -->
+                        <div class="col-12">
+                            <h5 class="section-title border-bottom pb-2 mb-2">Informações Básicas</h5>
+                        </div>
+                        <!-- Reorganização: Tipo, CNPJ/CPF, Nome -->
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label required-field">Tipo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                    {{ form.tipo }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.cnpj_cpf.id_for_label }}"
+                                       class="form-label required-field">CNPJ/CPF</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    {{ form.cnpj_cpf }}
+                                </div>
+                                <div class="form-text">Formato: 000.000.000-00 (CPF) ou 00.000.000/0000-00 (CNPJ)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.nome.id_for_label }}" class="form-label required-field">Nome</label>
+                                <div class="input-group flex-nowrap">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    {{ form.nome }}
+                                </div>
+                                <div class="form-text">Nome completo do fornecedor ou empresa</div>
+                            </div>
+                        </div>
+                        <!-- Informações de Contato -->
+                        <div class="col-12 mt-4">
+                            <h5 class="section-title border-bottom pb-2 mb-2">Informações de Contato</h5>
+                        </div>
+                        <!-- Reorganização: Email, Telefone, Endereço -->
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                <div class="input-group flex-nowrap">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                    {{ form.telefone }}
+                                </div>
+                                <div class="form-text">Formato: (00) 00000-0000</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço</label>
+                                <div class="input-group flex-nowrap">
+                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                    {{ form.endereco }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dados Bancários (Nova Seção) -->
+                        <div class="col-12 mt-4">
+                            <h5 class="section-title border-bottom pb-2 mb-2">Dados Bancários</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.banco.id_for_label }}" class="form-label">Banco</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-bank"></i></span>
+                                    {{ form.banco }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.tipo_conta.id_for_label }}" class="form-label">Tipo de Conta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                                    {{ form.tipo_conta }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.agencia.id_for_label }}" class="form-label">Agência</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                    {{ form.agencia }}
+                                </div>
+                                <div class="form-text">Formato: 0000-0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.conta.id_for_label }}" class="form-label">Conta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-wallet2"></i></span>
+                                    {{ form.conta }}
+                                </div>
+                                <div class="form-text">Formato: 12-3, 1234-5, etc</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'fornecedores:fornecedor_list' %}"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>Salvar Fornecedor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet"
+          href="{% static 'fornecedores/css/fornecedores.css' %}">
+{% endblock extra_css %}
+{% block extra_js %}
+    <script src="{% static 'js/masc_cpf_cnpj.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            $('#{{ form.agencia.id_for_label }}').mask('0000-0');
+            $('#{{ form.conta.id_for_label }}').on('input', function(e) {
+                var value = $(this).val().replace(/\D/g, '');
+                if (value.length > 0) {
+                    var formatted = value.slice(0, -1) + '-' + value.slice(-1);
+                    $(this).val(formatted);
+                }
+            });
+        });
+    </script>
+{% endblock extra_js %}

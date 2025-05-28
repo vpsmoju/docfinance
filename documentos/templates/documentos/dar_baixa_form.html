@@ -1,0 +1,50 @@
+{% extends "base/base.html" %}
+{% block title %}
+    Dar Baixa em Documento | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3>Baixa em Documento</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Informações do Documento</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Número:</th>
+                            <td>{{ documento.numero }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fornecedor:</th>
+                            <td>{{ documento.fornecedor }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor:</th>
+                            <td>R$ {{ documento.valor_liquido|floatformat:2 }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.data_pagamento.id_for_label }}" class="form-label">{{ form.data_pagamento.label }}</label>
+                    {{ form.data_pagamento }}
+                    {% if form.data_pagamento.errors %}
+                        <div class="invalid-feedback d-block">{{ form.data_pagamento.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Ao dar baixa neste documento, você está confirmando que o pagamento foi realizado na data informada.
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'documentos:detail' documento.pk %}"
+                       class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Confirmar Baixa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

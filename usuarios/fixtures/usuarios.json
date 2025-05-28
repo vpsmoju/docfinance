@@ -1,0 +1,108 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "usuario_teste",
+      "password": "pbkdf2_sha256$600000$abcdefghijklmnopqrstuvwxyz$1234567890abcdefghijklmnopqrstuvwxyz=",
+      "email": "teste@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-01-01T00:00:00Z",
+      "last_login": null,
+      "first_name": "Usuário",
+      "last_name": "Teste"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "admin_teste",
+      "password": "pbkdf2_sha256$600000$abcdefghijklmnopqrstuvwxyz$1234567890abcdefghijklmnopqrstuvwxyz=",
+      "email": "admin@example.com",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": false,
+      "date_joined": "2023-01-01T00:00:00Z",
+      "last_login": null,
+      "first_name": "Admin",
+      "last_name": "Teste"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "pendente_teste",
+      "password": "pbkdf2_sha256$600000$abcdefghijklmnopqrstuvwxyz$1234567890abcdefghijklmnopqrstuvwxyz=",
+      "email": "pendente@example.com",
+      "is_active": false,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2023-01-01T00:00:00Z",
+      "last_login": null,
+      "first_name": "Pendente",
+      "last_name": "Teste"
+    }
+  },
+  {
+    "model": "usuarios.perfil",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "telefone": "(91) 98765-4321",
+      "matricula": "USR001",
+      "cpf": "111.111.111-11",
+      "status": "aprovado",
+      "foto": ""
+    }
+  },
+  {
+    "model": "usuarios.perfil",
+    "pk": 2,
+    "fields": {
+      "usuario": 2,
+      "telefone": "(91) 12345-6789",
+      "matricula": "ADM001",
+      "cpf": "222.222.222-22",
+      "status": "aprovado",
+      "foto": ""
+    }
+  },
+  {
+    "model": "usuarios.perfil",
+    "pk": 3,
+    "fields": {
+      "usuario": 3,
+      "telefone": "(91) 55555-5555",
+      "matricula": "PND001",
+      "cpf": "333.333.333-33",
+      "status": "pendente",
+      "foto": ""
+    }
+  },
+  {
+    "model": "usuarios.logatividade",
+    "pk": 1,
+    "fields": {
+      "usuario": 1,
+      "acao": "Login",
+      "detalhes": "Usuário usuario_teste fez login no sistema",
+      "data_hora": "2023-01-01T12:00:00Z",
+      "ip": "127.0.0.1"
+    }
+  },
+  {
+    "model": "usuarios.logatividade",
+    "pk": 2,
+    "fields": {
+      "usuario": 2,
+      "acao": "Login",
+      "detalhes": "Usuário admin_teste fez login no sistema",
+      "data_hora": "2023-01-01T12:30:00Z",
+      "ip": "127.0.0.1"
+    }
+  }
+]

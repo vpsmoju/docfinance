@@ -1,0 +1,72 @@
+[project]
+name = "DocFinance"
+version = "0.1.0"
+description = "Sistema de gerenciamento de documentos financeiros"
+requires-python = ">=3.12.4"
+
+dependencies = [
+    "Django>=5.2.1",
+    "django-crispy-forms~=2.0",
+    "crispy-bootstrap5>=0.7",
+    "python-dotenv~=1.1.0"
+]
+
+[tool.setuptools]
+packages = [
+    "usuarios",
+    "documentos",
+    "relatorios",
+    "fornecedores",
+    "config"
+]
+
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# Configuração do Ruff
+[tool.ruff]
+line-length = 88
+target-version = "py312"  # Ajustado para sua versão do Python
+
+[tool.ruff.lint]
+# Regras a serem ativadas
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "DJ",   # flake8-django
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+]
+
+# Regras a serem ignoradas
+ignore = [
+    "E203",  # Whitespace before ':' (conflito com Black)
+    "E501",  # Line too long (gerenciado pelo formatter)
+    # Adicione temporariamente estas regras para facilitar a transição
+    "DJ001"  # Avoid using null=True on string-based fields (temporário até corrigir os modelos)
+]
+
+# Configurações específicas para Django
+[tool.ruff.lint.isort]
+known-third-party = ["django", "rest_framework", "crispy_forms", "crispy_bootstrap5"]
+
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*.py" = ["E501", "F401", "DJ"]  # Ignorar regras em arquivos de migração
+"*/settings/*.py" = ["F403", "F405"]  # Permitir imports com *
+"*/tests/*.py" = ["F841", "E722", "B007", "DJ"]  # Ignorar regras específicas em testes
+"get-pip.py" = ["E402"]  # Ignorar imports não no topo em get-pip.py
+"documentos/permissions.py" = ["F811"]  # Ignorar redefinição em permissions.py
+
+[tool.ruff.format]
+quote-style = "double"  # Use aspas duplas (estilo Django)
+indent-style = "space"  # Use espaços para indentação
+line-ending = "auto"    # Detectar automaticamente
+
+[tool.isort]
+skip_gitignore = true
+skip = ["notebooks", "resources", "data"]

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <meta name="keywords"
+          content="DocFinance, notificação, administrador, novo usuário, registro, aprovação, sistema financeiro">
+    <meta name="description"
+          content="Email de notificação para administradores sobre novos registros de usuários no sistema DocFinance">
+    <title>DocFinance - Notificação de Novo Usuário</title>
+    <head>
+        <meta charset="UTF-8">
+        <style>{% include 'usuarios/email_styles.html' %}</style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>DocFinance - Novo Usuário Registrado</h2>
+            </div>
+            <div class="content">
+                <p>Olá Administrador,</p>
+                <p>Um novo usuário se registrou no sistema DocFinance e está aguardando aprovação.</p>
+                <h3>Detalhes do Usuário:</h3>
+                <ul>
+                    <li>
+                        <strong>Nome de usuário:</strong> {{ user.username }}
+                    </li>
+                    <li>
+                        <strong>Nome completo:</strong> {{ user.get_full_name }}
+                    </li>
+                    <li>
+                        <strong>E-mail:</strong> {{ user.email }}
+                    </li>
+                    <li>
+                        <strong>Data de registro:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}
+                    </li>
+                </ul>
+                <p>Por favor, revise e aprove ou rejeite este usuário o mais breve possível.</p>
+                <a href="{{ pendentes_url }}" class="button">Ver Usuários Pendentes</a>
+            </div>
+            <div class="footer">
+                <p>Este é um e-mail automático, por favor não responda.</p>
+                <p>Copyright © DocFinance {% now "Y" %}</p>
+            </div>
+        </div>
+    </body>
+</html>

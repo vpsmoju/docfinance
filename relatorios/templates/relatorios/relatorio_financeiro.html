@@ -1,0 +1,157 @@
+{% extends "relatorios/relatorio_base.html" %}
+{% load custom_filters %}
+{% load static %}
+{% block relatorio_titulo %}
+    Relatório Financeiro
+{% endblock relatorio_titulo %}
+{% block filtros %}
+    {{ block.super }}
+    <div class="col-md-3 mb-2">
+        <label for="tipo_agrupamento" class="form-label">Agrupar por</label>
+        <select id="tipo_agrupamento" name="tipo_agrupamento" class="form-select">
+            <option value="mes"
+                    {% if request.GET.tipo_agrupamento == 'mes' %}selected{% endif %}>Mês</option>
+            <option value="secretaria"
+                    {% if request.GET.tipo_agrupamento == 'secretaria' %}selected{% endif %}>Secretaria</option>
+            <option value="recurso"
+                    {% if request.GET.tipo_agrupamento == 'recurso' %}selected{% endif %}>Recurso</option>
+        </select>
+    </div>
+    <div class="col-md-3 mb-2">
+        <label for="fornecedor" class="form-label">Fornecedor</label>
+        <input type="text"
+               id="fornecedor"
+               name="fornecedor"
+               class="form-control"
+               value="{{ fornecedor }}">
+    </div>
+    <div class="col-md-3 mb-2">
+        <label for="valor_min" class="form-label">Valor Mínimo</label>
+        <input type="number"
+               id="valor_min"
+               name="valor_min"
+               class="form-control"
+               value="{{ valor_min }}"
+               step="0.01">
+    </div>
+    <div class="col-md-3 mb-2">
+        <label for="valor_max" class="form-label">Valor Máximo</label>
+        <input type="number"
+               id="valor_max"
+               name="valor_max"
+               class="form-control"
+               value="{{ valor_max }}"
+               step="0.01">
+    </div>
+{% endblock filtros %}
+{% block relatorio_conteudo %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Resumo Financeiro</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total de Documentos</h6>
+                                    <h3 class="mb-0">{{ total_documentos }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Valor Total</h6>
+                                    <h3 class="mb-0">R$ {{ total_valor|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Valor Pendente</h6>
+                                    <h3 class="mb-0">R$ {{ total_pendente|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Valor Pago</h6>
+                                    <h3 class="mb-0">R$ {{ total_pago|currency_br }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ agrupamento_titulo }}</th>
+                                    <th class="text-center">Documentos</th>
+                                    <th class="text-end">Valor Total</th>
+                                    <th class="text-end">Valor Pago</th>
+                                    <th class="text-end">Valor Pendente</th>
+                                    <th class="text-end">% do Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in resumo_financeiro %}
+                                    <tr>
+                                        <td>{{ item.nome }}</td>
+                                        <td class="text-center">{{ item.total_documentos }}</td>
+                                        <td class="text-end">R$ {{ item.valor_total|currency_br }}</td>
+                                        <td class="text-end">R$ {{ item.valor_pago|currency_br }}</td>
+                                        <td class="text-end">R$ {{ item.valor_pendente|currency_br }}</td>
+                                        <td class="text-end">{{ item.percentual|floatformat:2 }}%</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">Nenhum dado encontrado.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-dark">
+                                <tr>
+                                    <th>Total</th>
+                                    <th class="text-center">{{ total_documentos }}</th>
+                                    <th class="text-end">R$ {{ total_valor|currency_br }}</th>
+                                    <th class="text-end">R$ {{ total_pago|currency_br }}</th>
+                                    <th class="text-end">R$ {{ total_pendente|currency_br }}</th>
+                                    <th class="text-end">100%</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Gráfico de Distribuição</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="financialChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock relatorio_conteudo %}
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('financialChart').getContext('2d');
+    const labels = [{% for item in resumo_financeiro %}'{{ item.nome }}',{% endfor %}];
+    const valores = [{% for item in resumo_financeiro %}{{ item.valor_total }},{% endfor %}];
+    configurarGraficoBarra(ctx, labels, valores, 'Valor Total');
+});
+    </script>
+{% endblock extra_js %}

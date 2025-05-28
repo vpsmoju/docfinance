@@ -1,0 +1,338 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Documento | DocFinance
+    {% else %}
+        Novo Documento | DocFinance
+    {% endif %}
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    {% if form.instance.pk %}
+                        <i class="bi bi-pencil-square me-2"></i>Editar Documento
+                    {% else %}
+                        <i class="bi bi-plus-circle me-2"></i>Novo Documento
+                    {% endif %}
+                </h3>
+                <a href="{% url 'documentos:list' %}"
+                   class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar para lista
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post" id="documentoForm">
+                    {% csrf_token %}
+                    <!-- Removido justify-content-around que estava criando as margens laterais -->
+                    <div class="row">
+                        <!-- LADO ESQUERDO: Informações Básicas -->
+                        <div class="col-md-8 lado-esquerdo" id="lado-esquerdo">
+                            <h5>.:: Informações Básicas ::.</h5>
+                            <hr class="mt-1 mb-3">
+                            <!-- Número e Data de Protocolo na mesma linha -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.numero.id_for_label }}" class="form-label">Número do Protocolo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-123"></i></span>
+                                        {% if form.instance.pk %}
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ form.instance.numero }}"
+                                                   readonly>
+                                            <input type="hidden" name="numero" value="{{ form.instance.numero }}">
+                                        {% else %}
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="Gerado automaticamente"
+                                                   readonly>
+                                            <input type="hidden"
+                                                   name="numero"
+                                                   value="TEMP_{{ request.user.id }}_{% now "U" %}">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.data_entrada.id_for_label }}" class="form-label">Data de Protocolo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                                        {% if form.instance.pk %}
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value="{{ form.instance.data_entrada|date:'d/m/Y H:i' }}"
+                                                   readonly>
+                                            {{ form.data_entrada.as_hidden }}
+                                        {% else %}
+                                            <input type="text"
+                                                   class="form-control"
+                                                   value='{% now "d/m/Y H:i" %}'
+                                                   readonly>
+                                            {{ form.data_entrada.as_hidden }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Secretaria e Recurso na mesma linha -->
+                            <!-- Secretaria e Recurso na mesma linha -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.secretaria.id_for_label }}" class="form-label">Secretaria</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                        <select name="secretaria"
+                                                id="{{ form.secretaria.id_for_label }}"
+                                                class="form-control form-select">
+                                            {% for value, text in form.fields.secretaria.choices %}
+                                                <option value="{{ value }}"
+                                                        {% if form.instance.secretaria == value %}selected{% endif %}>
+                                                    {{ text }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% if form.secretaria.errors %}<div class="invalid-feedback d-block">{{ form.secretaria.errors }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.recurso.id_for_label }}" class="form-label">Recurso</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-cash-coin"></i></span>
+                                        <select name="recurso"
+                                                id="{{ form.recurso.id_for_label }}"
+                                                class="form-control form-select">
+                                            {% for value, text in form.fields.recurso.choices %}
+                                                <option value="{{ value }}"
+                                                        {% if form.instance.recurso == value %}selected{% endif %}>
+                                                    {{ text }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% if form.recurso.errors %}<div class="invalid-feedback d-block">{{ form.recurso.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+                            <!-- Tipo, Data do Documento e CPF/CNPJ na mesma linha -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-file-earmark-text"></i></span>
+                                        <select name="tipo"
+                                                id="{{ form.tipo.id_for_label }}"
+                                                class="form-control form-select">
+                                            {% for value, text in form.fields.tipo.choices %}
+                                                <option value="{{ value }}"
+                                                        {% if form.instance.tipo == value %}selected{% endif %}>
+                                                    {{ text }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    {% if form.data_documento %}
+                                        <label for="{{ form.data_documento.id_for_label }}" class="form-label">Data do Documento</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                            {{ form.data_documento }}
+                                        </div>
+                                    {% else %}
+                                        <label for="{{ form.data_documento.id_for_label }}" class="form-label">Data do Documento</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                            {{ form.data_documento }}
+                                        </div>
+                                        {% if form.data_documento.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.data_documento.errors }}</div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="cnpj_cpf" class="form-label">CPF/CNPJ</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                                        <input type="text"
+                                               id="cnpj_cpf"
+                                               class="form-control"
+                                               placeholder="Digite o CPF/CNPJ">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Número do Documento e Fornecedor na mesma linha -->
+                            <div class="row mb-3">
+                                <div class="col-md-4" id="div_numero_documento">
+                                    {% if form.numero_documento %}
+                                        <label for="{{ form.numero_documento.id_for_label }}" class="form-label">Documento nº</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                            <input type="text"
+                                                   name="numero_documento"
+                                                   id="{{ form.numero_documento.id_for_label }}"
+                                                   class="form-control"
+                                                   value="{% if form.instance.numero_documento %}{{ form.instance.numero_documento }}{% endif %}"
+                                                   placeholder="Número do documento">
+                                        </div>
+                                    {% else %}
+                                        <label for="{{ form.numero_documento.id_for_label }}" class="form-label">Documento nº</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                            <input type="text"
+                                                   name="numero_documento"
+                                                   id="{{ form.numero_documento.id_for_label }}"
+                                                   class="form-control"
+                                                   value="{% if form.instance.numero_documento %}{{ form.instance.numero_documento }}{% endif %}"
+                                                   placeholder="Número do documento">
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="{{ form.fornecedor.id_for_label }}" class="form-label">Fornecedor</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="fornecedor_display"
+                                               value="{% if form.instance.fornecedor %}{{ form.instance.fornecedor }}{% else %}Será preenchido pelo CPF/CNPJ{% endif %}"
+                                               readonly>
+                                        {{ form.fornecedor.as_hidden }}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Descrição com altura reduzida -->
+                            <div class="mb-3">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    {% if form.descricao %}
+                                        <textarea name="descricao"
+                                                  id="{{ form.descricao.id_for_label }}"
+                                                  class="form-control campo-descricao-reduzida"
+                                                  rows="3">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
+                                    {% else %}
+                                        <textarea name="descricao"
+                                                  id="{{ form.descricao.id_for_label }}"
+                                                  class="form-control campo-descricao-reduzida"
+                                                  rows="3">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
+                                    {% endif %}
+                                </div>
+                                {% if form.descricao.errors %}<div class="invalid-feedback d-block">{{ form.descricao.errors }}</div>{% endif %}
+                            </div>
+                        </div>
+                        <!-- LADO DIREITO: Valores -->
+                        <div class="col-md-4 lado-direito" id="lado-direito">
+                            <h5>.:: Valores Financeiro ::.</h5>
+                            <hr class="mt-1 mb-3">
+                            <div class="mb-3">
+                                <label for="{{ form.valor_documento.id_for_label }}" class="form-label">Valor Bruto</label>
+                                <div class="input-group input-group-valores">
+                                    <span class="input-group-text text-success fw-bold">R$</span>
+                                    <input type="text"
+                                           id="valor_bruto"
+                                           class="form-control text-success fw-bold text-end">
+                                </div>
+                                {{ form.valor_documento.as_hidden }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.valor_iss.id_for_label }}" class="form-label">Valor ISS</label>
+                                <div class="input-group input-group-valores">
+                                    <span class="input-group-text text-danger">R$</span>
+                                    <input type="text" id="valor_iss" class="form-control text-danger text-end">
+                                </div>
+                                {{ form.valor_iss.as_hidden }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.valor_irrf.id_for_label }}" class="form-label">Valor IRRF</label>
+                                <div class="input-group input-group-valores">
+                                    <span class="input-group-text text-danger">R$</span>
+                                    <input type="text" id="valor_irrf" class="form-control text-danger text-end">
+                                </div>
+                                {{ form.valor_irrf.as_hidden }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.valor_liquido.id_for_label }}" class="form-label">Valor Líquido</label>
+                                <div class="input-group input-group-valores">
+                                    <span class="input-group-text text-primary fw-bold">R$</span>
+                                    <input type="text"
+                                           id="valor_liquido"
+                                           class="form-control text-primary fw-bold text-end"
+                                           readonly>
+                                </div>
+                                {{ form.valor_liquido.as_hidden }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Campos ocultos para o formulário -->
+                    <!-- Use apenas um conjunto de campos ocultos -->
+                    <input type="hidden"
+                           id="hidden_valor_documento"
+                           name="valor_documento"
+                           value="{% if form.instance.valor_documento %}{{ form.instance.valor_documento }}{% endif %}">
+                    <input type="hidden"
+                           id="hidden_valor_iss"
+                           name="valor_iss"
+                           value="{% if form.instance.valor_iss %}{{ form.instance.valor_iss }}{% endif %}">
+                    <input type="hidden"
+                           id="hidden_valor_irrf"
+                           name="valor_irrf"
+                           value="{% if form.instance.valor_irrf %}{{ form.instance.valor_irrf }}{% endif %}">
+                    <input type="hidden"
+                           id="hidden_valor_liquido"
+                           name="valor_liquido"
+                           value="{% if form.instance.valor_liquido %}{{ form.instance.valor_liquido }}{% endif %}">
+                    <!-- Status também deve ser tratado corretamente -->
+                    <input type="hidden"
+                           id="hidden_status"
+                           name="status"
+                           value="{% if form.instance.status %}{{ form.instance.status }}{% else %}PEN{% endif %}">
+                    {{ form.status.as_hidden }}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'documentos:list' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                    <!-- Campos ocultos para inicialização do JavaScript -->
+                    <input type="hidden"
+                           id="is_editing"
+                           value="{% if form.instance.pk %}true{% else %}false{% endif %}">
+                    {% if form.instance.pk %}
+                        <input type="hidden"
+                               id="valor_documento_inicial"
+                               value="{{ form.instance.valor_documento }}">
+                        <input type="hidden"
+                               id="valor_iss_inicial"
+                               value="{{ form.instance.valor_iss }}">
+                        <input type="hidden"
+                               id="valor_irrf_inicial"
+                               value="{{ form.instance.valor_irrf }}">
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Carregando os arquivos JavaScript -->
+    <script src="{% static 'documentos/js/documento_form.js' %}"></script>
+    <script src="{% static 'js/documento_validacao.js' %}"></script>
+    <script src="{% static 'documentos/js/documento_data.js' %}"></script>
+    <script src="{% static 'documentos/js/documento_tipo.js' %}"></script>
+    <script src="{% static 'js/documento_fornecedor.js' %}"></script>
+    <script src="{% static 'js/documento_recursos.js' %}"></script>
+    <div class="alert alert-danger form-errors d-none" id="form-errors">
+        <h4>Erros de validação:</h4>
+        <ul id="error-list">
+        </ul>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'documentos/css/documentos.css' %}">
+    <!-- Adicionando estilo inline para remover qualquer background lilás residual -->
+    <style>
+    .row > div {
+        background-color: transparent !important;
+    }
+    .card-body {
+        background-color: #fff;
+    }
+    </style>
+{% endblock extra_css %}
