@@ -39,7 +39,7 @@ class Perfil(models.Model):
 
 
 class LogAtividade(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     acao = models.CharField(max_length=100)
     detalhes = models.TextField()
     data_hora = models.DateTimeField(auto_now_add=True)
