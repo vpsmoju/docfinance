@@ -1,4 +1,5 @@
 [project]
+<<<<<<< HEAD
 name = "DocFinance"
 version = "0.1.0"
 description = "Sistema de gerenciamento de documentos financeiros"
@@ -70,3 +71,23 @@ line-ending = "auto"    # Detectar automaticamente
 [tool.isort]
 skip_gitignore = true
 skip = ["notebooks", "resources", "data"]
+=======
+name = "documentos-financeiros"
+version = "0.1.0"
+description = "Sistema de gerenciamento de documentos financeiros"
+readme = "README.md"
+requires-python = ">=3.13.2"
+dependencies = [
+    "Django>=5.2",
+    "django-crispy-forms>=2.0",
+    "crispy-bootstrap5>=0.7",
+    "python-dotenv>=1.0.0"
+]
+
+[tool.setuptools]
+packages = ["usuarios", "documentos", "relatorios"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+>>>>>>> ee7d5c42a8639467fba807706ab3198a91a4e088
