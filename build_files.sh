@@ -1,2 +1,5 @@
+# Install Python dependencies
 python -m pip install -r requirements.txt
-python manage.py collectstatic --noinput
+
+# Collect static files
+python manage.py collectstatic --noinput --clear
