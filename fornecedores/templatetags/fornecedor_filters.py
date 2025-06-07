@@ -31,11 +31,9 @@ def format_conta(value):
     # Remove qualquer formatação existente e pega apenas os números
     value = "".join(filter(str.isdigit, value))
 
-    # Formata apenas se for um número válido
-    if value.isdigit():
-        # Garante que sempre terá pelo menos 2 dígitos (1 número + 1 dígito verificador)
-        if len(value) >= 2:
-            # Separa o último dígito como verificador
-            return f"{value[:-1]}-{value[-1]}"
+    # Formata apenas se for um número válido e tiver pelo menos 2 dígitos
+    if value.isdigit() and len(value) >= 2:
+        # Separa o último dígito como verificador
+        return f"{value[:-1]}-{value[-1]}"
 
     return value
