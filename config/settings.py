@@ -25,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "").split(',') if host.strip()]
-print(f"DEBUG: ALLOWED_HOSTS = {ALLOWED_HOSTS}")
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', '.now.sh']
 
 # Configurações de segurança para produção
 CSRF_COOKIE_SECURE = True
@@ -58,7 +57,6 @@ X_FRAME_OPTIONS = 'DENY'
 #     # this in production to avoid double-counting.
 #     send_default_pii=True
 # )
-
 
 # Database
 DATABASES = {
@@ -124,16 +122,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 # DATABASES = {
 #     "default": {
@@ -141,15 +138,21 @@ DATABASES = {
 #         "NAME": os.getenv("DB_NAME"),
 #         "USER": os.getenv("DB_USER"),
 #         "PASSWORD": os.getenv("DB_PASSWORD"),
-#         "HOST": os.getenv(
-#             "DB_HOST"
-#         ),  # ou o endereço IP do seu banco de dados, se não for localhos,
-#         "PORT": os.getenv(
-#             "DB_PORT"
-#         ),  # ou o endereço IP do seu banco de dados, se não for localhos,
+#         "HOST": os.getenv("DB_HOST"),  # ou o end. IP do seu banco de dados, se não for localhos,
+#         "PORT": os.getenv("DB_PORT"),  # ou o end. IP do seu banco de dados, se não for localhos,
 #     }
 # }
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": 'railway',
+        "USER": 'postgres',
+        "PASSWORD": 'PJXeiZLAyXudDwJQONBTYbHuvcAGrvpN',
+        "HOST": 'ballast.proxy.rlwy.net',  # ou o end. IP do seu DB, se não for localhos,
+        "PORT": '21869',  # 21869 ou o end. IP do seu banco de dados, se não for localhos,
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -188,8 +191,8 @@ DATE_INPUT_FORMATS = ["%d/%m/%Y"]
 
 # Configuração de arquivos estáticos
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")
 
 # Media files
 MEDIA_URL = "media/"
