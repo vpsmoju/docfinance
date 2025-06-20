@@ -1,0 +1,57 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: docfinance
+objects:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: docfinance
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: docfinance
+    template:
+      metadata:
+        labels:
+          app: docfinance
+      spec:
+        containers:
+        - name: docfinance
+          image: docfinance:latest
+          ports:
+          - containerPort: 8000
+          env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: docfinance-secrets
+                key: database-url
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: docfinance-secrets
+                key: secret-key
+          - name: DEBUG
+            value: "False"
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: docfinance
+  spec:
+    ports:
+    - port: 8000
+      targetPort: 8000
+    selector:
+      app: docfinance
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: docfinance
+  spec:
+    to:
+      kind: Service
+      name: docfinance
