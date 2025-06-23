@@ -2,12 +2,6 @@
   "version": 2,
   "buildCommand": "sh build_files.sh",
   "outputDirectory": "staticfiles_build",
-  "builds": [
-    {
-      "src": "api/config/wsgi.py",
-      "use": "@vercel/python"
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
