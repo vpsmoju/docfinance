@@ -67,4 +67,5 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    path("teste-statico/", views.teste_estatico, name="teste_estatico"),
 ]

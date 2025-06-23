@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste de Estáticos</title>
+    <link rel="stylesheet" href="{% static 'css/animacoes.css' %}">
+    <style>
+      body { text-align: center; margin-top: 40px; font-family: sans-serif; }
+      img { max-width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Arquivos Estáticos</h1>
+    <p>Logo abaixo:</p>
+    <img src="{% static 'img/DocFinance3.png' %}" alt="Logo do DocFinance">
+    <p>Se a logo aparecer, está tudo funcionando!</p>
+</body>
+</html>

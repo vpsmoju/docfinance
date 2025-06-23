@@ -588,3 +588,6 @@ class CustomPasswordResetView(PasswordResetView):
             )
 
         return super().form_valid(form)
+
+def teste_estatico(request):
+    return render(request, "static_test.html")
