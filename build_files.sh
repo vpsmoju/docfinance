@@ -5,7 +5,6 @@ echo "🐍 Python version:"
 python3 --version
 
 echo "🚀 Iniciando processo de build do Django..."
-
 echo "📦 Instalando dependências..."
 pip3 install -r requirements.txt
 
