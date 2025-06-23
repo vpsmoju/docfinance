@@ -1,5 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from .views import teste_estatico
 
 from . import views
 
