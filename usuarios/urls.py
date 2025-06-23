@@ -68,5 +68,13 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
-    path("teste-statico/", teste_estatico),
+]
+
+from django.http import HttpResponse
+
+def teste_estatico_bruto(request):
+    return HttpResponse("<h1 style='color: green'>🎯 View funcionando</h1>")
+
+urlpatterns += [
+    path("teste-statico/", teste_estatico_bruto),
 ]
