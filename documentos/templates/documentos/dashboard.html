@@ -1,12 +1,21 @@
 {% extends "base/base.html" %}
+{% block extra_css %}
+<style>
+/* Cards menores e uniformes no dashboard */
+.dashboard-cards .card { min-height: 140px; }
+.dashboard-cards .card .card-body { display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
+.dashboard-cards .card .card-title { font-size: 0.95rem; font-weight: 500; margin-bottom: .25rem; }
+.dashboard-cards .card p { font-size: .9rem; margin-bottom: 0; }
+</style>
+{% endblock extra_css %}
 {% block title %}
     Dashboard | DocFinance
 {% endblock title %}
 {% block content %}
-    <div class="row">
+    <div class="row dashboard-cards">
         <!-- Cards de Resumo -->
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-warning">
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card text-white bg-warning h-100 w-100">
                 <div class="card-body">
                     <h5 class="card-title">Documentos Pendentes</h5>
                     <h2 class="card-text">{{ total_pendentes }}</h2>
@@ -14,8 +23,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-success">
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card text-white bg-success h-100 w-100">
                 <div class="card-body">
                     <h5 class="card-title">Documentos Pagos</h5>
                     <h2 class="card-text">{{ total_pagos }}</h2>
@@ -23,16 +32,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-danger">
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card text-white bg-danger h-100 w-100">
                 <div class="card-body">
                     <h5 class="card-title">Documentos Atrasados</h5>
                     <h2 class="card-text">{{ total_atrasados }}</h2>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card text-white bg-info">
+        <div class="col-md-3 mb-4 d-flex">
+            <div class="card text-white bg-info h-100 w-100">
                 <div class="card-body">
                     <h5 class="card-title">Total de Documentos</h5>
                     <h2 class="card-text">{{ total_pendentes|add:total_pagos|add:total_atrasados }}</h2>

@@ -40,168 +40,138 @@
         {% endblock extra_css %}
     </head>
     <body>
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-                <div class="container">
-                    <a class="navbar-brand"
-                       href="{% if user.is_authenticated %}{% url 'documentos:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
-                        <img src="{% static 'img/DocFinance3.png' %}?v=2"
-                             alt="DocFinance"
-                             height="60"
-                             width="100">
-                        DocFinance
+        <style>
+            /* Layout com sidebar à esquerda */
+            .app-container { display: flex; min-height: 100vh; }
+            .sidebar { width: 280px; background: #f8f9fa; border-right: 1px solid #e5e7eb; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+            .sidebar .sidebar-brand { border-bottom: 1px solid #e5e7eb; }
+            .sidebar .sidebar-brand img { height: 40px; width: auto; }
+            .sidebar a { text-decoration: none; color: #1f2937; display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border-radius: .5rem; }
+            .sidebar a:hover { background: #eef2ff; }
+            .sidebar .menu-title { font-size: .85rem; color: #6b7280; text-transform: uppercase; margin: .75rem .75rem .25rem; }
+            .submenu-toggle { width: 100%; background: transparent; border: 0; padding: .5rem .75rem; text-align: left; display: flex; align-items: center; gap: .5rem; border-radius: .5rem; color: #1f2937; }
+            .submenu-toggle:hover { background: #eef2ff; }
+            .submenu { display: none; list-style: none; padding-left: 1.5rem; margin: .25rem 0 .5rem; }
+            .submenu.open { display: block; }
+            .chevron { margin-left: auto; }
+            .main { flex: 1; padding: 1.5rem; }
+            @media (max-width: 992px) {
+                .sidebar { position: fixed; left: -300px; transition: left .25s ease; z-index: 1040; }
+                .sidebar.open { left: 0; }
+                .sidebar-toggle-btn { position: fixed; top: .75rem; left: .75rem; z-index: 1050; }
+                .main { padding-top: 3rem; }
+            }
+        </style>
+        <button class="btn btn-outline-primary sidebar-toggle-btn d-lg-none" id="sidebarToggle"><i class="bi bi-list"></i></button>
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="sidebar-brand d-flex align-items-center p-3">
+                    <a class="d-flex align-items-center gap-2" href="{% if user.is_authenticated %}{% url 'documentos:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
+                        <img src="{% static 'img/DocFinance3.png' %}?v=2" alt="DocFinance">
+                        <span class="fw-semibold">DocFinance</span>
                     </a>
-                    <button class="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            {% if user.is_authenticated %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'documentos:dashboard' %}">Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'documentos:list' %}">Documentos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'fornecedores:fornecedor_list' %}">Fornecedores</a>
-                                </li>
-                                {% if user.is_staff %}
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle"
-                                           href="#"
-                                           id="relatoriosDropdown"
-                                           role="button"
-                                           data-bs-toggle="dropdown"
-                                           aria-expanded="false">Relatórios</a>
-                                        <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:dashboard' %}">Dashboard</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:secretaria' %}">Por Secretaria</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:recurso' %}">Por Recurso</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:financeiro' %}">Financeiro</a>
-                                            </li>
-                                            <!-- Adicione seu novo relatório aqui -->
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:pagamentos' %}">Pagamentos</a>
-                                            </li>
-                                            <!-- Fim do novo relatório -->
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'relatorios:exportar_excel' %}">Exportar Excel</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'relatorios:filtro_encaminhamento' %}">Encaminhamentos</a>
-                                    </li>
-                                    <!-- Novo menu Admin -->
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle"
-                                           href="#"
-                                           id="adminDropdown"
-                                           role="button"
-                                           data-bs-toggle="dropdown"
-                                           aria-expanded="false">Administração</a>
-                                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'listar_usuarios' %}">Usuários</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'listar_usuarios_pendentes' %}">Usuários Pendentes</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{% url 'listar_logs' %}">Log do Sistema</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                {% endif %}
-                            {% endif %}
-                        </ul>
-                        <ul class="navbar-nav ms-auto">
-                            {% if user.is_authenticated %}
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle"
-                                       href="#"
-                                       role="button"
-                                       data-bs-toggle="dropdown">
-                                        {% if user.perfil.foto %}
-                                            <img src="{{ user.perfil.foto.url }}"
-                                                 alt="Foto de perfil"
-                                                 class="rounded-circle me-1"
-                                                 width="50"
-                                                 height="50">
-                                        {% else %}
-                                            <i class="bi bi-person-circle me-1"></i>
-                                        {% endif %}
-                                        {{ user.username }}
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'perfil' %}">Meu Perfil</a>
-                                        </li>
-                                        {% comment %}<li><a class="dropdown-item" href="{% url 'editar_perfil' %}">Editar Perfil</a></li>{% endcomment %}
-                                        {% comment %} <li><a class="dropdown-item" href="{% url 'alterar_senha' %}">Alterar Senha</a></li> {% endcomment %}
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
-                                            <form method="post" action="{% url 'logout' %}" class="logout-form">
-                                                {% csrf_token %}
-                                                <button type="submit" class="dropdown-item">Sair</button>
-                                            </form>
-                                        </li>
+                </div>
+                <nav class="p-2">
+                    <ul class="list-unstyled">
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'documentos:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                            </li>
+                            <li class="mt-2 menu-title">Navegação</li>
+                            <li class="has-sub">
+                                <button class="submenu-toggle"><i class="bi bi-file-earmark-text"></i> Documentos <i class="bi bi-chevron-down chevron"></i></button>
+                                <ul class="submenu list-unstyled">
+                                    <li><a href="{% url 'documentos:list' %}"><i class="bi bi-list"></i> Lista</a></li>
+                                    <li><a href="{% url 'relatorios:dashboard' %}"><i class="bi bi-graph-up"></i> Relatórios</a></li>
+                                    <li><a href="{% url 'relatorios:filtro_encaminhamento' %}"><i class="bi bi-forward"></i> Encaminhamentos</a></li>
+                                    <li><a href="{% url 'relatorios:pagamentos' %}"><i class="bi bi-cash-stack"></i> Pagamentos</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="{% url 'fornecedores:fornecedor_list' %}"><i class="bi bi-people"></i> Fornecedores</a>
+                            </li>
+                            {% if user.is_staff %}
+                                <li class="mt-2 menu-title">Administração</li>
+                                <li class="has-sub">
+                                    <button class="submenu-toggle"><i class="bi bi-gear"></i> Administração <i class="bi bi-chevron-down chevron"></i></button>
+                                    <ul class="submenu list-unstyled">
+                                        <li><a href="{% url 'listar_usuarios' %}"><i class="bi bi-person"></i> Usuários</a></li>
+                                        <li><a href="{% url 'listar_usuarios_pendentes' %}"><i class="bi bi-person-check"></i> Usuários Pendentes</a></li>
+                                        <li><a href="{% url 'listar_logs' %}"><i class="bi bi-journal-text"></i> Log do Sistema</a></li>
+                                        <li><a href="{% url 'relatorios:exportar_excel' %}"><i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel</a></li>
                                     </ul>
                                 </li>
-                            {% else %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'login' %}">Entrar</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'registro' %}">Registrar</a>
-                                </li>
                             {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <main class="container my-4">
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show {% if 'success' in message.tags %}alert-success-custom{% endif %}"
-                             role="alert">
-                            {{ message|safe }}
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="alert"
-                                    aria-label="Fechar"></button>
+                        {% else %}
+                            <li><a href="{% url 'home' %}"><i class="bi bi-house"></i> Início</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <div class="border-top p-3">
+                    {% if user.is_authenticated %}
+                        <div class="d-flex align-items-center gap-2">
+                            {% if user.perfil.foto %}
+                                <img src="{{ user.perfil.foto.url }}" class="rounded-circle" width="40" height="40" alt="Perfil">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-4"></i>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold">{{ user.username }}</div>
+                                <form method="post" action="{% url 'logout' %}" class="mt-1">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-secondary">Sair</button>
+                                </form>
+                            </div>
                         </div>
-                    {% endfor %}
+                    {% else %}
+                        <div class="d-flex flex-column gap-2">
+                            <a class="btn btn-primary" href="{% url 'login' %}">Entrar</a>
+                            <a class="btn btn-outline-primary" href="{% url 'registro' %}">Registrar</a>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-            {% block content %}
-            {% endblock content %}
-        </main>
-        <footer class="py-3 mt-5">
-            <div class="container text-center">
-                <p>© {% now "Y" %} DocFinance - Prefeitura de Moju. Todos os direitos reservados.</p>
+            </aside>
+            <div class="main">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show {% if 'success' in message.tags %}alert-success-custom{% endif %}" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block content %}
+                {% endblock content %}
+                <footer class="py-3 mt-5">
+                    <div class="text-center">
+                        <p>© {% now "Y" %} DocFinance - Prefeitura de Moju. Todos os direitos reservados.</p>
+                    </div>
+                </footer>
             </div>
-        </footer>
+        </div>
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.submenu-toggle').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const submenu = btn.nextElementSibling;
+                        submenu.classList.toggle('open');
+                        btn.querySelector('.chevron')?.classList.toggle('bi-chevron-up');
+                        btn.querySelector('.chevron')?.classList.toggle('bi-chevron-down');
+                    });
+                });
+                const sidebar = document.querySelector('.sidebar');
+                const toggle = document.getElementById('sidebarToggle');
+                if (toggle) {
+                    toggle.addEventListener('click', function() {
+                        sidebar.classList.toggle('open');
+                    });
+                }
+            });
+        </script>
         {% block extra_js %}
         {% endblock extra_js %}
     </body>
