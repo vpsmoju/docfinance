@@ -26,9 +26,10 @@
                     {% endif %}
                     <h4>{{ user.get_full_name }}</h4>
                     <p>{{ user.email }}</p>
-                    {% if user.perfil.telefone %}<p>Telefone: {{ user.perfil.telefone }}</p>{% endif %}
+                    {% load format_filters %}
+                    {% if user.perfil.telefone %}<p>Telefone: {{ user.perfil.telefone|format_telefone }}</p>{% endif %}
                     {% if user.perfil.matricula %}<p>Matrícula: {{ user.perfil.matricula }}</p>{% endif %}
-                    {% if user.perfil.cpf %}<p>CPF: {{ user.perfil.cpf }}</p>{% endif %}
+                    {% if user.perfil.cpf %}<p>CPF: {{ user.perfil.cpf|format_cpf }}</p>{% endif %}
                 </div>
             </div>
         </div>

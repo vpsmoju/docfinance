@@ -201,6 +201,21 @@ def perfil(request):
 
 
 @login_required
+def editar_perfil(request):
+    perfil = request.user.perfil
+    if request.method == "POST":
+        form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Perfil atualizado com sucesso!")
+            return redirect("perfil")
+    else:
+        form = PerfilForm(instance=perfil)
+    
+    return render(request, "usuarios/editar_perfil.html", {"form": form})
+
+
+@login_required
 def listar_usuarios(request):
     # Verificar se o usuário é administrador
     if not request.user.is_staff:

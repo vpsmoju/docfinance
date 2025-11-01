@@ -117,42 +117,43 @@
             </div>
         </div>
     </div>
-    {% block extra_js %}
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-    // Gráfico de Status
-    const statusCtx = document.getElementById('statusChart').getContext('2d');
-    new Chart(statusCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Pendentes', 'Pagos', 'Atrasados'],
-            datasets: [{
-                data: [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
-                backgroundColor: ['#ffc107', '#198754', '#dc3545']
-            }]
-        }
-    });
+{% endblock content %}
 
-    // Gráfico de Valores
-    const valoresCtx = document.getElementById('valoresChart').getContext('2d');
-    new Chart(valoresCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Pendente', 'Pago'],
-            datasets: [{
-                label: 'Valor Total (R$)',
-                data: [{{ valor_pendente }}, {{ valor_pago }}],
-                backgroundColor: ['#ffc107', '#198754']
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de Status
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Pendentes', 'Pagos', 'Atrasados'],
+                datasets: [{
+                    data: [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
+                    backgroundColor: ['#ffc107', '#198754', '#dc3545']
+                }]
+            }
+        });
+
+        // Gráfico de Valores
+        const valoresCtx = document.getElementById('valoresChart').getContext('2d');
+        new Chart(valoresCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pendente', 'Pago'],
+                datasets: [{
+                    label: 'Valor Total (R$)',
+                    data: [{{ valor_pendente }}, {{ valor_pago }}],
+                    backgroundColor: ['#ffc107', '#198754']
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
-        </script>
-    {% endblock extra_js %}
-{% endblock content %}
+        });
+     </script>
+{% endblock extra_js %}

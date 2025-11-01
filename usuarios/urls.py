@@ -9,6 +9,7 @@ urlpatterns = [
     path("login/", views.CustomLoginView.as_view(), name="login"),
     path("logout/", views.CustomLogoutView.as_view(), name="logout"),
     path("perfil/", views.perfil, name="perfil"),
+    path("perfil/editar/", views.editar_perfil, name="editar_perfil"),
     path("ativar/<str:token>/", views.ativar_conta, name="ativar_conta"),
     # Rotas de administração de usuários
     path("usuarios/", views.listar_usuarios, name="listar_usuarios"),
