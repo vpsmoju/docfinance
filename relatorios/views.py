@@ -21,6 +21,7 @@ from django.utils import timezone
 
 # Importações locais
 from documentos.models import Documento
+from fornecedores.models import Fornecedor
 
 # Configuração de logging
 # Configuração do logger
@@ -67,6 +68,30 @@ def dashboard(request):
     }
 
     return render(request, "relatorios/dashboard.html", context)
+
+
+@login_required
+def relatorio_fornecedores(request):
+    """Relatório de Fornecedores com listagem em ordem alfabética"""
+    search = request.GET.get("search", "").strip()
+
+    queryset = Fornecedor.objects.all()
+
+    if search:
+        # Remover pontuações para busca por CNPJ/CPF
+        digits = "".join(filter(str.isdigit, search))
+        if digits:
+            queryset = queryset.filter(Q(nome__icontains=search) | Q(cnpj_cpf__icontains=digits))
+        else:
+            queryset = queryset.filter(Q(nome__icontains=search))
+
+    fornecedores = queryset.order_by("nome")
+
+    context = {
+        "fornecedores": fornecedores,
+    }
+
+    return render(request, "relatorios/relatorio_fornecedores.html", context)
 
 
 @login_required
@@ -621,6 +646,7 @@ def filtro_encaminhamento(request):
     data_fim = request.GET.get("data_fim", "")
     secretaria_id = request.GET.get("secretaria", "")
     fornecedor = request.GET.get("fornecedor", "")
+    destino = request.GET.get("destino", "")  # controle_interno ou contabilidade
 
     # Inicializar queryset
     documentos = Documento.objects.all().order_by("fornecedor__nome", "data_documento")
@@ -660,6 +686,7 @@ def filtro_encaminhamento(request):
         "fornecedor": fornecedor,
         "is_paginated": True,
         "paginator": paginator,
+        "destino": destino,
     }
 
     return render(request, "relatorios/filtro_encaminhamento.html", context)

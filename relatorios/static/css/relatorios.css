@@ -1,0 +1,17 @@
+/* Estilos padronizados para cards de resumo em relatórios */
+.resumo-cards .card-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.resumo-cards .card-title {
+    min-height: 1.5rem; /* garante altura uniforme do título */
+    margin-bottom: 0.5rem; /* espaço consistente entre título e valor */
+}
+
+.resumo-cards .card h3 {
+    margin-top: 0.25rem; /* pequenos ajustes para alinhamento do valor */
+}

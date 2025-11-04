@@ -13,6 +13,9 @@
             </div>
             <div class="card-body">
                 <form method="get" action="{% url 'relatorios:filtro_encaminhamento' %}">
+                    {% if destino %}
+                        <input type="hidden" name="destino" value="{{ destino }}">
+                    {% endif %}
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label for="data_inicio">Data Início:</label>
@@ -121,20 +124,24 @@
                     {% endif %}
                     <!-- Botões de Encaminhamento -->
                     <div class="mt-4">
-                        <button type="submit"
-                                class="btn btn-success"
-                                name="tipo"
-                                value="controle_interno"
-                                onclick="return verificarSelecao('Controle Interno')">
-                            Encaminhar para Controle Interno
-                        </button>
-                        <button type="submit"
-                                class="btn btn-info"
-                                name="tipo"
-                                value="contabilidade"
-                                onclick="return verificarSelecao('Contabilidade')">
-                            Encaminhar para Contabilidade
-                        </button>
+                        {% if destino != 'contabilidade' %}
+                            <button type="submit"
+                                    class="btn btn-success"
+                                    name="tipo"
+                                    value="controle_interno"
+                                    onclick="return verificarSelecao('Controle Interno')">
+                                Encaminhar para Controle Interno
+                            </button>
+                        {% endif %}
+                        {% if destino != 'controle_interno' %}
+                            <button type="submit"
+                                    class="btn btn-info"
+                                    name="tipo"
+                                    value="contabilidade"
+                                    onclick="return verificarSelecao('Contabilidade')">
+                                Encaminhar para Contabilidade
+                            </button>
+                        {% endif %}
                     </div>
                 </form>
             </div>

@@ -25,25 +25,25 @@
                     <h5 class="mb-0">Resumo por Recurso</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card bg-info text-white">
+                    <div class="row mb-4 resumo-cards">
+                        <div class="col-md-4 mb-4 d-flex">
+                            <div class="card bg-info text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Total de Documentos</h6>
                                     <h3 class="mb-0">{{ total_documentos }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card bg-success text-white">
+                        <div class="col-md-4 mb-4 d-flex">
+                            <div class="card bg-success text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Valor Total</h6>
                                     <h3 class="mb-0">R$ {{ total_valor|currency_br }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card bg-primary text-white">
+                        <div class="col-md-4 mb-4 d-flex">
+                            <div class="card bg-primary text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Valor Líquido</h6>
                                     <h3 class="mb-0">R$ {{ total_liquido|currency_br }}</h3>
@@ -83,6 +83,18 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Gráfico de Distribuição por Recurso</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="recursoChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>

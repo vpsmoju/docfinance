@@ -60,18 +60,35 @@
                             <li>
                                 <a href="{% url 'documentos:dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
                             </li>
-                            <li class="mt-2 menu-title">Navegação</li>
+                            <li class="mt-2 menu-title">NAVEGAÇÃO</li>
+
+                            <!-- NOVO -->
                             <li class="has-sub">
-                                <button class="submenu-toggle"><i class="bi bi-file-earmark-text"></i> Documentos <i class="bi bi-chevron-down chevron"></i></button>
+                                <button class="submenu-toggle"><i class="bi bi-plus-square"></i> Novo <i class="bi bi-chevron-down chevron"></i></button>
                                 <ul class="submenu list-unstyled">
-                                    <li><a href="{% url 'documentos:list' %}"><i class="bi bi-list"></i> Lista</a></li>
-                                    <li><a href="{% url 'relatorios:dashboard' %}"><i class="bi bi-graph-up"></i> Relatórios</a></li>
-                                    <li><a href="{% url 'relatorios:filtro_encaminhamento' %}"><i class="bi bi-forward"></i> Encaminhamentos</a></li>
-                                    <li><a href="{% url 'relatorios:pagamentos' %}"><i class="bi bi-cash-stack"></i> Pagamentos</a></li>
+                                    <li><a href="{% url 'documentos:list' %}"><i class="bi bi-file-earmark-plus"></i> Documentos</a></li>
+                                    <li><a href="{% url 'fornecedores:fornecedor_list' %}"><i class="bi bi-person-plus"></i> Fornecedores</a></li>
+                                    <li><a href="{% url 'documentos:create' %}"><i class="bi bi-collection"></i> Recursos</a></li>
                                 </ul>
                             </li>
-                            <li>
-                                <a href="{% url 'fornecedores:fornecedor_list' %}"><i class="bi bi-people"></i> Fornecedores</a>
+
+                            <!-- RELATÓRIOS -->
+                            <li class="has-sub mt-2">
+                                <button class="submenu-toggle"><i class="bi bi-bar-chart"></i> Relatórios <i class="bi bi-chevron-down chevron"></i></button>
+                                <ul class="submenu list-unstyled">
+                                    <li><a href="{% url 'relatorios:dashboard' %}"><i class="bi bi-file-earmark-bar-graph"></i> Documentos</a></li>
+                                    <li><a href="{% url 'relatorios:fornecedores' %}"><i class="bi bi-people"></i> Fornecedores</a></li>
+                                    <li><a href="{% url 'relatorios:recurso' %}"><i class="bi bi-stack"></i> Recursos</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- DESPACHOS (Filtro de Encaminhamento) -->
+                            <li class="has-sub mt-2">
+                                <button class="submenu-toggle"><i class="bi bi-forward-fill"></i> Despachos <i class="bi bi-chevron-down chevron"></i></button>
+                                <ul class="submenu list-unstyled">
+                                    <li><a href="{% url 'relatorios:filtro_encaminhamento' %}?destino=controle_interno"><i class="bi bi-check2-circle"></i> Controle Interno</a></li>
+                                    <li><a href="{% url 'relatorios:filtro_encaminhamento' %}?destino=contabilidade"><i class="bi bi-calculator"></i> Contabilidade</a></li>
+                                </ul>
                             </li>
                             
                         {% else %}

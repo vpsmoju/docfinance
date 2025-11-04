@@ -1,0 +1,52 @@
+@media print {
+    /* Ocultar elementos desnecessários na impressão */
+    .navbar, 
+    .filtros-container, 
+    .btn-toolbar, 
+    footer, 
+    .btn-close,
+    .alert {
+        display: none !important;
+    }
+    
+    /* Remover bordas e sombras dos cards */
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Ajustar cores para impressão */
+    .card-header {
+        background-color: #fff !important;
+        color: #000 !important;
+        border-bottom: 1px solid #ddd !important;
+    }
+    
+    .table-dark {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    
+    /* Ajustes gerais para impressão */
+    body {
+        padding: 0;
+        margin: 0;
+        font-size: 12pt;
+    }
+    
+    /* Configuração da página */
+    @page {
+        size: A4;
+        margin: 1.5cm;
+    }
+    
+    /* Garantir que as tabelas não quebrem entre páginas */
+    table { page-break-inside: avoid; }
+    
+    /* Ajustes para textos e cores */
+    .text-white { color: #000 !important; }
+    .bg-primary, .bg-info, .bg-success, .bg-warning { background-color: transparent !important; }
+    
+    /* Garantir que imagens sejam impressas */
+    img { max-width: 100% !important; }
+}

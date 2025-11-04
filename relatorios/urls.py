@@ -13,6 +13,7 @@ app_name = "relatorios"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
+    path("fornecedores/", views.relatorio_fornecedores, name="fornecedores"),
     path("secretaria/", views.relatorio_secretaria, name="secretaria"),
     path("recurso/", views.relatorio_recurso, name="recurso"),
     path("financeiro/", views.relatorio_financeiro, name="financeiro"),

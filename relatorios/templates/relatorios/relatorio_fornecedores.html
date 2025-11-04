@@ -1,0 +1,89 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}
+    Relatório de Fornecedores | DocFinance
+{% endblock title %}
+
+{% block content %}
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    <i class="bi bi-people me-2"></i>Relatório de Fornecedores
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <!-- Barra de pesquisa -->
+                <form method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Buscar por nome ou CNPJ/CPF..."
+                               value="{{ request.GET.search|default:'' }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search me-1"></i>Buscar
+                        </button>
+                        {% if request.GET.search %}
+                            <a href="{% url 'relatorios:fornecedores' %}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Limpar
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+                <!-- Tabela de fornecedores (ordenada por nome A–Z) -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>CNPJ/CPF</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fornecedor in fornecedores %}
+                                <tr>
+                                    <td>{{ fornecedor.nome }}</td>
+                                    <td>{{ fornecedor.get_tipo_display }}</td>
+                                    <td>{{ fornecedor.cnpj_cpf }}</td>
+                                    <td>{{ fornecedor.telefone|default:"-" }}</td>
+                                    <td>{{ fornecedor.email|default:"-" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            {% if request.GET.search %}
+                                                Nenhum fornecedor encontrado para "{{ request.GET.search }}".
+                                            {% else %}
+                                                Nenhum fornecedor cadastrado.
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Lista alfabética na parte inferior -->
+                {% if fornecedores %}
+                    <div class="mt-4">
+                        <h5 class="mb-3">Todos os Fornecedores (A–Z)</h5>
+                        <ul class="list-group">
+                            {% for fornecedor in fornecedores %}
+                                <li class="list-group-item">{{ fornecedor.nome }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

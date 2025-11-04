@@ -52,33 +52,33 @@
                     <h5 class="mb-0">Resumo Financeiro</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card bg-info text-white">
+                    <div class="row mb-4 resumo-cards">
+                        <div class="col-md-3 mb-4 d-flex">
+                            <div class="card bg-info text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Total de Documentos</h6>
                                     <h3 class="mb-0">{{ total_documentos }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-success text-white">
+                        <div class="col-md-3 mb-4 d-flex">
+                            <div class="card bg-success text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Valor Total</h6>
                                     <h3 class="mb-0">R$ {{ total_valor|currency_br }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-warning text-dark">
+                        <div class="col-md-3 mb-4 d-flex">
+                            <div class="card bg-warning text-dark h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Valor Pendente</h6>
                                     <h3 class="mb-0">R$ {{ total_pendente|currency_br }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="card bg-primary text-white">
+                        <div class="col-md-3 mb-4 d-flex">
+                            <div class="card bg-primary text-white h-100 w-100">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Valor Pago</h6>
                                     <h3 class="mb-0">R$ {{ total_pago|currency_br }}</h3>
