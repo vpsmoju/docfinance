@@ -160,6 +160,53 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
     <script>
+// Fallback: define configurarGraficoTorta se não estiver disponível
+if (typeof configurarGraficoTorta === 'undefined') {
+    function configurarGraficoTorta(ctx, labels, valores, titulo) {
+        const backgroundColors = [
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(199, 199, 199, 0.6)'
+        ];
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: titulo,
+                    data: valores,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                const value = context.raw;
+                                label += new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(value);
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de recursos
     const ctx = document.getElementById('recursoChart').getContext('2d');

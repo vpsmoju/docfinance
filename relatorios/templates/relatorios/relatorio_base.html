@@ -79,7 +79,6 @@
         {% endblock relatorio_conteudo %}
     </div>
     {% load static %}
-    <!-- Adicione esta linha no head do documento -->
-    <link rel="stylesheet" href="{% static 'css/relatorios.css' %}">
-    <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
+    <!-- CSS dos relatórios escopado ao app -->
+    <link rel="stylesheet" href="{% static 'relatorios/css/relatorios.css' %}">
 {% endblock content %}

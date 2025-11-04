@@ -147,6 +147,56 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
     <script>
+// Fallback: define configurarGraficoBarra se não estiver disponível
+if (typeof configurarGraficoBarra === 'undefined') {
+    function configurarGraficoBarra(ctx, labels, valores, titulo) {
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: titulo,
+                    data: valores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                const value = context.raw;
+                                label += new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(value);
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('financialChart').getContext('2d');
     const labels = [{% for item in resumo_financeiro %}'{{ item.nome }}',{% endfor %}];
