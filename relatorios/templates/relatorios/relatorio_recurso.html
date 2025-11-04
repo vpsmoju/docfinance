@@ -66,7 +66,7 @@
                             <tbody>
                                 {% for rec in recursos %}
                                     <tr>
-                                        <td>{{ rec.recurso_display }}</td>
+                                        <td>{{ rec.nome }}</td>
                                         <td class="text-center">{{ rec.count }}</td>
                                         <td class="text-end">R$ {{ rec.valor_total|currency_br }}</td>
                                         <td class="text-end">R$ {{ rec.valor_liquido|currency_br }}</td>
@@ -125,7 +125,7 @@
                                         <tr>
                                             <td>{{ doc.numero }}</td>
                                             <td>{{ doc.fornecedor }}</td>
-                                            <td>{{ doc.get_secretaria_display }}</td>
+                                            <td>{{ doc.secretaria }}</td>
                                             <td>{{ doc.data_documento|date:"d/m/Y" }}</td>
                                             <td class="text-end">R$ {{ doc.valor_documento|currency_br }}</td>
                                             <td>

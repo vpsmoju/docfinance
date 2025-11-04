@@ -4,12 +4,12 @@ from datetime import datetime
 
 import xlsxwriter
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views.generic import TemplateView
 
-from .models import Documento
+from .models import Documento, Secretaria, Recurso
 
 
 class RelatorioBaseView(LoginRequiredMixin, TemplateView):
@@ -70,23 +70,15 @@ class RelatorioSecretariaView(RelatorioBaseView):
 
         # Agrupar por secretaria
         secretarias_dados = (
-            documentos.values("secretaria")
+            documentos.select_related("secretaria")
+            .values("secretaria", secretaria_nome=F("secretaria__nome"))
             .annotate(
                 total=Sum("valor_documento"),
                 total_liquido=Sum("valor_liquido"),
                 quantidade=Count("id"),
             )
-            .order_by("secretaria")
+            .order_by("secretaria__nome")
         )
-
-        # Adicionar nome legível da secretaria
-        for item in secretarias_dados:
-            for choice in Documento.SECRETARIA_CHOICES:
-                if choice[0] == item["secretaria"]:
-                    item["secretaria_nome"] = choice[1]
-                    break
-            else:
-                item["secretaria_nome"] = "Não definido"
 
         context["secretarias_dados"] = secretarias_dados
         context["total_geral"] = documentos.aggregate(
@@ -199,23 +191,15 @@ class RelatorioRecursoView(RelatorioBaseView):
 
         # Agrupar por recurso
         recursos_dados = (
-            documentos.values("recurso")
+            documentos.select_related("recurso")
+            .values("recurso", recurso_nome=F("recurso__nome"))
             .annotate(
                 total=Sum("valor_documento"),
                 total_liquido=Sum("valor_liquido"),
                 quantidade=Count("id"),
             )
-            .order_by("recurso")
+            .order_by("recurso__nome")
         )
-
-        # Adicionar nome legível do recurso
-        for item in recursos_dados:
-            for choice in Documento.RECURSO_CHOICES:
-                if choice[0] == item["recurso"]:
-                    item["recurso_nome"] = choice[1]
-                    break
-            else:
-                item["recurso_nome"] = "Não definido"
 
         context["recursos_dados"] = recursos_dados
         context["total_geral"] = documentos.aggregate(

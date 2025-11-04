@@ -18,6 +18,41 @@ from django.utils import timezone
 from fornecedores.models import Fornecedor
 
 
+class Secretaria(models.Model):
+    """Modelo de Secretaria (dinâmico)."""
+
+    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome")
+    codigo = models.CharField(
+        max_length=20, unique=True, verbose_name="Código/Sigla"
+    )
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "Secretaria"
+        verbose_name_plural = "Secretarias"
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
+
+class Recurso(models.Model):
+    """Modelo de Recurso vinculado a uma Secretaria (dinâmico)."""
+
+    nome = models.CharField(max_length=100, verbose_name="Nome")
+    codigo = models.CharField(max_length=50, unique=True, verbose_name="Código")
+    secretaria = models.ForeignKey(
+        Secretaria, on_delete=models.CASCADE, related_name="recursos"
+    )
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "Recurso"
+        verbose_name_plural = "Recursos"
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
+
 class Documento(models.Model):
     """
     Modelo para representar documentos financeiros.
@@ -38,79 +73,6 @@ class Documento(models.Model):
         ("ATR", "Atrasado"),
     ]
 
-    # Opções para o campo Secretaria
-    SECRETARIA_CHOICES = [
-        ("ADM", "Sec. de Administração"),
-        ("ASS", "Sec. de Assistência"),
-        ("EDU", "Sec. de Educação"),
-        ("SAU", "Sec. de Saúde"),
-    ]
-
-    # Opções para o campo Recurso
-    RECURSO_CHOICES_EDU = [
-        ("FUNDEB", "FUNDEB"),
-        ("DMDE", "DMDE"),
-        ("QSE", "QSE"),
-        ("PNAE", "PNAE"),
-        ("PETE", "PETE"),
-        ("PEAE", "PEAE"),
-        ("PNAT", "PNAT"),
-        ("SEDUC_CRECHE", "SEDUC/CRECHE"),
-        ("MOJU_EDUCA", "MOJU-EDUCA"),
-        ("BRALF", "BRALF"),
-        ("PDDE", "PDDE"),
-        ("CONVENIO_EDU", "CONVÊNIO"),
-    ]
-
-    RECURSO_CHOICES_ADM = [
-        ("GABINETE", "GABINETE"),
-        ("PREFEITURA", "PREFEITURA"),
-        ("SEMAD", "SEMAD"),
-        ("SEOB", "SEOB"),
-        ("SECTEMA", "SECTEMA"),
-        ("ILUM_PUBLICA", "ILUM. PÚBLICA"),
-        ("SEMUSP", "SEMUSP"),
-        ("SEMAGRI", "SEMAGRI"),
-        ("LEI_ALDIR_BLANC", "LEI ALDIR BLANC"),
-        ("SECULT", "SECULT"),
-        ("SEMAPI", "SEMAPI"),
-        ("SETRANS", "SETRANS"),
-        ("SEMDESTRE", "SEMDESTRE"),
-        ("SEFAZ", "SEFAZ"),
-        ("SECDELT", "SECDELT"),
-        ("CONVENIO_ADM", "CONVÊNIO"),
-    ]
-
-    RECURSO_CHOICES_ASS = [
-        ("FMAS", "FMAS"),
-        ("IGD_IGPAB", "IGD/IGPAB"),
-        ("PSB", "PSB"),
-        ("MAC", "MAC"),
-        ("GSUAS", "GSUAS"),
-        ("PROT_ESPECIAL", "PROT_ESPECIAL"),
-        ("PROT_BASICA", "PROT_BASICA"),
-        ("BL_IGD", "BL IGD"),
-        ("PROCAD_SUAS", "PROCAD-SUAS"),
-        ("CRIAN_FELIZ", "CRIAN_FELIZ"),
-        ("AUX_BRASIL", "AUX_BRASIL"),
-        ("CONVENIO_ASS", "CONVÊNIO"),
-    ]
-
-    RECURSO_CHOICES_SAU = [
-        ("PISO_ENFER", "PISO ENFER"),
-        ("CONTRAPARTIDA", "CONTRAPARTIDA"),
-        ("FUS", "FUS"),
-        ("OUTROS", "OUTROS"),
-        ("CONVENIO_SAU", "CONVÊNIO"),
-    ]
-
-    # Combinando todas as opções de recurso
-    RECURSO_CHOICES = (
-        RECURSO_CHOICES_EDU
-        + RECURSO_CHOICES_ADM
-        + RECURSO_CHOICES_ASS
-        + RECURSO_CHOICES_SAU
-    )
 
     fornecedor = models.ForeignKey(
         Fornecedor, on_delete=models.CASCADE, verbose_name="Fornecedor"
@@ -152,21 +114,23 @@ class Documento(models.Model):
         related_name="documentos_baixados",
     )
 
-    # Novos campos
-    secretaria = models.CharField(
-        max_length=3,
-        choices=SECRETARIA_CHOICES,
-        verbose_name="Secretaria",
-        blank=True,
+    # Novos campos (dinâmicos via FK)
+    secretaria = models.ForeignKey(
+        Secretaria,
+        on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+        verbose_name="Secretaria",
+        related_name="documentos",
     )
 
-    recurso = models.CharField(
-        max_length=20,
-        choices=RECURSO_CHOICES,
-        verbose_name="Recurso",
-        blank=True,
+    recurso = models.ForeignKey(
+        Recurso,
+        on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+        verbose_name="Recurso",
+        related_name="documentos",
     )
 
     class Meta:

@@ -31,10 +31,16 @@ from django.views.generic import (
 from .api import buscar_fornecedor_por_cnpj_cpf
 
 # Nas importações no topo do arquivo
-from .forms import DarBaixaForm, DocumentoForm
+from .forms import (
+    DarBaixaForm,
+    DocumentoForm,
+    RecursoForm,
+    SecretariaForm,
+    CadastroSecretariaRecursoForm,
+)
 
 # Imports locais
-from .models import Documento
+from .models import Documento, Recurso, Secretaria
 
 # Configurar o logger
 logger = logging.getLogger(__name__)
@@ -471,3 +477,74 @@ def dashboard(request):
     }
 
     return render(request, "documentos/dashboard.html", context)
+
+
+def gestao_recursos(request):
+    """Tela de gestão unificada de Secretarias e Recursos (cadastro único e listagem agrupada)."""
+    secretarias = Secretaria.objects.order_by("nome").prefetch_related("recursos")
+    cadastro_form = CadastroSecretariaRecursoForm(request.POST or None)
+
+    if request.method == "POST" and cadastro_form.is_valid():
+        secretaria, recurso = cadastro_form.save()
+        messages.success(
+            request,
+            "Secretaria e Recurso cadastrados/atualizados com sucesso!",
+        )
+        return redirect("documentos:gestao_recursos")
+
+    context = {
+        "secretarias": secretarias,
+        "cadastro_form": cadastro_form,
+    }
+    return render(request, "documentos/gestao_recursos.html", context)
+
+
+def editar_secretaria(request, pk):
+    secretaria = get_object_or_404(Secretaria, pk=pk)
+    form = SecretariaForm(request.POST or None, instance=secretaria)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Secretaria atualizada com sucesso!")
+        return redirect("documentos:gestao_recursos")
+    return render(request, "documentos/editar_secretaria.html", {"form": form, "obj": secretaria})
+
+
+def editar_recurso(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    form = RecursoForm(request.POST or None, instance=recurso)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Recurso atualizado com sucesso!")
+        return redirect("documentos:gestao_recursos")
+    return render(request, "documentos/editar_recurso.html", {"form": form, "obj": recurso})
+
+
+def excluir_secretaria(request, pk):
+    secretaria = get_object_or_404(Secretaria, pk=pk)
+    if request.method == "POST":
+        nome = secretaria.nome
+        secretaria.delete()  # Exclui secretaria; recursos vinculados são excluídos em cascata
+        messages.success(
+            request,
+            f"Secretaria '{nome}' excluída com sucesso. Recursos vinculados foram removidos.",
+        )
+        return redirect("documentos:gestao_recursos")
+    return render(
+        request,
+        "documentos/confirm_delete_secretaria.html",
+        {"obj": secretaria},
+    )
+
+
+def excluir_recurso(request, pk):
+    recurso = get_object_or_404(Recurso, pk=pk)
+    if request.method == "POST":
+        nome = recurso.nome
+        recurso.delete()
+        messages.success(request, f"Recurso '{nome}' excluído com sucesso.")
+        return redirect("documentos:gestao_recursos")
+    return render(
+        request,
+        "documentos/confirm_delete_recurso.html",
+        {"obj": recurso},
+    )

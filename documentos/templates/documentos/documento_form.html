@@ -88,7 +88,7 @@
                                                 class="form-control form-select">
                                             {% for value, text in form.fields.secretaria.choices %}
                                                 <option value="{{ value }}"
-                                                        {% if form.instance.secretaria == value %}selected{% endif %}>
+                                                        {% if form.instance.secretaria_id == value %}selected{% endif %}>
                                                     {{ text }}
                                                 </option>
                                             {% endfor %}
@@ -102,13 +102,9 @@
                                         <span class="input-group-text"><i class="bi bi-cash-coin"></i></span>
                                         <select name="recurso"
                                                 id="{{ form.recurso.id_for_label }}"
-                                                class="form-control form-select">
-                                            {% for value, text in form.fields.recurso.choices %}
-                                                <option value="{{ value }}"
-                                                        {% if form.instance.recurso == value %}selected{% endif %}>
-                                                    {{ text }}
-                                                </option>
-                                            {% endfor %}
+                                                class="form-control form-select"
+                                                data-initial-recurso="{% if form.instance.recurso_id %}{{ form.instance.recurso_id }}{% endif %}">
+                                            <option value="">---------</option>
                                         </select>
                                     </div>
                                     {% if form.recurso.errors %}<div class="invalid-feedback d-block">{{ form.recurso.errors }}</div>{% endif %}
@@ -317,7 +313,7 @@
     <script src="{% static 'documentos/js/documento_data.js' %}"></script>
     <script src="{% static 'documentos/js/documento_tipo.js' %}"></script>
     <script src="{% static 'js/documento_fornecedor.js' %}"></script>
-    <script src="{% static 'js/documento_recursos.js' %}"></script>
+    <script src="{% static 'js/documento_recursos.js' %}?v=3"></script>
     <div class="alert alert-danger form-errors d-none" id="form-errors">
         <h4>Erros de validação:</h4>
         <ul id="error-list">

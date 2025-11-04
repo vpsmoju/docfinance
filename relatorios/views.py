@@ -20,7 +20,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 # Importações locais
-from documentos.models import Documento
+from documentos.models import Documento, Secretaria, Recurso
 from fornecedores.models import Fornecedor
 
 # Configuração de logging
@@ -101,22 +101,24 @@ def relatorio_secretaria(request):
 
     # Agrupamento por secretaria
     secretarias = (
-        Documento.objects.values("secretaria")
+        Documento.objects.select_related("secretaria")
+        .values("secretaria", nome=F("secretaria__nome"))
         .annotate(
             count=Count("id"),
             valor_total=Sum("valor_documento"),
             valor_liquido=Sum("valor_liquido"),
         )
-        .order_by("secretaria")
+        .order_by("nome")
     )
 
     # Lista de documentos filtrados por secretaria
     if secretaria:
         documentos_list = Documento.objects.filter(
-            secretaria=secretaria
-        ).select_related("fornecedor")
-        secretaria_nome = dict(Documento.SECRETARIA_CHOICES).get(
-            secretaria, "Não definido"
+            secretaria_id=secretaria
+        ).select_related("fornecedor", "secretaria")
+        secretaria_nome = (
+            Secretaria.objects.filter(pk=secretaria).values_list("nome", flat=True).first()
+            or "Não definido"
         )
     else:
         documentos_list = Documento.objects.all().select_related("fornecedor")
@@ -138,7 +140,7 @@ def relatorio_secretaria(request):
         "documentos": documentos,
         "secretaria_selecionada": secretaria,
         "secretaria_nome": secretaria_nome,
-        "secretaria_choices": Documento.SECRETARIA_CHOICES,
+        "secretaria_choices": [(s.id, s.nome) for s in Secretaria.objects.order_by("nome")],
         "is_paginated": True,
         "paginator": paginator,
     }
@@ -153,21 +155,25 @@ def relatorio_recurso(request):
 
     # Agrupamento por recurso
     recursos = (
-        Documento.objects.values("recurso")
+        Documento.objects.select_related("recurso")
+        .values("recurso", nome=F("recurso__nome"))
         .annotate(
             count=Count("id"),
             valor_total=Sum("valor_documento"),
             valor_liquido=Sum("valor_liquido"),
         )
-        .order_by("recurso")
+        .order_by("nome")
     )
 
     # Lista de documentos filtrados por recurso
     if recurso:
-        documentos_list = Documento.objects.filter(recurso=recurso).select_related(
-            "fornecedor"
+        documentos_list = Documento.objects.filter(recurso_id=recurso).select_related(
+            "fornecedor", "recurso"
         )
-        recurso_nome = dict(Documento.RECURSO_CHOICES).get(recurso, "Não definido")
+        recurso_nome = (
+            Recurso.objects.filter(pk=recurso).values_list("nome", flat=True).first()
+            or "Não definido"
+        )
     else:
         documentos_list = Documento.objects.all().select_related("fornecedor")
         recurso_nome = "Todos"
@@ -188,7 +194,7 @@ def relatorio_recurso(request):
         "documentos": documentos,
         "recurso_selecionado": recurso,
         "recurso_nome": recurso_nome,
-        "recurso_choices": Documento.RECURSO_CHOICES,
+        "recurso_choices": [(r.id, r.nome) for r in Recurso.objects.order_by("nome")],
         "is_paginated": True,
         "paginator": paginator,
     }
@@ -330,13 +336,13 @@ def relatorio_financeiro(request):
     elif tipo_agrupamento == "secretaria":
         context["agrupamento_titulo"], context["resumo_financeiro"] = (
             _agrupar_documentos(
-                documentos, "secretaria", "Secretaria", Documento.SECRETARIA_CHOICES
+                documentos, "secretaria", "Secretaria", [(s.id, s.nome) for s in Secretaria.objects.all()]
             )
         )
     elif tipo_agrupamento == "recurso":
         context["agrupamento_titulo"], context["resumo_financeiro"] = (
             _agrupar_documentos(
-                documentos, "recurso", "Recurso", Documento.RECURSO_CHOICES
+                documentos, "recurso", "Recurso", [(r.id, r.nome) for r in Recurso.objects.all()]
             )
         )
     else:
@@ -388,9 +394,10 @@ def relatorio_pagamentos(request):
 
     # Filtrar por secretaria se fornecido
     if secretaria:
-        documentos = documentos.filter(secretaria=secretaria)
-        secretaria_nome = dict(Documento.SECRETARIA_CHOICES).get(
-            secretaria, "Não definido"
+        documentos = documentos.filter(secretaria_id=secretaria)
+        secretaria_nome = (
+            Secretaria.objects.filter(pk=secretaria).values_list("nome", flat=True).first()
+            or "Não definido"
         )
     else:
         secretaria_nome = "Todas"
@@ -406,9 +413,9 @@ def relatorio_pagamentos(request):
     }
 
     # Processar cada secretaria
-    for secretaria_code, secretaria_nome in Documento.SECRETARIA_CHOICES:
+    for s in Secretaria.objects.order_by("nome"):
         # Filtrar documentos por secretaria
-        docs_secretaria = documentos.filter(secretaria=secretaria_code)
+        docs_secretaria = documentos.filter(secretaria=s)
 
         if docs_secretaria.exists():
             # Calcular totais da secretaria
@@ -423,20 +430,12 @@ def relatorio_pagamentos(request):
             # Agrupar por recurso dentro da secretaria
             recursos_dados = []
 
-            # Obter recursos para esta secretaria
-            recursos_choices = []
-            if secretaria_code == "EDU":
-                recursos_choices = Documento.RECURSO_CHOICES_EDU
-            elif secretaria_code == "ADM":
-                recursos_choices = Documento.RECURSO_CHOICES_ADM
-            elif secretaria_code == "ASS":
-                recursos_choices = Documento.RECURSO_CHOICES_ASS
-            elif secretaria_code == "SAU":
-                recursos_choices = Documento.RECURSO_CHOICES_SAU
+            # Obter recursos para esta secretaria dinamicamente
+            recursos_choices = Recurso.objects.filter(secretaria=s).order_by("nome")
 
-            for recurso_code, recurso_nome in recursos_choices:
+            for recurso in recursos_choices:
                 # Filtrar documentos por recurso
-                docs_recurso = docs_secretaria.filter(recurso=recurso_code)
+                docs_recurso = docs_secretaria.filter(recurso=recurso)
 
                 if docs_recurso.exists():
                     # Calcular totais do recurso
@@ -451,8 +450,8 @@ def relatorio_pagamentos(request):
                     # Adicionar dados do recurso
                     recursos_dados.append(
                         {
-                            "recurso_code": recurso_code,
-                            "recurso_nome": recurso_nome,
+                            "recurso_code": recurso.id,
+                            "recurso_nome": recurso.nome,
                             "total": total_recurso["total"],
                             "total_liquido": total_recurso["total_liquido"],
                             "total_iss": total_recurso["total_iss"],
@@ -463,8 +462,8 @@ def relatorio_pagamentos(request):
                     )
 
             # Adicionar dados da secretaria
-            secretarias_dados[secretaria_code] = {
-                "secretaria_nome": secretaria_nome,
+            secretarias_dados[s.id] = {
+                "secretaria_nome": s.nome,
                 "total": total_secretaria["total"],
                 "total_liquido": total_secretaria["total_liquido"],
                 "total_iss": total_secretaria["total_iss"],
@@ -494,7 +493,7 @@ def relatorio_pagamentos(request):
         "total_geral": total_geral,
         "secretaria_selecionada": secretaria,
         "secretaria_nome": secretaria_nome,
-        "secretaria_choices": Documento.SECRETARIA_CHOICES,
+        "secretaria_choices": [(sec.id, sec.nome) for sec in Secretaria.objects.order_by("nome")],
         "data_inicio": data_inicio.strftime("%Y-%m-%d"),
         "data_fim": data_fim.strftime("%Y-%m-%d"),
         "status_selecionado": status,
@@ -661,7 +660,7 @@ def filtro_encaminhamento(request):
         documentos = documentos.filter(data_documento__lte=data_fim)
 
     if secretaria_id:
-        documentos = documentos.filter(secretaria=secretaria_id)
+        documentos = documentos.filter(secretaria_id=secretaria_id)
 
     if fornecedor:
         documentos = documentos.filter(fornecedor__nome__icontains=fornecedor)
@@ -679,7 +678,7 @@ def filtro_encaminhamento(request):
 
     context = {
         "documentos": documentos_paginados,
-        "secretarias": Documento.SECRETARIA_CHOICES,
+        "secretarias": [(s.id, s.nome) for s in Secretaria.objects.order_by("nome")],
         "data_inicio": data_inicio,
         "data_fim": data_fim,
         "secretaria": secretaria_id,

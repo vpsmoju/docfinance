@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from .models import Fornecedor
+from .models import Fornecedor, Recurso
 
 
 def buscar_fornecedor_por_cnpj_cpf(request):
@@ -32,3 +32,13 @@ def buscar_fornecedor_por_cnpj_cpf(request):
         )
     except Fornecedor.DoesNotExist:
         return JsonResponse({"error": "Fornecedor não encontrado"})
+
+
+def recursos_por_secretaria(request, secretaria_id):
+    """Retorna recursos (id, nome) de uma secretaria específica em JSON."""
+    recursos = (
+        Recurso.objects.filter(secretaria_id=secretaria_id)
+        .order_by("nome")
+        .values("id", "nome")
+    )
+    return JsonResponse({"recursos": list(recursos)})

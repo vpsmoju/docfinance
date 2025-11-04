@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Secretarias e Recursos | DocFinance{% endblock title %}
+{% block content %}
+<div class="container py-4">
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0 text-white"><i class="bi bi-collection me-2"></i>Secretarias e Recursos</h3>
+    </div>
+    <div class="card-body">
+      <h5 class="mb-3">Cadastro Único</h5>
+      <form method="post" class="mb-4">
+        {% csrf_token %}
+        {{ cadastro_form.non_field_errors }}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nome da Secretaria</label>
+            {{ cadastro_form.secretaria_nome }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Nome do Recurso</label>
+            {{ cadastro_form.recurso_nome }}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </form>
+
+      <h5 class="mb-3">Secretarias e seus Recursos</h5>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Secretaria</th>
+              <th>Recursos</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in secretarias %}
+            <tr>
+              <td>{{ s.nome }}</td>
+              <td>
+                {% if s.recursos.all %}
+                  {% for r in s.recursos.all %}
+                    <span class="badge bg-secondary me-1">
+                      {{ r.nome }}
+                      <a href="{% url 'documentos:editar_recurso' r.id %}" class="text-white ms-2"><i class="bi bi-pencil"></i></a>
+                      <a href="{% url 'documentos:excluir_recurso' r.id %}" class="text-white ms-1"><i class="bi bi-trash"></i></a>
+                    </span>
+                  {% empty %}
+                    <span class="text-muted">Nenhum recurso</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="text-muted">Nenhum recurso</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{% url 'documentos:editar_secretaria' s.id %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i> Editar</a>
+                <a href="{% url 'documentos:excluir_secretaria' s.id %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Excluir</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center">Nenhuma secretaria cadastrada.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
