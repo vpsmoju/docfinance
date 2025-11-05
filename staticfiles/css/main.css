@@ -16,6 +16,22 @@ main {
 
 footer {
     flex-shrink: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 0.5rem 0 !important;
+    border-top: 1px solid #e5e7eb;
+    z-index: 1000;
+    margin-left: 280px;
+}
+
+@media (max-width: 992px) {
+    footer {
+        margin-left: 0;
+    }
 }
 
 /* Estilos para a página inicial */
@@ -36,11 +52,7 @@ footer {
     overflow-x: auto;
 }
 
-.alert-success-custom {
-    background-color: #d4edda !important;
-    border-color: #c3e6cb !important;
-    color: #155724 !important;
-}
+/* Estilos de alerta movidos para style.css */
 
 .inline-form {
     display: inline;

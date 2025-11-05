@@ -132,12 +132,11 @@
     </div>
     {% block extra_js %}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="{% static 'js/relatorios.js' %}"></script>
         <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Paleta única e tooltips com contagem
-    function configurarGraficoTortaContagem(ctx, labels, valores, titulo) {
-        const backgroundColors = [
+// Fallback: define helper contagem+percentual se não estiver disponível
+if (typeof configurarGraficoTortaContagemPercentual === 'undefined') {
+    function configurarGraficoTortaContagemPercentual(ctx, labels, valores, titulo, colors) {
+        const backgroundColors = colors || [
             'rgba(54, 162, 235, 0.6)',
             'rgba(255, 99, 132, 0.6)',
             'rgba(255, 206, 86, 0.6)',
@@ -148,16 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         return new Chart(ctx, {
             type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: titulo,
-                    data: valores,
-                    backgroundColor: backgroundColors,
-                    borderColor: backgroundColors.map(c => c.replace('0.6', '1')),
-                    borderWidth: 1
-                }]
-            },
+            data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: backgroundColors, borderColor: backgroundColors.map(c => c.replace('0.6','1')), borderWidth: 1 }] },
             options: {
                 responsive: true,
                 plugins: {
@@ -168,9 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let label = context.label || '';
                                 if (label) { label += ': '; }
                                 const value = context.raw;
-                                const total = (context.dataset && Array.isArray(context.dataset.data))
-                                    ? context.dataset.data.reduce((sum, v) => sum + v, 0)
-                                    : 0;
+                                const total = (context.dataset && Array.isArray(context.dataset.data)) ? context.dataset.data.reduce((sum, v) => sum + v, 0) : 0;
                                 const percent = total ? (value / total) * 100 : 0;
                                 return `${label}${value} documentos (${percent.toFixed(1)}%)`;
                             }
@@ -180,13 +168,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+}
+        </script>
+        <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Usar helper global para contagem com porcentagem nos tooltips
 
     // Gráfico de Secretarias
     {% if docs_por_secretaria %}
     const secretariaCtx = document.getElementById('secretariaChart').getContext('2d');
     const secretariaLabels = [{% for sec in docs_por_secretaria %}'{{ sec.secretaria_display }}',{% endfor %}];
     const secretariaValores = [{% for sec in docs_por_secretaria %}{{ sec.count }},{% endfor %}];
-    configurarGraficoTortaContagem(secretariaCtx, secretariaLabels, secretariaValores, 'Documentos por Secretaria');
+    configurarGraficoTortaContagemPercentual(secretariaCtx, secretariaLabels, secretariaValores, 'Documentos por Secretaria');
     {% endif %}
     
     // Gráfico de Recursos
@@ -194,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const recursoCtx = document.getElementById('recursoChart').getContext('2d');
     const recursoLabels = [{% for rec in docs_por_recurso %}'{{ rec.recurso_display }}',{% endfor %}];
     const recursoValores = [{% for rec in docs_por_recurso %}{{ rec.count }},{% endfor %}];
-    configurarGraficoTortaContagem(recursoCtx, recursoLabels, recursoValores, 'Documentos por Recurso');
+    configurarGraficoTortaContagemPercentual(recursoCtx, recursoLabels, recursoValores, 'Documentos por Recurso');
     {% endif %}
 });
         </script>

@@ -45,9 +45,20 @@ document.addEventListener('DOMContentLoaded', function() {
         $(telefoneField).mask('(00) 00000-0000');
     }
     
-    // Validação do formulário
+    // Sanitização e validação do formulário
     if (formValidation) {
         $(formValidation).on('submit', function(event) {
+            // Remover máscara e enviar apenas dígitos para CNPJ/CPF
+            if (cnpjCpfField && tipoField) {
+                const tipo = tipoField.value;
+                const apenasDigitos = ($(cnpjCpfField).val() || '').replace(/\D/g, '');
+                if (tipo === 'PF') {
+                    $(cnpjCpfField).val(apenasDigitos.slice(0, 11));
+                } else {
+                    $(cnpjCpfField).val(apenasDigitos.slice(0, 14));
+                }
+            }
+
             if (!this.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();

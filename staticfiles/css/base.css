@@ -1,0 +1,70 @@
+/* Base layout styles extracted from templates/base/base.html */
+/* Layout com sidebar fixa à esquerda */
+.app-container { min-height: 100vh; }
+.sidebar { width: 280px; background: #f8f9fa; border-right: 1px solid #e5e7eb; position: fixed; left: 0; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 1040; }
+.sidebar .sidebar-brand { border-bottom: 1px solid #e5e7eb; text-align: center; }
+.sidebar .sidebar-brand img { height: 40px; width: auto; }
+.sidebar .sidebar-brand a { justify-content: center; }
+.brand-subtitle { font-size: .8rem; color: #6b7280; }
+.brand-badge { display: inline-block; background: transparent; color: #198754; border-radius: 0; padding: 0; font-size: .9rem; font-weight: 700; }
+.sidebar .dropdown-menu { width: 100%; }
+.sidebar .dropdown-item i { margin-right: .5rem; }
+.sidebar a { text-decoration: none; color: #1f2937; display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border-radius: .5rem; }
+.sidebar a:hover { background: #eef2ff; }
+.sidebar .menu-title { font-size: .85rem; color: #6b7280; text-transform: uppercase; margin: .75rem .75rem .25rem; }
+.submenu-toggle { width: 100%; background: transparent; border: 0; padding: .5rem .75rem; text-align: left; display: flex; align-items: center; gap: .5rem; border-radius: .5rem; color: #1f2937; }
+.submenu-toggle:hover { background: #eef2ff; }
+.submenu { display: none; list-style: none; padding-left: 1.5rem; margin: .25rem 0 .5rem; }
+.submenu.open { display: block; }
+.chevron { margin-left: auto; }
+.sidebar-content { flex: 1; overflow-y: auto; padding: .5rem .5rem; }
+.sidebar-footer { border-top: 1px solid #e5e7eb; padding: .75rem; }
+.main { padding: 1.5rem; margin-left: 280px; }
+@media (max-width: 992px) {
+    .sidebar { left: -300px; transition: left .25s ease; }
+    .sidebar.open { left: 0; }
+    .sidebar-toggle-btn { position: fixed; top: .75rem; left: .75rem; z-index: 1050; }
+    .main { padding-top: 3rem; margin-left: 0; }
+}
+
+/* Tipografia responsiva: base ligeiramente menor para compactar conteúdo */
+html { font-size: 15px; }
+
+@media (max-width: 992px) {
+    html { font-size: 15px; }
+}
+
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+}
+
+@media (max-width: 576px) {
+    html { font-size: 13px; }
+}
+
+/* Título de cards/headers mais compacto */
+.card-header h3 {
+    font-size: clamp(1.0rem, 2.3vw, 1.25rem);
+}
+
+/* Texto de labels, campos e botões levemente menor para organizar mais conteúdo */
+.form-label, .input-group-text, .form-control, .btn {
+    font-size: .90rem;
+}
+
+@media (max-width: 576px) {
+    .form-label, .input-group-text, .form-control, .btn {
+        font-size: .85rem;
+    }
+}
+
+/* Tabelas mais compactas (linhas e cabeçalhos) */
+.table th, .table td {
+    font-size: .90rem;
+    padding: .5rem .75rem;
+}
+
+.table thead th {
+    font-size: .85rem;
+}
+}

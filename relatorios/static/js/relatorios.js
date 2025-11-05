@@ -121,6 +121,96 @@ function configurarGraficoTorta(ctx, labels, valores, titulo) {
     });
 }
 
+// Gráfico de contagem com tooltip exibindo porcentagem
+function configurarGraficoTortaContagemPercentual(ctx, labels, valores, titulo, colors) {
+    const backgroundColors = colors || [
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(199, 199, 199, 0.6)'
+    ];
+    return new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: titulo,
+                data: valores,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) { label += ': '; }
+                            const value = context.raw;
+                            const total = (context.dataset && Array.isArray(context.dataset.data))
+                                ? context.dataset.data.reduce((sum, v) => sum + v, 0)
+                                : 0;
+                            const percent = total ? (value / total) * 100 : 0;
+                            return `${label}${value} documentos (${percent.toFixed(1)}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de valores com tooltip exibindo BRL e contagem absoluta
+function configurarGraficoTortaValorComContagem(ctx, labels, valores, contagens, titulo, colors) {
+    const backgroundColors = colors || [
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(199, 199, 199, 0.6)'
+    ];
+    return new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: titulo,
+                data: valores,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            const count = contagens[context.dataIndex] || 0;
+                            const valorBRL = new Intl.NumberFormat('pt-BR', {
+                                style: 'currency', currency: 'BRL'
+                            }).format(value);
+                            return `${label}: ${valorBRL} (${count} documentos)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 // Configuração para gráficos de barra
 function configurarGraficoBarra(ctx, labels, valores, titulo) {
     return new Chart(ctx, {
