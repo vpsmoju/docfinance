@@ -65,14 +65,14 @@ class Fornecedor(models.Model):
         blank=True,
         null=True,
         verbose_name="Agência",
-        help_text="Formato: 0000 ou 0000-0",
+        help_text="Formato: 0000 ou 0000-0 (dígito pode ser X)",
     )
     conta = models.CharField(
         max_length=12,
         blank=True,
         null=True,
         verbose_name="Conta",
-        help_text="Formato: 0000000000-0",
+        help_text="Formato: 0000000000-0 (dígito pode ser X)",
     )
 
     # Campos de auditoria
@@ -107,28 +107,42 @@ class Fornecedor(models.Model):
                 if not valid:
                     raise ValidationError({"cnpj_cpf": message})
 
-        # Validar formato da agência
+        # Validar formato da agência (suporta dígito verificador 'X')
         if self.agencia:
-            agencia_sem_hifen = str(self.agencia).replace("-", "")
-            formato_valido = (
-                (
-                    len(str(self.agencia)) == 4 and str(self.agencia).isdigit()
-                )  # Formato: 0000
-                or (
-                    len(str(self.agencia)) == 6
-                    and str(self.agencia)[4] == "-"
-                    and agencia_sem_hifen.isdigit()
-                )  # Formato: 0000-0
-            )
-            if not formato_valido:
+            agencia = str(self.agencia)
+            if (
+                len(agencia) == 4 and agencia.isdigit()
+            ):
+                pass  # Formato: 0000
+            elif (
+                len(agencia) == 6
+                and agencia[0:4].isdigit()
+                and agencia[4] == "-"
+                and (agencia[5].isdigit() or agencia[5].lower() == "x")
+            ):
+                pass  # Formato: 0000-0 ou 0000-X
+            else:
                 raise ValidationError(
-                    {"agencia": "Formato inválido. Use 0000 ou 0000-0"}
+                    {"agencia": "Formato inválido. Use 0000 ou 0000-0 (dígito pode ser X)"}
                 )
 
         # Validar formato da conta
-        if self.conta and not (
-            len(self.conta) == 12
-            and str(self.conta)[10] == "-"
-            and str(self.conta).replace("-", "").isdigit()
-        ):
-            raise ValidationError({"conta": "Formato inválido. Use 0000000000-0"})
+        if self.conta:
+            conta = str(self.conta)
+            # Permitir 1 a 11 dígitos antes do hífen e 1 dígito/letter 'X' após
+            partes = conta.split("-")
+            dv_valido = (
+                len(partes) == 2
+                and len(partes[1]) == 1
+                and (partes[1].isdigit() or partes[1].lower() == "x")
+            )
+            if (
+                len(partes) != 2
+                or not partes[0].isdigit()
+                or not dv_valido
+                or len(partes[0]) < 1
+                or len(partes[0]) > 11
+            ):
+                raise ValidationError({
+                    "conta": "Formato inválido. Use padrões como 12-3, 1234-5 ou dígito X"
+                })

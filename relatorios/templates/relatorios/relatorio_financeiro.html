@@ -1,6 +1,7 @@
 {% extends "relatorios/relatorio_base.html" %}
 {% load custom_filters %}
 {% load static %}
+{% load l10n %}
 {% block relatorio_titulo %}
     Relatório Financeiro
 {% endblock relatorio_titulo %}
@@ -145,7 +146,7 @@
 {% endblock relatorio_conteudo %}
 {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
+    <script src="{% static 'js/relatorios.js' %}"></script>
     <script>
 // Fallback: define configurarGraficoBarra se não estiver disponível
 if (typeof configurarGraficoBarra === 'undefined') {
@@ -200,7 +201,7 @@ if (typeof configurarGraficoBarra === 'undefined') {
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('financialChart').getContext('2d');
     const labels = [{% for item in resumo_financeiro %}'{{ item.nome }}',{% endfor %}];
-    const valores = [{% for item in resumo_financeiro %}{{ item.valor_total }},{% endfor %}];
+    const valores = [{% for item in resumo_financeiro %}{{ item.valor_total|unlocalize }},{% endfor %}];
     configurarGraficoBarra(ctx, labels, valores, 'Valor Total');
 });
     </script>

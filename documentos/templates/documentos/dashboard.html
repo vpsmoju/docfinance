@@ -1,4 +1,7 @@
 {% extends "base/base.html" %}
+{% load static %}
+{% load l10n %}
+{% load custom_filters %}
 {% block extra_css %}
 <style>
 /* Cards menores e uniformes no dashboard */
@@ -19,7 +22,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Documentos Pendentes</h5>
                     <h2 class="card-text">{{ total_pendentes }}</h2>
-                    <p>Valor Total: R$ {{ valor_pendente|floatformat:2 }}</p>
+                    <p>Valor Total: R$ {{ valor_pendente|currency_br }}</p>
                 </div>
             </div>
         </div>
@@ -28,7 +31,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Documentos Pagos</h5>
                     <h2 class="card-text">{{ total_pagos }}</h2>
-                    <p>Valor Total: R$ {{ valor_pago|floatformat:2 }}</p>
+                    <p>Valor Total: R$ {{ valor_pago|currency_br }}</p>
                 </div>
             </div>
         </div>
@@ -96,7 +99,7 @@
                                 <td>{{ doc.numero }}</td>
                                 <td>{{ doc.fornecedor }}</td>
                                 <td>{{ doc.data_pagamento }}</td>
-                                <td>R$ {{ doc.valor_liquido }}</td>
+                                <td>R$ {{ doc.valor_liquido|currency_br }}</td>
                                 <td>
                                     {% if doc.status == 'PEN' %}
                                         <span class="badge bg-warning">Pendente</span>
@@ -121,39 +124,64 @@
 
 {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/relatorios.js' %}"></script>
     <script>
-        // Gráfico de Status
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        new Chart(statusCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Pendentes', 'Pagos', 'Atrasados'],
-                datasets: [{
-                    data: [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
-                    backgroundColor: ['#ffc107', '#198754', '#dc3545']
-                }]
-            }
-        });
-
-        // Gráfico de Valores
-        const valoresCtx = document.getElementById('valoresChart').getContext('2d');
-        new Chart(valoresCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Pendente', 'Pago'],
-                datasets: [{
-                    label: 'Valor Total (R$)',
-                    data: [{{ valor_pendente }}, {{ valor_pago }}],
-                    backgroundColor: ['#ffc107', '#198754']
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+        // Fallback: define helpers se relatorios.js não estiver disponível
+        if (typeof configurarGraficoTorta === 'undefined') {
+            function configurarGraficoTorta(ctx, labels, valores, titulo) {
+                const backgroundColors = [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 206, 86, 0.6)'
+                ];
+                return new Chart(ctx, {
+                    type: 'pie',
+                    data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: backgroundColors }] },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        const value = context.raw;
+                                        return label + new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
+        }
+        if (typeof configurarGraficoBarra === 'undefined') {
+            function configurarGraficoBarra(ctx, labels, valores, titulo) {
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: 'rgba(54, 162, 235, 0.6)' }] },
+                    options: {
+                        scales: { y: { beginAtZero: true, ticks: { callback: function(value){ return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value); } } } },
+                        plugins: { tooltip: { callbacks: { label: function(context){ let label = context.dataset.label || ''; if(label){ label += ': '; } const value = context.raw; return label + new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value); } } } }
+                    }
+                });
+            }
+        }
+        // Gráfico de Status (torta)
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        configurarGraficoTorta(
+            statusCtx,
+            ['Pendentes', 'Pagos', 'Atrasados'],
+            [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
+            'Documentos por Status'
+        );
+
+        // Gráfico de Valores (barra) com valores não localizados e BRL nos tooltips
+        const valoresCtx = document.getElementById('valoresChart').getContext('2d');
+        configurarGraficoBarra(
+            valoresCtx,
+            ['Pendente', 'Pago'],
+            [{{ valor_pendente|unlocalize }}, {{ valor_pago|unlocalize }}],
+            'Valor Total (R$)'
+        );
      </script>
 {% endblock extra_js %}

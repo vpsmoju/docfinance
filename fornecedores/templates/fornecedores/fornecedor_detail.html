@@ -43,7 +43,7 @@
                                 <p class="mb-1">
                                     <strong>CNPJ/CPF:</strong>
                                 </p>
-                                <p class="bg-light p-2 rounded">{{ fornecedor.cnpj_cpf }}</p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.cnpj_cpf|format_cnpj_cpf }}</p>
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                                 <p class="mb-1">
                                     <strong>Telefone:</strong>
                                 </p>
-                                <p class="bg-light p-2 rounded">{{ fornecedor.telefone|default:"Não informado" }}</p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.telefone|format_telefone|default:"Não informado" }}</p>
                             </div>
                         </div>
                         <div class="mb-4">
@@ -115,13 +115,13 @@
                                 <p class="mb-1">
                                     <strong>Data de Cadastro:</strong>
                                 </p>
-                                <p class="bg-light p-2 rounded">{{ fornecedor.data_criacao|date:"d/m/Y H:i" }}</p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.created_at|date:"d/m/Y H:i" }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p class="mb-1">
                                     <strong>Última Atualização:</strong>
                                 </p>
-                                <p class="bg-light p-2 rounded">{{ fornecedor.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.updated_at|date:"d/m/Y H:i" }}</p>
                             </div>
                         </div>
                     </div>

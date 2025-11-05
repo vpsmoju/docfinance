@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static %}
+{% load static fornecedor_filters %}
 {% block title %}
     Fornecedores | DocFinance
 {% endblock title %}
@@ -53,8 +53,8 @@
                                 <tr>
                                     <td>{{ fornecedor.nome }}</td>
                                     <td>{{ fornecedor.get_tipo_display }}</td>
-                                    <td>{{ fornecedor.cnpj_cpf }}</td>
-                                    <td>{{ fornecedor.telefone|default:"-" }}</td>
+                                    <td>{{ fornecedor.cnpj_cpf|format_cnpj_cpf }}</td>
+                                    <td>{{ fornecedor.telefone|format_telefone|default:"-" }}</td>
                                     <td>{{ fornecedor.email|default:"-" }}</td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm">

@@ -46,16 +46,16 @@ def dashboard(request):
         or 0,
     }
 
-    # Documentos por secretaria (top 5)
+    # Documentos por secretaria (top 5) com nome para exibição
     docs_por_secretaria = (
-        Documento.objects.values("secretaria")
+        Documento.objects.values("secretaria", secretaria_display=F("secretaria__nome"))
         .annotate(count=Count("id"))
         .order_by("-count")[:5]
     )
 
-    # Documentos por recurso (top 5)
+    # Documentos por recurso (top 5) com nome para exibição
     docs_por_recurso = (
-        Documento.objects.values("recurso")
+        Documento.objects.values("recurso", recurso_display=F("recurso__nome"))
         .annotate(count=Count("id"))
         .order_by("-count")[:5]
     )
@@ -189,14 +189,29 @@ def relatorio_recurso(request):
     except EmptyPage:
         documentos = paginator.page(paginator.num_pages)
 
+    # Calcular totais e percentual por recurso
+    recursos_list = list(recursos)
+    total_documentos = sum(r.get("count") or 0 for r in recursos_list)
+    total_valor = sum(r.get("valor_total") or 0 for r in recursos_list)
+    total_liquido = sum(r.get("valor_liquido") or 0 for r in recursos_list)
+
+    # Percentual do total por recurso (baseado em valor_total)
+    total_valor_base = total_valor or 0
+    for r in recursos_list:
+        valor = r.get("valor_total") or 0
+        r["percentual"] = float(valor) / float(total_valor_base) * 100 if total_valor_base else 0
+
     context = {
-        "recursos": recursos,
+        "recursos": recursos_list,
         "documentos": documentos,
         "recurso_selecionado": recurso,
         "recurso_nome": recurso_nome,
         "recurso_choices": [(r.id, r.nome) for r in Recurso.objects.order_by("nome")],
         "is_paginated": True,
         "paginator": paginator,
+        "total_documentos": total_documentos,
+        "total_valor": total_valor,
+        "total_liquido": total_liquido,
     }
 
     return render(request, "relatorios/relatorio_recurso.html", context)

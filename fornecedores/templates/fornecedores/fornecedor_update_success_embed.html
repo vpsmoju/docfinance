@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Fornecedor atualizado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; }
+        .wrap { padding: 16px; }
+        .success { background: #e6ffed; border: 1px solid #57d68d; color: #0a4; padding: 12px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="success">Fornecedor atualizado com sucesso. Esta janela será fechada.</div>
+    </div>
+    <script>
+        (function() {
+            try {
+                var payload = {
+                    type: 'fornecedor_updated',
+                    id: {{ fornecedor.id }},
+                    nome: '{{ fornecedor.nome|escapejs }}',
+                    cnpj_cpf: '{{ fornecedor.cnpj_cpf|escapejs }}'
+                };
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage(payload, '*');
+                }
+            } catch (e) {
+                console.error('Falha ao enviar mensagem ao parent:', e);
+            }
+        })();
+    </script>
+</body>
+</html>

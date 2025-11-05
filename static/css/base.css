@@ -27,8 +27,8 @@
     .main { padding-top: 3rem; margin-left: 0; }
 }
 
-/* Tipografia responsiva: reduz tamanhos em telas menores */
-html { font-size: 16px; }
+/* Tipografia responsiva: base ligeiramente menor para compactar conteúdo */
+html { font-size: 15px; }
 
 @media (max-width: 992px) {
     html { font-size: 15px; }
@@ -42,18 +42,29 @@ html { font-size: 16px; }
     html { font-size: 13px; }
 }
 
-/* Título de cards/headers mais compacto em telas pequenas */
+/* Título de cards/headers mais compacto */
 .card-header h3 {
-    font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+    font-size: clamp(1.0rem, 2.3vw, 1.25rem);
 }
 
-/* Texto de labels, campos e botões levemente menor em telas menores */
+/* Texto de labels, campos e botões levemente menor para organizar mais conteúdo */
 .form-label, .input-group-text, .form-control, .btn {
-    font-size: .95rem;
+    font-size: .90rem;
 }
 
 @media (max-width: 576px) {
     .form-label, .input-group-text, .form-control, .btn {
-        font-size: .90rem;
+        font-size: .85rem;
     }
+}
+
+/* Tabelas mais compactas (linhas e cabeçalhos) */
+.table th, .table td {
+    font-size: .90rem;
+    padding: .5rem .75rem;
+}
+
+.table thead th {
+    font-size: .85rem;
+}
 }

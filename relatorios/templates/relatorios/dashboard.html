@@ -98,7 +98,11 @@
                     <h5 class="mb-0">Documentos por Secretaria</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="secretariaChart" width="400" height="300"></canvas>
+                    {% if docs_por_secretaria %}
+                        <canvas id="secretariaChart" width="400" height="300"></canvas>
+                    {% else %}
+                        <p class="text-muted small mb-0">Sem dados para exibir.</p>
+                    {% endif %}
                 </div>
                 <div class="card-footer">
                     <a href="{% url 'relatorios:secretaria' %}"
@@ -113,7 +117,11 @@
                     <h5 class="mb-0">Documentos por Recurso</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="recursoChart" width="400" height="300"></canvas>
+                    {% if docs_por_recurso %}
+                        <canvas id="recursoChart" width="400" height="300"></canvas>
+                    {% else %}
+                        <p class="text-muted small mb-0">Sem dados para exibir.</p>
+                    {% endif %}
                 </div>
                 <div class="card-footer">
                     <a href="{% url 'relatorios:recurso' %}"
@@ -124,20 +132,70 @@
     </div>
     {% block extra_js %}
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
+        <script src="{% static 'js/relatorios.js' %}"></script>
         <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Paleta única e tooltips com contagem
+    function configurarGraficoTortaContagem(ctx, labels, valores, titulo) {
+        const backgroundColors = [
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(199, 199, 199, 0.6)'
+        ];
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: titulo,
+                    data: valores,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(c => c.replace('0.6', '1')),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                const value = context.raw;
+                                const total = (context.dataset && Array.isArray(context.dataset.data))
+                                    ? context.dataset.data.reduce((sum, v) => sum + v, 0)
+                                    : 0;
+                                const percent = total ? (value / total) * 100 : 0;
+                                return `${label}${value} documentos (${percent.toFixed(1)}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // Gráfico de Secretarias
+    {% if docs_por_secretaria %}
     const secretariaCtx = document.getElementById('secretariaChart').getContext('2d');
     const secretariaLabels = [{% for sec in docs_por_secretaria %}'{{ sec.secretaria_display }}',{% endfor %}];
     const secretariaValores = [{% for sec in docs_por_secretaria %}{{ sec.count }},{% endfor %}];
-    configurarGraficoTorta(secretariaCtx, secretariaLabels, secretariaValores, 'Documentos por Secretaria');
+    configurarGraficoTortaContagem(secretariaCtx, secretariaLabels, secretariaValores, 'Documentos por Secretaria');
+    {% endif %}
     
     // Gráfico de Recursos
+    {% if docs_por_recurso %}
     const recursoCtx = document.getElementById('recursoChart').getContext('2d');
     const recursoLabels = [{% for rec in docs_por_recurso %}'{{ rec.recurso_display }}',{% endfor %}];
     const recursoValores = [{% for rec in docs_por_recurso %}{{ rec.count }},{% endfor %}];
-    configurarGraficoTorta(recursoCtx, recursoLabels, recursoValores, 'Documentos por Recurso');
+    configurarGraficoTortaContagem(recursoCtx, recursoLabels, recursoValores, 'Documentos por Recurso');
+    {% endif %}
 });
         </script>
     {% endblock extra_js %}

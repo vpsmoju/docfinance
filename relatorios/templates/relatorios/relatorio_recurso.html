@@ -1,6 +1,7 @@
 {% extends "relatorios/relatorio_base.html" %}
 {% load custom_filters %}
 {% load static %}
+{% load l10n %}
 {% block relatorio_titulo %}
     Relatório por Recurso
 {% endblock relatorio_titulo %}
@@ -94,7 +95,11 @@
                     <h5 class="mb-0">Gráfico de Distribuição por Recurso</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="recursoChart" width="400" height="200"></canvas>
+                    {% if recursos %}
+                        <canvas id="recursoChart" width="400" height="200"></canvas>
+                    {% else %}
+                        <p class="text-muted small mb-0">Sem dados para exibir.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -158,61 +163,61 @@
 {% endblock relatorio_conteudo %}
 {% block extra_js %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'relatorios/js/relatorios.js' %}"></script>
+    <script src="{% static 'js/relatorios.js' %}"></script>
     <script>
-// Fallback: define configurarGraficoTorta se não estiver disponível
-if (typeof configurarGraficoTorta === 'undefined') {
-    function configurarGraficoTorta(ctx, labels, valores, titulo) {
-        const backgroundColors = [
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(199, 199, 199, 0.6)'
-        ];
-        return new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: titulo,
-                    data: valores,
-                    backgroundColor: backgroundColors,
-                    borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'right' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) { label += ': '; }
-                                const value = context.raw;
-                                label += new Intl.NumberFormat('pt-BR', {
-                                    style: 'currency',
-                                    currency: 'BRL'
-                                }).format(value);
-                                return label;
-                            }
+// Função local: gráfico de valor com tooltip exibindo contagem absoluta
+function configurarGraficoTortaValorComContagem(ctx, labels, valores, contagens, titulo) {
+    const backgroundColors = [
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(199, 199, 199, 0.6)'
+    ];
+    return new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: titulo,
+                data: valores,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            const count = contagens[context.dataIndex] || 0;
+                            const valorBRL = new Intl.NumberFormat('pt-BR', {
+                                style: 'currency', currency: 'BRL'
+                            }).format(value);
+                            return `${label}: ${valorBRL} (${count} documentos)`;
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 }
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de recursos
+    {% if recursos %}
     const ctx = document.getElementById('recursoChart').getContext('2d');
-    const labels = [{% for rec in recursos %}'{{ rec.recurso_display }}',{% endfor %}];
-    const valores = [{% for rec in recursos %}{{ rec.valor_total }},{% endfor %}];
-    configurarGraficoTorta(ctx, labels, valores, 'Valor Total por Recurso');
+    const labels = [{% for rec in recursos %}'{{ rec.nome }}',{% endfor %}];
+    const valores = [{% for rec in recursos %}{{ rec.valor_total|unlocalize }},{% endfor %}];
+    const contagens = [{% for rec in recursos %}{{ rec.count }},{% endfor %}];
+    configurarGraficoTortaValorComContagem(ctx, labels, valores, contagens, 'Valor Total por Recurso');
+    {% endif %}
 });
     </script>
 {% endblock extra_js %}

@@ -312,12 +312,45 @@
     <script src="{% static 'js/documento_validacao.js' %}"></script>
     <script src="{% static 'documentos/js/documento_data.js' %}"></script>
     <script src="{% static 'documentos/js/documento_tipo.js' %}"></script>
-    <script src="{% static 'js/documento_fornecedor.js' %}"></script>
+    <script src="{% static 'js/documento_fornecedor.js' %}?v=2"></script>
     <script src="{% static 'js/documento_recursos.js' %}?v=3"></script>
     <div class="alert alert-danger form-errors d-none" id="form-errors">
         <h4>Erros de validação:</h4>
         <ul id="error-list">
         </ul>
+    </div>
+    <!-- Modal: Fornecedor não encontrado -->
+    <div class="modal fade" id="fornecedorNaoEncontradoModal" tabindex="-1" aria-labelledby="fornecedorNaoEncontradoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="fornecedorNaoEncontradoLabel"><i class="bi bi-exclamation-triangle me-2"></i>Fornecedor não encontrado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    Não localizamos um fornecedor com o CPF/CNPJ informado.<br>
+                    Deseja cadastrar um novo fornecedor para continuar o lançamento?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnCadastrarFornecedor">Cadastrar fornecedor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal: Cadastro de Fornecedor (embed) -->
+    <div class="modal fade" id="cadastroFornecedorModal" tabindex="-1" aria-labelledby="cadastroFornecedorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="cadastroFornecedorLabel"><i class="bi bi-person-plus me-2"></i>Cadastrar novo fornecedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="iframeCadastroFornecedor" src="" style="width: 100%; height: 70vh; border: 0;" title="Cadastro de Fornecedor"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}
 {% block extra_css %}

@@ -1,14 +1,26 @@
-{% extends "base/base.html" %}
 {% load static %}
-{% block title %}
-    {% if form.instance.pk %}
-        Editar Fornecedor | DocFinance
-    {% else %}
-        Novo Fornecedor | DocFinance
-    {% endif %}
-{% endblock title %}
-{% block content %}
-    <div class="container py-4">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if form.instance.pk %}Editar Fornecedor{% else %}Novo Fornecedor{% endif %}</title>
+    <!-- Bootstrap & libs -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body { background: #fff; }
+        .fornecedor-card { box-shadow: none; border: none; }
+        .card-header { background-color: #0d6efd; }
+    </style>
+</head>
+<body>
+    <div class="container py-3">
         <div class="card fornecedor-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0 text-white">
@@ -18,136 +30,96 @@
                         <i class="bi bi-plus-circle me-2"></i>Novo Fornecedor
                     {% endif %}
                 </h3>
-                <a href="{% url 'fornecedores:fornecedor_list' %}"
-                   class="btn btn-outline-light btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i>Voltar para lista
-                </a>
             </div>
             <div class="card-body p-4">
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
+                    <input type="hidden" name="embed" value="true">
                     {% if form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.non_field_errors }}
-                        </div>
+                        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
                     {% endif %}
                     <div class="row g-4">
                         <!-- Informações Básicas -->
                         <div class="col-12">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Informações Básicas</h5>
+                            <h5 class="section-title border-bottom pb-2 mb-3">Informações Básicas</h5>
                         </div>
-                        <!-- Reorganização: Tipo, CNPJ/CPF, Nome -->
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="{{ form.tipo.id_for_label }}" class="form-label required-field">Tipo</label>
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
                                     {{ form.tipo }}
                                 </div>
-                                {% if form.tipo.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.tipo.errors }}</div>
-                                {% endif %}
+                                {% if form.tipo.errors %}<div class="invalid-feedback d-block">{{ form.tipo.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="{{ form.cnpj_cpf.id_for_label }}"
-                                       class="form-label required-field">CNPJ/CPF</label>
+                                <label for="{{ form.cnpj_cpf.id_for_label }}" class="form-label">CNPJ/CPF</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
                                     {{ form.cnpj_cpf }}
                                 </div>
-                                <div class="form-text">Formato: 000.000.000-00 (CPF) ou 00.000.000/0000-00 (CNPJ)</div>
-                                {% if form.cnpj_cpf.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.cnpj_cpf.errors }}</div>
-                                {% endif %}
+                                {% if form.cnpj_cpf.errors %}<div class="invalid-feedback d-block">{{ form.cnpj_cpf.errors }}</div>{% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="{{ form.nome.id_for_label }}" class="form-label required-field">Nome</label>
-                                <div class="input-group flex-nowrap">
+                                <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                                <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                                     {{ form.nome }}
                                 </div>
-                                <div class="form-text">Nome completo do fornecedor ou empresa</div>
-                                {% if form.nome.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.nome.errors }}</div>
-                                {% endif %}
+                                {% if form.nome.errors %}<div class="invalid-feedback d-block">{{ form.nome.errors }}</div>{% endif %}
                             </div>
                         </div>
-                        <!-- Informações de Contato -->
-                        <div class="col-12 mt-4">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Informações de Contato</h5>
-                        </div>
-                        <!-- Reorganização: Email, Telefone, Endereço -->
-                        <div class="col-md-3">
+
+                        <!-- Contato -->
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                                <div class="input-group flex-nowrap">
+                                <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     {{ form.email }}
                                 </div>
-                                {% if form.email.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.email.errors }}</div>
-                                {% endif %}
+                                {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors }}</div>{% endif %}
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                                     {{ form.telefone }}
                                 </div>
-                                <div class="form-text">Formato: (00) 00000-0000</div>
-                                {% if form.telefone.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.telefone.errors }}</div>
-                                {% endif %}
+                                {% if form.telefone.errors %}<div class="invalid-feedback d-block">{{ form.telefone.errors }}</div>{% endif %}
                             </div>
+                        </div>
+
+                        <div class="col-12">
+                            <h5 class="section-title border-bottom pb-2 mb-3">Dados Bancários</h5>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço</label>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                    {{ form.endereco }}
-                                </div>
-                                {% if form.endereco.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.endereco.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- Dados Bancários (Nova Seção) -->
-                        <div class="col-12 mt-4">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Dados Bancários</h5>
-                        </div>
-                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="{{ form.banco.id_for_label }}" class="form-label">Banco</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-bank"></i></span>
                                     {{ form.banco }}
                                 </div>
-                                {% if form.banco.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.banco.errors }}</div>
-                                {% endif %}
+                                {% if form.banco.errors %}<div class="invalid-feedback d-block">{{ form.banco.errors }}</div>{% endif %}
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="{{ form.tipo_conta.id_for_label }}" class="form-label">Tipo de Conta</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
                                     {{ form.tipo_conta }}
                                 </div>
-                                {% if form.tipo_conta.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.tipo_conta.errors }}</div>
-                                {% endif %}
+                                {% if form.tipo_conta.errors %}<div class="invalid-feedback d-block">{{ form.tipo_conta.errors }}</div>{% endif %}
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="{{ form.agencia.id_for_label }}" class="form-label">Agência</label>
                                 <div class="input-group">
@@ -155,12 +127,10 @@
                                     {{ form.agencia }}
                                 </div>
                                 <div class="form-text">Formato: 0000-0 (dígito pode ser X)</div>
-                                {% if form.agencia.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.agencia.errors }}</div>
-                                {% endif %}
+                                {% if form.agencia.errors %}<div class="invalid-feedback d-block">{{ form.agencia.errors }}</div>{% endif %}
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="{{ form.conta.id_for_label }}" class="form-label">Conta</label>
                                 <div class="input-group">
@@ -168,17 +138,11 @@
                                     {{ form.conta }}
                                 </div>
                                 <div class="form-text">Formato: 12-3, 1234-5, ou dígito X no final</div>
-                                {% if form.conta.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.conta.errors }}</div>
-                                {% endif %}
+                                {% if form.conta.errors %}<div class="invalid-feedback d-block">{{ form.conta.errors }}</div>{% endif %}
                             </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{% url 'fornecedores:fornecedor_list' %}"
-                           class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle me-1"></i>Cancelar
-                        </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle me-1"></i>Salvar Fornecedor
                         </button>
@@ -187,12 +151,6 @@
             </div>
         </div>
     </div>
-{% endblock content %}
-{% block extra_css %}
-    <link rel="stylesheet"
-          href="{% static 'fornecedores/css/fornecedores.css' %}">
-{% endblock extra_css %}
-{% block extra_js %}
     <script src="{% static 'js/masc_cpf_cnpj.js' %}"></script>
     <script>
         $(document).ready(function(){
@@ -215,19 +173,15 @@
                     $(this).val('');
                 }
             });
-
             // Conta: permitir último caractere numérico ou 'X'
             $('#{{ form.conta.id_for_label }}').on('input', function() {
                 var raw = $(this).val().replace(/-/g, '').replace(/\s+/g, '');
-                // Manter apenas dígitos e possível 'x'/'X'
                 raw = raw.replace(/[^0-9xX]/g, '');
-
                 if (raw.length >= 2) {
                     var dv = raw.slice(-1).toUpperCase();
                     var numeros = raw.slice(0, -1).replace(/[^0-9]/g, '').slice(0, 11);
                     $(this).val(numeros + '-' + dv);
                 } else if (raw.length === 1) {
-                    // Apenas um caractere digitado (provável DV), não formata ainda
                     $(this).val(raw.toUpperCase());
                 } else {
                     $(this).val('');
@@ -235,4 +189,6 @@
             });
         });
     </script>
-{% endblock extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
