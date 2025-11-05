@@ -73,6 +73,14 @@ class Documento(models.Model):
         ("ATR", "Atrasado"),
     ]
 
+    ETAPA_CHOICES = [
+        ("ABERTURA", "Abertura de Processo"),
+        ("CONTROLE_INTERNO", "Controle Interno"),
+        ("EMPENHO", "Empenho"),
+        ("PAGAMENTO", "Pagamento"),
+        ("BAIXA", "Baixa"),
+    ]
+
 
     fornecedor = models.ForeignKey(
         Fornecedor, on_delete=models.CASCADE, verbose_name="Fornecedor"
@@ -87,6 +95,12 @@ class Documento(models.Model):
         verbose_name="Data de Pagamento", blank=True, null=True
     )  # Tornando opcional
     data_entrada = models.DateTimeField(auto_now_add=True)
+    etapa = models.CharField(
+        max_length=20,
+        choices=ETAPA_CHOICES,
+        default="ABERTURA",
+        verbose_name="Etapa do Processo",
+    )
     valor_documento = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Valor Bruto"
     )
@@ -226,6 +240,28 @@ class Documento(models.Model):
         sequencial_str = f"{sequencial:04d}"
 
         return f"{prefixo}{sequencial_str}"
+
+
+class HistoricoDocumento(models.Model):
+    """Registra histórico de alterações de etapa em um documento."""
+
+    documento = models.ForeignKey(
+        "Documento", on_delete=models.CASCADE, related_name="historicos"
+    )
+    etapa = models.CharField(max_length=20, choices=Documento.ETAPA_CHOICES)
+    descricao = models.TextField(blank=True, null=True)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    data_hora = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-data_hora"]
+        verbose_name = "Histórico de Documento"
+        verbose_name_plural = "Históricos de Documento"
+
+    def __str__(self):
+        return f"{self.documento.numero} - {self.get_etapa_display()} em {self.data_hora}"
 
     def clean(self):
         """Realiza validações personalizadas antes de salvar o objeto."""

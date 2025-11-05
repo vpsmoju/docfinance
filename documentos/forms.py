@@ -256,3 +256,14 @@ class DarBaixaForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         required=True,
     )
+
+
+class AtualizarEtapaForm(forms.Form):
+    """Formulário para atualizar a etapa do processo do documento."""
+
+    etapa = forms.ChoiceField(choices=Documento.ETAPA_CHOICES, label="Nova etapa")
+    descricao = forms.CharField(
+        label="Descrição (opcional)",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+    )

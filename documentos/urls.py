@@ -6,8 +6,10 @@ app_name = "documentos"
 
 urlpatterns = [
     path("", views.DocumentoListView.as_view(), name="list"),
+    path("gestao/", views.GestaoDocumentosView.as_view(), name="gestao"),
     path("novo/", views.DocumentoCreateView.as_view(), name="create"),
     path("<int:pk>/", views.DocumentoDetailView.as_view(), name="detail"),
+    path("<int:pk>/historico/", views.historico_documento, name="historico"),
     path("<int:pk>/editar/", views.DocumentoUpdateView.as_view(), name="update"),
     path("<int:pk>/excluir/", views.DocumentoDeleteView.as_view(), name="delete"),
     path(

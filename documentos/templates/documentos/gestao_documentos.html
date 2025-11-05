@@ -1,0 +1,159 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}
+    Gestão de Documentos | DocFinance
+{% endblock title %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-white">
+                    <i class="bi bi-collection me-2"></i>Gestão de Documentos
+                </h3>
+                <!-- Botão "Novo Documento" removido conforme solicitado -->
+            </div>
+            <div class="card-body p-4">
+                <form method="get" class="mb-4">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" name="search" class="form-control" placeholder="Buscar por número ou fornecedor..." value="{{ request.GET.search|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="etapa" class="form-select">
+                                <option value="">Todas as Etapas</option>
+                                {% for value, text in etapas %}
+                                    <option value="{{ value }}" {% if request.GET.etapa == value %}selected{% endif %}>{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="secretaria" class="form-select">
+                                <option value="">Todas as Secretarias</option>
+                                {% for s in secretarias %}
+                                    <option value="{{ s.id }}" {% if request.GET.secretaria == s.id|stringformat:"s" %}selected{% endif %}>{{ s.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+                        {% if request.GET.search or request.GET.etapa or request.GET.secretaria %}
+                            <a href="{% url 'documentos:gestao' %}" class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i>Limpar</a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Documento</th>
+                                <th>Fornecedor</th>
+                                <th>Secretaria</th>
+                                <th>Valor</th>
+                                <th>Etapa</th>
+                                <th>Data</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in documentos %}
+                                <tr>
+                                    <td>{{ d.numero }}</td>
+                                    <td><a href="{% url 'fornecedores:fornecedor_detail' d.fornecedor.id %}">{{ d.fornecedor }}</a></td>
+                                    <td>{{ d.secretaria.nome|default:"-" }}</td>
+                                    <td>R$ {{ d.valor_documento|currency_br }}</td>
+                                    <td>
+                                        {% if d.etapa == 'ABERTURA' %}
+                                            <span class="badge bg-secondary">Abertura</span>
+                                        {% elif d.etapa == 'CONTROLE_INTERNO' %}
+                                            <span class="badge bg-info text-dark">Controle Interno</span>
+                                        {% elif d.etapa == 'EMPENHO' %}
+                                            <span class="badge bg-warning text-dark">Empenho</span>
+                                        {% elif d.etapa == 'PAGAMENTO' %}
+                                            <span class="badge bg-primary">Pagamento</span>
+                                        {% elif d.etapa == 'BAIXA' %}
+                                            <span class="badge bg-success">Baixa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ d.data_documento|date:"d/m/Y" }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'documentos:detail' d.id %}" class="btn btn-info" title="Detalhes"><i class="bi bi-eye"></i></a>
+                                            <a href="{% url 'documentos:historico' d.id %}" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                            <a href="{% url 'documentos:historico' d.id %}" class="btn btn-secondary open-historico" title="Histórico"><i class="bi bi-clock-history"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="7" class="text-center">Nenhum documento encontrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if is_paginated %}
+                    <nav aria-label="Paginação">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior"><i class="bi bi-chevron-left"></i></a></li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Próxima"><i class="bi bi-chevron-right"></i></a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'documentos/css/documentos.css' %}">
+{% endblock extra_css %}
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframe = document.getElementById('historicoIframe');
+            const modalEl = document.getElementById('historicoModal');
+            let modalInstance = null;
+            if (modalEl && window.bootstrap) {
+                modalInstance = new bootstrap.Modal(modalEl);
+            }
+            document.querySelectorAll('.open-historico').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (iframe) iframe.src = href + (href.includes('?') ? '&' : '?') + 'embed=true';
+                    modalInstance && modalInstance.show();
+                });
+            });
+        });
+    </script>
+
+    <!-- Modal de Histórico -->
+    <div class="modal fade" id="historicoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white" style="padding-top: .375rem; padding-bottom: .375rem;">
+                    <!-- Título removido conforme solicitado -->
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="historicoIframe" src="" style="width:100%;height:70vh;border:0;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock extra_js %}

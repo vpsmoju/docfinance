@@ -37,10 +37,11 @@ from .forms import (
     RecursoForm,
     SecretariaForm,
     CadastroSecretariaRecursoForm,
+    AtualizarEtapaForm,
 )
 
 # Imports locais
-from .models import Documento, Recurso, Secretaria
+from .models import Documento, Recurso, Secretaria, HistoricoDocumento
 
 # Configurar o logger
 logger = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ class DocumentoListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Filtra os documentos com base na pesquisa."""
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related("fornecedor", "secretaria")
         search = self.request.GET.get("search")
 
         if search:
@@ -477,6 +478,75 @@ def dashboard(request):
     }
 
     return render(request, "documentos/dashboard.html", context)
+
+
+class GestaoDocumentosView(LoginRequiredMixin, ListView):
+    """Lista focada para gestão dos documentos com filtros de etapa e secretaria."""
+
+    model = Documento
+    template_name = "documentos/gestao_documentos.html"
+    context_object_name = "documentos"
+    paginate_by = 10
+    ordering = ["-data_documento"]
+
+    def get_queryset(self):
+        qs = super().get_queryset().select_related("fornecedor", "secretaria")
+        search = self.request.GET.get("search")
+        etapa = self.request.GET.get("etapa")
+        secretaria_id = self.request.GET.get("secretaria")
+
+        if search:
+            qs = qs.filter(
+                Q(numero__icontains=search)
+                | Q(fornecedor__nome__icontains=search)
+            )
+        if etapa:
+            qs = qs.filter(etapa=etapa)
+        if secretaria_id:
+            qs = qs.filter(secretaria_id=secretaria_id)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["etapas"] = Documento.ETAPA_CHOICES
+        ctx["secretarias"] = Secretaria.objects.all()
+        return ctx
+
+
+def historico_documento(request, pk):
+    """Exibe o histórico de alterações de etapa de um documento e permite nova atualização."""
+    documento = get_object_or_404(Documento, pk=pk)
+    form = AtualizarEtapaForm(request.POST or None, initial={"etapa": documento.etapa})
+
+    if request.method == "POST" and form.is_valid():
+        nova_etapa = form.cleaned_data["etapa"]
+        descricao = form.cleaned_data.get("descricao")
+
+        # Atualiza etapa atual e registra histórico
+        documento.etapa = nova_etapa
+        documento.save()
+        HistoricoDocumento.objects.create(
+            documento=documento,
+            etapa=nova_etapa,
+            descricao=descricao,
+            usuario=request.user,
+        )
+        messages.success(request, "Etapa atualizada e histórico registrado.")
+        return redirect("documentos:historico", pk=pk)
+
+    historicos = documento.historicos.select_related("usuario").order_by("data_hora").all()
+    # Renderização para modal/iframe quando embed=true
+    if request.GET.get("embed"):
+        return render(
+            request,
+            "documentos/historico_modal.html",
+            {"documento": documento, "historicos": historicos},
+        )
+    return render(
+        request,
+        "documentos/historico_documento.html",
+        {"documento": documento, "historicos": historicos, "form": form},
+    )
 
 
 def gestao_recursos(request):

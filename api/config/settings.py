@@ -225,3 +225,6 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# Permitir incorporação de páginas em iframes da mesma origem (necessário para modais com iframe)
+X_FRAME_OPTIONS = 'SAMEORIGIN'

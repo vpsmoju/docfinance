@@ -67,7 +67,7 @@
                                     <td>{{ doc.fornecedor }}</td>
                                     <td class="texto-centro">{{ doc.numero_documento }}</td>
                                     <td class="texto-direita">{{ doc.valor_documento|currency_br }}</td>
-                                    <td class="texto-centro">{{ doc.get_recurso_display|default:"-" }}</td>
+            <td class="texto-centro">{{ doc.recurso.nome|default:"-" }}</td>
                                 </tr>
                             {% empty %}
                                 <tr>

@@ -89,7 +89,7 @@
                                         </td>
                                         <td>{{ doc.numero }}</td>
                                         <td>{{ doc.fornecedor }}</td>
-                                        <td>{{ doc.get_secretaria_display }}</td>
+                                        <td>{{ doc.secretaria.nome|default:"-" }}</td>
                                         <td>{{ doc.data_documento|date:"d/m/Y" }}</td>
                                         <td>R$ {{ doc.valor_documento|floatformat:2 }}</td>
                                         <td>{{ doc.get_status_display }}</td>

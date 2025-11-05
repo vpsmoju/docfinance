@@ -795,7 +795,9 @@ def relatorio_contabilidade(request):
     secretaria = None
     if documentos:
         primeiro_doc = documentos.first()
-        secretaria = primeiro_doc.get_secretaria_display()
+        secretaria = (
+            primeiro_doc.secretaria.nome if primeiro_doc.secretaria else ""
+        )
 
     context = {
         "documentos": documentos,
@@ -875,8 +877,8 @@ def exportar_csv(request):
                 doc.data_documento.strftime("%d/%m/%Y") if doc.data_documento else "",
                 doc.valor_documento,
                 doc.valor_liquido,
-                doc.get_secretaria_display(),
-                doc.get_recurso_display(),
+                doc.secretaria.nome if doc.secretaria else "",
+                doc.recurso.nome if doc.recurso else "",
                 doc.get_status_display(),
             ]
         )
@@ -964,8 +966,8 @@ def exportar_excel(request):
             worksheet.write(row, 3, "")
         worksheet.write(row, 4, doc.valor_documento, moeda)
         worksheet.write(row, 5, doc.valor_liquido, moeda)
-        worksheet.write(row, 6, doc.get_secretaria_display())
-        worksheet.write(row, 7, doc.get_recurso_display())
+        worksheet.write(row, 6, doc.secretaria.nome if doc.secretaria else "")
+        worksheet.write(row, 7, doc.recurso.nome if doc.recurso else "")
         worksheet.write(row, 8, doc.get_status_display())
 
     # Ajustar largura das colunas
