@@ -522,6 +522,18 @@ def historico_documento(request, pk):
         nova_etapa = form.cleaned_data["etapa"]
         descricao = form.cleaned_data.get("descricao")
 
+        # Mensagens padrão automáticas por etapa (fallback no backend)
+        padroes_descricao = {
+            "ABERTURA": "abertura de processo",
+            "CONTROLE_INTERNO": "recebido para análise",
+            "EMPENHO": "recebido para empenho",
+            "PAGAMENTO": "Apto para pagamento",
+            "BAIXA": "pago e fim de processo",
+        }
+
+        if not descricao or not descricao.strip():
+            descricao = padroes_descricao.get(nova_etapa, "")
+
         # Atualiza etapa atual e registra histórico
         documento.etapa = nova_etapa
         documento.save()
@@ -535,17 +547,18 @@ def historico_documento(request, pk):
         return redirect("documentos:historico", pk=pk)
 
     historicos = documento.historicos.select_related("usuario").order_by("data_hora").all()
+    ultimo_historico = documento.historicos.select_related("usuario").order_by("data_hora").last()
     # Renderização para modal/iframe quando embed=true
     if request.GET.get("embed"):
         return render(
             request,
             "documentos/historico_modal.html",
-            {"documento": documento, "historicos": historicos},
+            {"documento": documento, "historicos": historicos, "ultimo_historico": ultimo_historico},
         )
     return render(
         request,
         "documentos/historico_documento.html",
-        {"documento": documento, "historicos": historicos, "form": form},
+        {"documento": documento, "historicos": historicos, "form": form, "ultimo_historico": ultimo_historico},
     )
 
 

@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,9 +12,17 @@
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
+        /* Wrapper mais estreito e centralizado, responsivo */
+        .modal-wrapper { max-width: 700px; width: 100%; margin: 0 auto; }
+        @media (max-width: 576px) { .modal-wrapper { padding: 8px !important; } }
+
         /* Cards responsivos: Fornecedor+Descrição e Valor lado a lado em telas médias */
-        .info-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .info-cards { display: grid; grid-template-columns: 1fr; gap: 5px; }
         @media (min-width: 768px) { .info-cards { grid-template-columns: 2fr 1fr; } }
+        .card .card-body { padding: 0.45rem; }
+        .fornecedor-display { font-size: 0.95rem; }
+        .descricao-display { font-size: 0.95rem; }
+        .valor-display { font-size: 1.05rem; }
         .break-text { overflow-wrap: anywhere; word-break: break-word; }
 
         /* Linha do tempo responsiva */
@@ -22,16 +31,23 @@
         .timeline-item { position: relative; padding-left: 44px; padding-bottom: 16px; }
         .timeline-item::before { content: ''; position: absolute; left: 12px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #0d6efd; border: 2px solid #fff; box-shadow: 0 0 0 2px #0d6efd22; }
         .badge-stage { margin-right: 8px; }
+
+        /* Layout flutuante como antes, com rolagem interna no card */
+        .modal-embed-body { max-height: calc(100vh - 160px); overflow-y: auto; }
     </style>
 </head>
 <body>
-    <div class="container py-3">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-                <h4 class="mb-1">Documento: {{ documento.numero }}</h4>
-            </div>
+    <!-- Conteúdo direto (sem card externo e sem backdrop), para parecer a tela flutuante única) -->
+    <div class="modal-wrapper p-3">
+        <!-- Barra de cabeçalho única com texto -->
+        <div class="d-flex align-items-center border-bottom mb-2 pb-2">
+            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Histórico de Alterações</h5>
+        </div>
+        <!-- Linha com número do documento e secretaria na mesma linha -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Documento: {{ documento.numero }}</h6>
             {% if documento.secretaria %}
-            <span class="badge bg-info text-dark">{{ documento.secretaria.nome }}</span>
+                <span class="badge bg-info text-dark">{{ documento.secretaria.nome }}</span>
             {% endif %}
         </div>
 
@@ -40,16 +56,16 @@
             <div class="card">
                 <div class="card-body">
                     <div class="text-muted small mb-1"><i class="bi bi-person me-1"></i>Fornecedor</div>
-                    <div class="fs-6 fw-semibold break-text">{{ documento.fornecedor }}</div>
+                    <div class="fornecedor-display fw-semibold break-text">{{ documento.fornecedor }}</div>
                     <div class="text-muted small mt-3"><i class="bi bi-file-earmark-text me-1"></i>Descrição</div>
-                    <div class="break-text">{{ documento.descricao|default:"-" }}</div>
+                    <div class="descricao-display break-text">{{ documento.descricao|default:"-" }}</div>
                 </div>
             </div>
             <!-- Card Valor -->
             <div class="card">
                 <div class="card-body">
                     <div class="text-muted small mb-1"><i class="bi bi-cash-stack me-1"></i>Valor</div>
-                    <div class="fs-5 fw-semibold">R$ {{ documento.valor_documento|default:0|floatformat:2 }}</div>
+                    <div class="valor-display fw-semibold">R$ {{ documento.valor_documento|currency_br }}</div>
                 </div>
             </div>
         </div>
@@ -61,7 +77,7 @@
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <div class="flex-grow-1">
                             {% if h.etapa == 'ABERTURA' %}
-                                <span class="badge bg-secondary badge-stage">Abertura do Processo</span>
+                                <span class="badge bg-secondary badge-stage">Abertura de Documento</span>
                             {% elif h.etapa == 'CONTROLE_INTERNO' %}
                                 <span class="badge bg-info text-dark badge-stage">Controle Interno</span>
                             {% elif h.etapa == 'EMPENHO' %}
@@ -84,6 +100,7 @@
             {% endfor %}
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
