@@ -32,3 +32,63 @@
     min-height: unset !important;
     resize: none;
 }
+
+/* Layout mais compacto e responsivo para a página de fornecedor */
+.fornecedor-container {
+    max-width: 860px;
+}
+
+.fornecedor-card .card-body {
+    padding: 1rem !important;
+}
+
+.fornecedor-card .row.g-3 {
+    --bs-gutter-x: .75rem;
+    --bs-gutter-y: .75rem;
+}
+
+.fornecedor-card .mb-3 {
+    margin-bottom: .5rem !important;
+}
+
+.fornecedor-card .section-title {
+    font-size: 1rem;
+}
+
+.fornecedor-card .form-label {
+    margin-bottom: .25rem;
+    font-size: .95rem;
+}
+
+.fornecedor-card .input-group-text {
+    padding: .3rem .5rem;
+}
+
+.fornecedor-card .form-text {
+    margin-top: .25rem;
+    font-size: .8rem;
+}
+
+.fornecedor-card .form-control {
+    padding: .35rem .6rem;
+    font-size: .95rem;
+}
+
+.fornecedor-card .card-header {
+    padding: .5rem .75rem;
+}
+
+.fornecedor-card h3.mb-0 {
+    font-size: 1.15rem;
+}
+
+@media (max-width: 576px) {
+    .fornecedor-container {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+    .fornecedor-card .row.g-3 {
+        --bs-gutter-x: .5rem;
+        --bs-gutter-y: .5rem;
+    }
+}

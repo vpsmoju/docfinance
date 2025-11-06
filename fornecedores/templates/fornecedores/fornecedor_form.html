@@ -8,7 +8,7 @@
     {% endif %}
 {% endblock title %}
 {% block content %}
-    <div class="container py-4">
+    <div class="container py-2 fornecedor-container">
         <div class="card fornecedor-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0 text-white">
@@ -23,7 +23,7 @@
                     <i class="bi bi-arrow-left me-1"></i>Voltar para lista
                 </a>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-3">
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
                     {% if form.non_field_errors %}
@@ -31,10 +31,10 @@
                             {{ form.non_field_errors }}
                         </div>
                     {% endif %}
-                    <div class="row g-4">
+                    <div class="row g-2">
                         <!-- Informações Básicas -->
                         <div class="col-12">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Informações Básicas</h5>
+                            <h5 class="section-title border-bottom pb-1 mb-2">Informações Básicas</h5>
                         </div>
                         <!-- Reorganização: Tipo, CNPJ/CPF, Nome -->
                         <div class="col-md-3">
@@ -77,8 +77,8 @@
                             </div>
                         </div>
                         <!-- Informações de Contato -->
-                        <div class="col-12 mt-4">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Informações de Contato</h5>
+                        <div class="col-12 mt-2">
+                            <h5 class="section-title border-bottom pb-1 mb-2">Informações de Contato</h5>
                         </div>
                         <!-- Reorganização: Email, Telefone, Endereço -->
                         <div class="col-md-3">
@@ -120,8 +120,8 @@
                         </div>
                         
                         <!-- Dados Bancários (Nova Seção) -->
-                        <div class="col-12 mt-4">
-                            <h5 class="section-title border-bottom pb-2 mb-2">Dados Bancários</h5>
+                        <div class="col-12 mt-2">
+                            <h5 class="section-title border-bottom pb-1 mb-2">Dados Bancários</h5>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
@@ -174,12 +174,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4">
+                    <div class="d-flex justify-content-end gap-2 mt-3">
                         <a href="{% url 'fornecedores:fornecedor_list' %}"
-                           class="btn btn-outline-secondary">
+                           class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-x-circle me-1"></i>Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary btn-sm">
                             <i class="bi bi-check-circle me-1"></i>Salvar Fornecedor
                         </button>
                     </div>
