@@ -1,3 +1,1 @@
 # docfinance
-
-Atualização de teste: validação do fluxo de credenciais via Git Credential Manager (GCM) e push para remotes `origin` e `mirror`.
