@@ -521,6 +521,8 @@ def historico_documento(request, pk):
     if request.method == "POST" and form.is_valid():
         nova_etapa = form.cleaned_data["etapa"]
         descricao = form.cleaned_data.get("descricao")
+        motivo_tipo = form.cleaned_data.get("motivo_tipo")
+        motivo_livre = form.cleaned_data.get("motivo_livre")
 
         # Mensagens padrão automáticas por etapa (fallback no backend)
         padroes_descricao = {
@@ -531,34 +533,99 @@ def historico_documento(request, pk):
             "BAIXA": "pago e fim de processo",
         }
 
-        if not descricao or not descricao.strip():
-            descricao = padroes_descricao.get(nova_etapa, "")
+        # Verificar se há retrocesso de etapa e exigir motivo
+        etapas_keys = [key for key, _ in Documento.ETAPA_CHOICES]
+        try:
+            idx_novo = etapas_keys.index(nova_etapa)
+            idx_atual = etapas_keys.index(documento.etapa)
+        except ValueError:
+            idx_novo = idx_atual = 0
 
-        # Atualiza etapa atual e registra histórico
-        documento.etapa = nova_etapa
-        documento.save()
-        HistoricoDocumento.objects.create(
-            documento=documento,
-            etapa=nova_etapa,
-            descricao=descricao,
-            usuario=request.user,
-        )
-        messages.success(request, "Etapa atualizada e histórico registrado.")
-        return redirect("documentos:historico", pk=pk)
+        if idx_novo < idx_atual and not (motivo_tipo or (motivo_livre and motivo_livre.strip())):
+            form.add_error("motivo_tipo", "Escolha um motivo ou descreva no campo livre.")
+        else:
+            if idx_novo < idx_atual:
+                # Compor descrição a partir do motivo
+                label_por_valor = dict(form.fields["motivo_tipo"].choices)
+                partes = ["Devolução"]
+                if motivo_tipo:
+                    partes.append(label_por_valor.get(motivo_tipo, motivo_tipo))
+                if motivo_livre and motivo_livre.strip():
+                    partes.append(motivo_livre.strip())
+                descricao = " — ".join(partes)
+            else:
+                if not descricao or not descricao.strip():
+                    descricao = padroes_descricao.get(nova_etapa, "")
+
+            # Atualiza etapa atual e registra histórico
+            documento.etapa = nova_etapa
+            documento.save()
+            HistoricoDocumento.objects.create(
+                documento=documento,
+                etapa=nova_etapa,
+                descricao=descricao,
+                usuario=request.user,
+            )
+            messages.success(request, "Etapa atualizada e histórico registrado.")
+            return redirect("documentos:historico", pk=pk)
 
     historicos = documento.historicos.select_related("usuario").order_by("data_hora").all()
     ultimo_historico = documento.historicos.select_related("usuario").order_by("data_hora").last()
+
+    # Montar informações de etapas para a linha do tempo (figura 1)
+    etapas_seq = Documento.ETAPA_CHOICES
+    datas_por_etapa = {}
+    descr_por_etapa = {}
+    for h in historicos:
+        # Guardar SEMPRE a última data registrada por etapa
+        # (historicos está ordenado por data_hora crescente, então sobrescrevemos)
+        datas_por_etapa[h.etapa] = h.data_hora
+        if h.descricao:
+            descr_por_etapa[h.etapa] = h.descricao
+
+    # Garantir data para ABERTURA mesmo sem histórico, usando data_entrada
+    if "ABERTURA" not in datas_por_etapa and hasattr(documento, "data_entrada"):
+        datas_por_etapa["ABERTURA"] = documento.data_entrada
+
+    # Índice da etapa atual para marcar etapas concluídas
+    try:
+        indice_atual = [key for key, _ in etapas_seq].index(documento.etapa)
+    except ValueError:
+        indice_atual = 0
+
+    etapas_info = []
+    for idx, (key, label) in enumerate(etapas_seq):
+        etapas_info.append(
+            {
+                "key": key,
+                "label": label,
+                "concluida": idx <= indice_atual,
+                "data": datas_por_etapa.get(key),
+                "descricao": descr_por_etapa.get(key),
+            }
+        )
     # Renderização para modal/iframe quando embed=true
     if request.GET.get("embed"):
         return render(
             request,
             "documentos/historico_modal.html",
-            {"documento": documento, "historicos": historicos, "ultimo_historico": ultimo_historico},
+            {
+                "documento": documento,
+                "historicos": historicos,
+                "ultimo_historico": ultimo_historico,
+                "etapas_info": etapas_info,
+            },
         )
     return render(
         request,
         "documentos/historico_documento.html",
-        {"documento": documento, "historicos": historicos, "form": form, "ultimo_historico": ultimo_historico},
+        {
+            "documento": documento,
+            "historicos": historicos,
+            "form": form,
+            "ultimo_historico": ultimo_historico,
+            "etapas_info": etapas_info,
+        },
     )
 
 

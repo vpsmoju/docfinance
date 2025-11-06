@@ -26,7 +26,17 @@
                             <div class="col-md-10">
                                 <label class="form-label">Etapa</label>
                                 {{ form.etapa }}
-                                <div class="form-text text-muted">Mensagem será preenchida automaticamente conforme a etapa.</div>
+                                <input type="hidden" id="current_etapa" value="{{ documento.etapa }}">
+                                <div class="form-text text-muted">Mensagem será preenchida automaticamente conforme a etapa. Se a etapa retroceder, informe o motivo da devolução.</div>
+                            </div>
+                            <!-- Campos de devolução precisam estar DENTRO do formulário para serem enviados no POST -->
+                            <div class="col-12" id="devolucao_field" style="display:none;">
+                                <label class="form-label">Motivo da devolução</label>
+                                <div class="row g-2">
+                                    <div class="col-md-5">{{ form.motivo_tipo }}</div>
+                                    <div class="col-md-7">{{ form.motivo_livre }}</div>
+                                </div>
+                                <div class="form-text text-muted">Escolha um motivo e, se necessário, detalhe no campo ao lado.</div>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check2-circle me-1"></i>Atualizar</button>
@@ -37,15 +47,15 @@
                         <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 px-3">
                             <div>
                                 {% if ultimo_historico.etapa == 'ABERTURA' %}
-                                    <span class="badge bg-secondary me-2">Abertura de Documento</span>
+                                    <span class="badge bg-secondary me-2"><i class="bi bi-journal-plus"></i>Abertura de Documento</span>
                                 {% elif ultimo_historico.etapa == 'CONTROLE_INTERNO' %}
-                                    <span class="badge bg-info text-dark me-2">Controle Interno</span>
+                                    <span class="badge bg-info text-dark me-2"><i class="bi bi-shield-check"></i>Controle Interno</span>
                                 {% elif ultimo_historico.etapa == 'EMPENHO' %}
-                                    <span class="badge bg-warning text-dark me-2">Empenho</span>
+                                    <span class="badge bg-warning text-dark me-2"><i class="bi bi-clipboard-check"></i>Empenho</span>
                                 {% elif ultimo_historico.etapa == 'PAGAMENTO' %}
-                                    <span class="badge bg-primary me-2">Pagamento</span>
+                                    <span class="badge bg-primary me-2"><i class="bi bi-credit-card"></i>Pagamento</span>
                                 {% elif ultimo_historico.etapa == 'BAIXA' %}
-                                    <span class="badge bg-success me-2">Baixa</span>
+                                    <span class="badge bg-success me-2"><i class="bi bi-check-circle"></i>Baixa</span>
                                 {% endif %}
                                 <span class="text-muted small">{{ ultimo_historico.descricao|default:"" }}</span>
                             </div>
@@ -56,35 +66,38 @@
                         </div>
                     {% endif %}
                 </div>
-                <div style="flex: 1; overflow-y: auto;">
-                <div class="list-group">
-                    {% for h in historicos %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-1 px-3">
-                            <div>
-                                {% if h.etapa == 'ABERTURA' %}
-                                    <span class="badge bg-secondary me-2">Abertura de Documento</span>
-                                {% elif h.etapa == 'CONTROLE_INTERNO' %}
-                                    <span class="badge bg-info text-dark me-2">Controle Interno</span>
-                                {% elif h.etapa == 'EMPENHO' %}
-                                    <span class="badge bg-warning text-dark me-2">Empenho</span>
-                                {% elif h.etapa == 'PAGAMENTO' %}
-                                    <span class="badge bg-primary me-2">Pagamento</span>
-                                {% elif h.etapa == 'BAIXA' %}
-                                    <span class="badge bg-success me-2">Baixa</span>
-                                {% endif %}
-                                <div class="text-muted small">{{ h.descricao|default:"" }}</div>
-                            </div>
-                            <div class="text-end">
-                                <div>{{ h.data_hora|date:"d/m/Y" }} {{ h.data_hora|date:"H:i:s" }}</div>
-                                <div class="text-muted small">{% if h.usuario %}{{ h.usuario.get_full_name|default:h.usuario.username }}{% else %}Sistema{% endif %}</div>
-                            </div>
-                        </div>
-                    {% empty %}
-                        <div class="alert alert-info">Nenhum histórico registrado ainda.</div>
-                    {% endfor %}
-                </div>
-                </div>
+                <!-- Lista completa removida para edição mínima conforme figura 2 -->
             </div>
         </div>
     </div>
+    <script>
+        (function(){
+            const select = document.querySelector('select[name="etapa"]');
+            const campo = document.getElementById('devolucao_field');
+            const motivoTipo = document.querySelector('select[name="motivo_tipo"]');
+            const motivoLivre = document.querySelector('textarea[name="motivo_livre"]');
+            const currentEtapa = document.getElementById('current_etapa').value;
+
+            function indexOfEtapa(key){
+                const opts = Array.from(select.options).map(o => o.value);
+                return opts.indexOf(key);
+            }
+
+            function updateVisibilidade(){
+                const nova = select.value;
+                const idxNova = indexOfEtapa(nova);
+                const idxAtual = indexOfEtapa(currentEtapa);
+                const retrocede = idxNova > -1 && idxAtual > -1 && idxNova < idxAtual;
+                campo.style.display = retrocede ? '' : 'none';
+                if (motivoTipo) motivoTipo.required = retrocede;
+                if (!retrocede && motivoTipo) motivoTipo.value = '';
+                if (!retrocede && motivoLivre) motivoLivre.value = '';
+            }
+
+            if (select){
+                select.addEventListener('change', updateVisibilidade);
+                updateVisibilidade();
+            }
+        })();
+    </script>
 {% endblock content %}

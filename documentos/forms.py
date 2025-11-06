@@ -262,8 +262,27 @@ class AtualizarEtapaForm(forms.Form):
     """Formulário para atualizar a etapa do processo do documento."""
 
     etapa = forms.ChoiceField(choices=Documento.ETAPA_CHOICES, label="Nova etapa")
+    MOTIVOS_DEVOLUCAO = [
+        ("PEND_DOC", "Pendência documental"),
+        ("ERRO_EMP", "Erro no empenho"),
+        ("AJUSTE_VAL", "Ajuste de valores"),
+        ("DIV_DADOS", "Divergência de dados"),
+        ("SOL_SEC", "Solicitação da secretaria"),
+        ("OUTRO", "Outro"),
+    ]
+    motivo_tipo = forms.ChoiceField(
+        choices=MOTIVOS_DEVOLUCAO,
+        required=False,
+        label="Motivo da devolução (opções)",
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+    motivo_livre = forms.CharField(
+        label="Detalhe/observação (opcional)",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+    )
     descricao = forms.CharField(
         label="Descrição (opcional)",
         required=False,
-        widget=forms.Textarea(attrs={"class": "form-control"}),
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
     )
