@@ -92,3 +92,37 @@
         --bs-gutter-y: .5rem;
     }
 }
+
+/* Acordeão compacto para Dados Bancários */
+.fornecedor-card .accordion-button {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.95rem;
+}
+.fornecedor-card .accordion-body {
+    padding: 0.5rem;
+}
+
+/* Em telas médias e grandes, deixe o acordeão com aparência de seção e desative interação */
+@media (min-width: 768px) {
+    .fornecedor-card .accordion-item {
+        border: 0;
+    }
+    .fornecedor-card .accordion-button {
+        background-color: transparent;
+        box-shadow: none;
+        color: inherit;
+        padding: 0;
+        pointer-events: none; /* desativa clique no desktop */
+    }
+    .fornecedor-card .accordion-button::after {
+        display: none; /* oculta o ícone de seta */
+    }
+    .fornecedor-card .accordion-header {
+        border-bottom: 1px solid var(--bs-border-color);
+        margin-bottom: .5rem;
+        padding-bottom: .25rem;
+    }
+    .fornecedor-card .accordion-body {
+        padding: 0;
+    }
+}
