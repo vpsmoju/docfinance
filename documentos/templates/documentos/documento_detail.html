@@ -5,56 +5,82 @@
     Documento {{ object.numero }} | DocFinance
 {% endblock title %}
 {% block content %}
-    <div class="container py-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0 text-white">
-                    <i class="bi bi-file-earmark-text me-2"></i>Documento: {{ object.numero }}
-                </h3>
-                <div>
-                    <a href="{% url 'documentos:update' object.pk %}"
-                       class="btn btn-outline-light btn-sm me-2">
-                        <i class="bi bi-pencil me-1"></i>Editar
+    <div class="floating-overlay">
+        <div class="floating-panel card shadow-lg">
+            <div class="card-header d-flex justify-content-between align-items-center py-2 {% if object.status == 'PEN' %}bg-warning text-dark{% elif object.status == 'PAG' %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <nav class="small" aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 text-truncate" style="max-width: 50vw;">
+                            <li class="breadcrumb-item"><a class="text-reset text-decoration-none" href="{% url 'documentos:list' %}">Documentos</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Detalhe</li>
+                        </ol>
+                    </nav>
+                    <h6 class="mb-0 fw-semibold text-truncate">
+                        {% if object.status == 'PAG' %}
+                            <i class="bi bi-check-circle me-1"></i>
+                        {% elif object.status == 'PEN' %}
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                        {% else %}
+                            <i class="bi bi-x-circle me-1"></i>
+                        {% endif %}
+                        {{ object.numero }}
+                    </h6>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    {% if object.status == 'PEN' %}
+                    <a href="{% url 'documentos:update' object.pk %}" class="btn btn-dark">
+                        <i class="bi bi-pencil me-1"></i><span class="d-none d-sm-inline">Editar</span>
                     </a>
                     {% if perms.documentos.delete_documento %}
-                        <a href="{% url 'documentos:delete' object.pk %}"
-                           class="btn btn-outline-light btn-sm me-2">
-                            <i class="bi bi-trash me-1"></i>Excluir
+                        <a href="{% url 'documentos:delete' object.pk %}" class="btn btn-dark">
+                            <i class="bi bi-trash me-1"></i><span class="d-none d-sm-inline">Excluir</span>
                         </a>
                     {% endif %}
-                    <a href="{% url 'documentos:list' %}"
-                       class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-arrow-left me-1"></i>Voltar
+                    <a href="{% url 'documentos:list' %}" class="btn btn-dark">
+                        <i class="bi bi-arrow-left me-1"></i><span class="d-none d-sm-inline">Voltar</span>
                     </a>
+                    {% else %}
+                    <a href="{% url 'documentos:update' object.pk %}" class="btn btn-outline-light">
+                        <i class="bi bi-pencil me-1"></i><span class="d-none d-sm-inline">Editar</span>
+                    </a>
+                    {% if perms.documentos.delete_documento %}
+                        <a href="{% url 'documentos:delete' object.pk %}" class="btn btn-outline-light">
+                            <i class="bi bi-trash me-1"></i><span class="d-none d-sm-inline">Excluir</span>
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'documentos:list' %}" class="btn btn-outline-light">
+                        <i class="bi bi-arrow-left me-1"></i><span class="d-none d-sm-inline">Voltar</span>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
-            <div class="card-body p-4">
-                <div class="row justify-content-around">
-                    <div class="col-md-5">
-                        <h5 class="section-title border-bottom pb-2 mb-3">Informações Básicas</h5>
-                        <dl class="row">
+            <div class="card-body p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="section-title border-bottom pb-1 mb-2">Informações Básicas</h6>
+                        <dl class="row g-1 align-items-center small mb-0">
                             <dt class="col-sm-4">nº do Protocolo</dt>
                             <dd class="col-sm-8">
                                 {{ object.numero }}
                             </dd>
-                            <dt class="col-sm-4 mt-2">nº da NF/Recibo</dt>
-                            <dd class="col-sm-8 mt-2">
+                            <dt class="col-sm-4">nº da NF/Recibo</dt>
+                            <dd class="col-sm-8">
                                 {% if object.tipo == 'REC' %}
                                     {{ object.numero }}
                                 {% else %}
                                     {{ object.numero_documento }}
                                 {% endif %}
                             </dd>
-                            <dt class="col-sm-4 mt-2">Tipo</dt>
-                            <dd class="col-sm-8 mt-2">
+                            <dt class="col-sm-4">Tipo</dt>
+                            <dd class="col-sm-8">
                                 {{ object.get_tipo_display }}
                             </dd>
-                            <dt class="col-sm-4 mt-2">Fornecedor</dt>
-                            <dd class="col-sm-8 mt-2">
+                            <dt class="col-sm-4">Fornecedor</dt>
+                            <dd class="col-sm-8">
                                 <a href="{% url 'fornecedores:fornecedor_detail' object.fornecedor.id %}">{{ object.fornecedor }}</a>
                             </dd>
-                            <dt class="col-sm-4 mt-2">Status</dt>
-                            <dd class="col-sm-8 mt-2">
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">
                                 {% if object.status == 'PEN' %}
                                     <span class="badge bg-warning text-dark">Pendente</span>
                                 {% elif object.status == 'PAG' %}
@@ -65,43 +91,38 @@
                             </dd>
                         </dl>
                     </div>
-                    <div class="col-md-5">
-                        <h5 class="section-title border-bottom pb-2 mb-3">Datas</h5>
-                        <dl class="row">
+                    <div class="col-md-6">
+                        <h6 class="section-title border-bottom pb-1 mb-2">Datas</h6>
+                        <dl class="row g-1 align-items-center small mb-0">
                             <dt class="col-sm-5">Data do Documento</dt>
                             <dd class="col-sm-7">
                                 {{ object.data_documento|date:"d/m/Y" }}
                             </dd>
-                            <dt class="col-sm-5 mt-2">Data de Entrada</dt>
-                            <dd class="col-sm-7 mt-2">
+                            <dt class="col-sm-5">Data de Entrada</dt>
+                            <dd class="col-sm-7">
                                 {{ object.data_entrada|date:"d/m/Y \à\s H:i" }}
                             </dd>
-                            {% if object.data_baixa %}
-                                <div class="col-12 mt-2 mb-2 d-flex justify-content-center">
-                                    <hr class="border-secondary w-70">
-                                </div>
-                            {% endif %}
-                            <dt class="col-sm-5 mt-2">Data de Pagamento</dt>
-                            <dd class="col-sm-7 mt-2">
+                            <dt class="col-sm-5">Data de Pagamento</dt>
+                            <dd class="col-sm-7">
                                 {{ object.data_pagamento|date:"d/m/Y"|default:"-" }}
                             </dd>
                             {% if object.data_baixa %}
-                                <dt class="col-sm-5 mt-2">Data da Baixa</dt>
-                                <dd class="col-sm-7 mt-2">
+                                <dt class="col-sm-5">Data da Baixa</dt>
+                                <dd class="col-sm-7">
                                     {{ object.data_baixa|date:"d/m/Y \à\s H:i" }}
                                 </dd>
                             {% endif %}
                         </dl>
                     </div>
                 </div>
-                <div class="row mt-4 justify-content-around">
-                    <div class="col-md-5">
-                        <h5 class="section-title border-bottom pb-2 mb-3">Descrição</h5>
-                        <p>{{ object.descricao|linebreaks|default:"Sem descrição" }}</p>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <h6 class="section-title border-bottom pb-1 mb-2">Descrição</h6>
+                        <p class="small mb-2">{{ object.descricao|linebreaks|default:"Sem descrição" }}</p>
                         <!-- Alocação Orçamentária -->
-                        <div class="mt-4 p-3 bg-light rounded border">
-                            <h5 class="text-primary border-bottom pb-2 mb-3">Alocação Orçamentária</h5>
-                            <dl class="row">
+                        <div class="p-2 bg-light rounded border">
+                            <h6 class="text-primary mb-2">Alocação Orçamentária</h6>
+                            <dl class="row g-1 align-items-center small mb-0">
                                 <dt class="col-sm-4">Secretaria</dt>
                                 <dd class="col-sm-8">
                                     {% if object.secretaria %}
@@ -110,8 +131,8 @@
                                         <span class="text-muted">Não informado</span>
                                     {% endif %}
                                 </dd>
-                                <dt class="col-sm-4 mt-2">Recurso</dt>
-                                <dd class="col-sm-8 mt-2">
+                                <dt class="col-sm-4">Recurso</dt>
+                                <dd class="col-sm-8">
                                     {% if object.recurso %}
                                         <span class="badge bg-success">{{ object.recurso.nome }}</span>
                                     {% else %}
@@ -121,25 +142,17 @@
                             </dl>
                         </div>
                     </div>
-                    <div class="col-md-5">
-                        <h5 class="section-title border-bottom pb-2 mb-3">Valores</h5>
-                        <dl class="row">
+                    <div class="col-md-6">
+                        <h6 class="section-title border-bottom pb-1 mb-2">Valores</h6>
+                        <dl class="row g-1 align-items-center small mb-0">
                             <dt class="col-sm-5">Valor do Documento</dt>
-                            <dd class="col-sm-7">
-                                <span class="text-success fw-bold">R$ {{ object.valor_documento|currency_br }}</span>
-                            </dd>
-                            <dt class="col-sm-5 mt-2">ISS</dt>
-                            <dd class="col-sm-7 mt-2">
-                                <span class="text-danger">R$ {{ object.valor_iss|currency_br }}</span>
-                            </dd>
-                            <dt class="col-sm-5 mt-2">IRRF</dt>
-                            <dd class="col-sm-7 mt-2">
-                                <span class="text-danger">R$ {{ object.valor_irrf|currency_br }}</span>
-                            </dd>
-                            <dt class="col-sm-5 mt-2">Valor Líquido</dt>
-                            <dd class="col-sm-7 mt-2">
-                                <span class="text-primary fw-bold">R$ {{ object.valor_liquido|currency_br }}</span>
-                            </dd>
+                            <dd class="col-sm-7 text-end"><span class="text-success fw-semibold">R$ {{ object.valor_documento|currency_br }}</span></dd>
+                            <dt class="col-sm-5">ISS</dt>
+                            <dd class="col-sm-7 text-end"><span class="text-danger">R$ {{ object.valor_iss|currency_br }}</span></dd>
+                            <dt class="col-sm-5">IRRF</dt>
+                            <dd class="col-sm-7 text-end"><span class="text-danger">R$ {{ object.valor_irrf|currency_br }}</span></dd>
+                            <dt class="col-sm-5">Valor Líquido</dt>
+                            <dd class="col-sm-7 text-end"><span class="text-primary fw-semibold">R$ {{ object.valor_liquido|currency_br }}</span></dd>
                         </dl>
                     </div>
                 </div>
@@ -149,4 +162,60 @@
 {% endblock content %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'documentos/css/documentos.css' %}">
+    <style>
+      .floating-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,15,20,.35);
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        z-index: 1040;
+        animation: fadeIn .2s ease-out;
+      }
+      .floating-panel {
+        position: relative;
+        width: min(88vw, 720px);
+        border-radius: .75rem;
+        animation: slideUp .22s ease-out;
+        box-sizing: border-box;
+      }
+      @media (max-width: 576px) {
+        .floating-overlay { padding: .5rem; overflow-x: hidden; }
+        .floating-panel { width: 100%; border-radius: .5rem; }
+        .card-header { flex-wrap: wrap; row-gap: .25rem; }
+        .card-header .btn-group { flex-wrap: wrap; gap: .25rem; }
+      }
+      @media (min-width: 1200px) {
+        .floating-panel { width: min(70vw, 720px); }
+      }
+      .floating-close {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      }
+      .section-title { font-size: .94rem; }
+      dl.row dt { color: #555; }
+      .card-body p { margin-bottom: .5rem; }
+      .min-w-0 { min-width: 0; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideUp { from { transform: translateY(8px); opacity: .95; } to { transform: translateY(0); opacity: 1; } }
+    </style>
 {% endblock extra_css %}
+{% block extra_js %}
+<script>
+  (function(){
+    const overlay = document.querySelector('.floating-overlay');
+    const panel = document.querySelector('.floating-panel');
+    if(overlay && panel){
+      overlay.addEventListener('click', function(e){
+        if(!panel.contains(e.target)){
+          if(window.history.length > 1){ window.history.back(); }
+          else { window.location.href = "{% url 'documentos:list' %}"; }
+        }
+      });
+    }
+  })();
+</script>
+{% endblock extra_js %}
