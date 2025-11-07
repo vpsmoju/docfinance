@@ -5,20 +5,20 @@
 {% endblock title %}
 {% block content %}
     <!-- Backdrop flutuante -->
-    <div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25" style="z-index:1050;"></div>
+    <div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 z-1050"></div>
 
     <!-- Painel flutuante centralizado -->
-    <div class="position-fixed top-50 start-50 translate-middle w-100" style="max-width: 680px; z-index:1055;">
+    <div class="position-fixed top-50 start-50 translate-middle w-100 max-w-680 z-1055">
         <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" style="padding-top: .375rem; padding-bottom: .375rem;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-375">
                 <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Histórico de Alterações</h5>
                 <div class="d-flex gap-2">
                     <a href="{% url 'documentos:detail' documento.id %}" class="btn btn-outline-light btn-sm" title="Detalhes"><i class="bi bi-eye"></i></a>
                     <a href="{% url 'documentos:gestao' %}" class="btn btn-outline-light btn-sm" title="Fechar"><i class="bi bi-x-lg"></i></a>
                 </div>
             </div>
-            <div class="card-body p-2" style="max-height: 60vh; overflow: hidden; display: flex; flex-direction: column;">
-                <div style="background: var(--bs-body-bg, #fff); border-bottom: 1px solid rgba(0,0,0,.1); box-shadow: 0 2px 2px rgba(0,0,0,.03);">
+            <div class="card-body p-2 d-flex flex-column overflow-hidden max-h-60vh">
+                <div class="bg-body border-bottom shadow-sm">
                     <div class="mb-3">
                         <h6 class="mb-2">Documento: {{ documento.numero }} — {{ documento.fornecedor }}</h6>
                         <form method="post" class="row g-2">
@@ -30,7 +30,7 @@
                                 <div class="form-text text-muted">Mensagem será preenchida automaticamente conforme a etapa. Se a etapa retroceder, informe o motivo da devolução.</div>
                             </div>
                             <!-- Campos de devolução precisam estar DENTRO do formulário para serem enviados no POST -->
-                            <div class="col-12" id="devolucao_field" style="display:none;">
+                            <div class="col-12 d-none" id="devolucao_field">
                                 <label class="form-label">Motivo da devolução</label>
                                 <div class="row g-2">
                                     <div class="col-md-5">{{ form.motivo_tipo }}</div>

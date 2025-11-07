@@ -175,3 +175,14 @@ footer p {
 /* .card-text {
     color: #6c757d;
 } */
+
+/* Utilitários adicionais */
+.h-70vh {
+    height: 70vh;
+}
+.max-w-50vw { max-width: 50vw; }
+.max-w-680 { max-width: 680px; }
+.max-h-60vh { max-height: 60vh; }
+.z-1050 { z-index: 1050; }
+.z-1055 { z-index: 1055; }
+.py-375 { padding-top: .375rem; padding-bottom: .375rem; }

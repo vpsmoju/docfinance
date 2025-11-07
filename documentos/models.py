@@ -9,6 +9,7 @@ Models:
 """
 
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -171,6 +172,48 @@ class Documento(models.Model):
         """
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def clean(self):
+        """Validações e ajustes automáticos antes de salvar.
+
+        - Garante que para tipos "Nota Fiscal" (NF) e "Fatura" (FAT) não haja descontos
+          de ISS/IRRF (sempre zero).
+        - Recalcula `valor_liquido` como `valor_documento - valor_iss - valor_irrf`.
+        - Impede valores negativos em campos monetários.
+        - Valida coerência básica de datas em relação ao status de pagamento.
+        """
+        super().clean()
+
+        # Normalização de campos numéricos para evitar None
+        self.valor_documento = self.valor_documento or Decimal("0")
+        self.valor_iss = self.valor_iss or Decimal("0")
+        self.valor_irrf = self.valor_irrf or Decimal("0")
+
+        # Regra: NF/FAT não possuem descontos (ISS/IRRF sempre zero)
+        if self.tipo in ("NF", "FAT"):
+            self.valor_iss = Decimal("0")
+            self.valor_irrf = Decimal("0")
+
+        # Impedir valores negativos em descontos
+        if self.valor_iss < 0:
+            raise ValidationError({"valor_iss": "O valor de ISS não pode ser negativo."})
+        if self.valor_irrf < 0:
+            raise ValidationError({"valor_irrf": "O valor de IRRF não pode ser negativo."})
+        if self.valor_documento < 0:
+            raise ValidationError({"valor_documento": "O valor do documento não pode ser negativo."})
+
+        # Recalcular valor líquido sempre com base nas regras acima
+        self.valor_liquido = self.valor_documento - self.valor_iss - self.valor_irrf
+
+        if self.valor_liquido < 0:
+            raise ValidationError({"valor_liquido": "O valor líquido não pode ser negativo."})
+
+        # Coerência de datas com status
+        if self.status == "PAG" and not self.data_pagamento:
+            raise ValidationError({"data_pagamento": "A data de pagamento é obrigatória quando o status é Pago."})
+        if self.status != "PAG" and self.data_pagamento is not None:
+            # Se não está pago, remover data de pagamento para manter consistência
+            self.data_pagamento = None
 
     @staticmethod
     def gerar_numero():

@@ -1,36 +1,25 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Formatar a data para o formato brasileiro
-    const dataDocumentoInput = document.getElementById('id_data_documento');
-    if (dataDocumentoInput) {
-        // Converter formato yyyy-mm-dd para dd/mm/yyyy
-        dataDocumentoInput.addEventListener('change', function() {
-            const dataOriginal = this.value;
-            if (dataOriginal) {
-                const partes = dataOriginal.split('-');
-                if (partes.length === 3) {
-                    // Formatar como dd/mm/yyyy
-                    const dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                    console.log('Data formatada:', dataFormatada);
-                    // Se necessário, atualizar um campo oculto com a data formatada
-                    const hiddenDataInput = document.getElementById('hidden_data_documento');
-                    if (hiddenDataInput) {
-                        hiddenDataInput.value = dataFormatada;
-                    }
-                }
-            }
-        });
-        
-        // Se estiver em modo de edição, formatar a data inicial
-        const isEditing = document.getElementById('is_editing');
-        if (isEditing && isEditing.value === 'true') {
-            const dataOriginal = dataDocumentoInput.value;
-            if (dataOriginal && dataOriginal.includes('-')) {
-                const partes = dataOriginal.split('-');
-                if (partes.length === 3) {
-                    // Formatar como dd/mm/yyyy para exibição
-                    dataDocumentoInput.value = `${partes[2]}/${partes[1]}/${partes[0]}`;
-                }
-            }
-        }
+document.addEventListener('DOMContentLoaded', function () {
+  const dataDocumentoInput = document.getElementById('id_data_documento');
+  if (!dataDocumentoInput) return;
+
+  // Se o input for do tipo "date", ele exige ISO (YYYY-MM-DD).
+  // Não devemos reescrever para dd/mm/aaaa, pois isso apaga o valor.
+  if (dataDocumentoInput.type === 'date') {
+    const v = dataDocumentoInput.value;
+    // Caso tenha vindo em dd/mm/aaaa por algum motivo, normaliza para ISO.
+    const m = v && v.match(/^([0-3]?\d)\/([0-1]?\d)\/(\d{4})$/);
+    if (m) {
+      const [_, d, mth, y] = m;
+      dataDocumentoInput.value = `${y}-${mth.padStart(2, '0')}-${d.padStart(2, '0')}`;
     }
+    return;
+  }
+
+  // Para inputs texto (se algum template alternativo usar), podemos exibir em dd/mm/aaaa.
+  const v = dataDocumentoInput.value;
+  const iso = v && v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) {
+    const [_, y, mth, d] = iso;
+    dataDocumentoInput.value = `${d}/${mth}/${y}`;
+  }
 });

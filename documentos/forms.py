@@ -21,24 +21,42 @@ from .models import Documento, Recurso, Secretaria
 
 
 class DateInputBR(DateInput):
-    """Widget personalizado para campos monetários."""
+    """Widget de data usando input nativo do navegador.
 
-    def get_format(self):
-        """Retorna o formato de data usado por este widget."""
-        return "%d/%m/%Y"
-
-    def format_value(self, value):
-        """Formate o valor da data para o formato Brasileiro."""
-        if value is None:
-            return ""
-        return value
+    O valor do input type="date" deve estar em formato ISO (YYYY-MM-DD).
+    Esta classe garante que valores existentes em edição sejam renderizados
+    corretamente, independentemente do locale desejado.
+    """
 
     input_type = "date"
+
+    def get_format(self):
+        """Usa o formato ISO para garantir renderização em inputs de data."""
+        return "%Y-%m-%d"
+
+    def format_value(self, value):
+        """Converte o valor para ISO (YYYY-MM-DD) quando possível."""
+        if value is None:
+            return ""
+        # Valor como string já ISO
+        if isinstance(value, str):
+            # Normaliza casos 'DD/MM/AAAA' para ISO, se aplicável
+            import re
+            m = re.match(r"^(\d{2})/(\d{2})/(\d{4})$", value)
+            if m:
+                d, mth, y = m.groups()
+                return f"{y}-{mth}-{d}"
+            return value
+        # Valor como date/datetime
+        try:
+            return value.strftime("%Y-%m-%d")
+        except Exception:
+            return super().format_value(value)
 
     def __init__(self, attrs=None):
         attrs = attrs or {}
         attrs.update({"class": "form-control"})
-        super().__init__(attrs=attrs, format="%d/%m/%Y")
+        super().__init__(attrs=attrs, format="%Y-%m-%d")
 
 
 class DocumentoForm(forms.ModelForm):

@@ -171,6 +171,134 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // =============================
+    // Regras de descontos por tipo
+    // =============================
+    const tipoSelect = document.getElementById('id_tipo');
+    const descontosContainer = document.getElementById('descontos_container');
+    const grupoIss = document.getElementById('grupo_iss');
+    const grupoIrrf = document.getElementById('grupo_irrf');
+    const sectionIss = document.getElementById('section_iss');
+    const sectionIrrf = document.getElementById('section_irrf');
+
+    const radioNone = document.getElementById('desconto_none');
+    const radioIss = document.getElementById('desconto_iss');
+    const radioIrrf = document.getElementById('desconto_irrf');
+    const radioIssIrrf = document.getElementById('desconto_iss_irrf');
+
+    function show(el) { if (el) el.style.display = ''; }
+    function hide(el) { if (el) el.style.display = 'none'; }
+    function setZero(input) {
+        if (!input) return;
+        input.value = '0,00';
+    }
+    function disable(input) { if (input) input.disabled = true; }
+    function enable(input) { if (input) input.disabled = false; }
+
+    function showRadio(id, visible) {
+        const input = document.getElementById(id);
+        const label = document.querySelector(`label[for="${id}"]`);
+        if (!input || !label) return;
+        input.style.display = visible ? '' : 'none';
+        label.style.display = visible ? '' : 'none';
+    }
+
+    function updateDescontoUI() {
+        const selected = document.querySelector('input[name="desconto_opcao"]:checked')?.value || 'NONE';
+
+        if (selected === 'NONE') {
+            hide(sectionIss);
+            hide(sectionIrrf);
+            setZero(valorIssInput);
+            setZero(valorIrrfInput);
+            enable(valorBrutoInput);
+            disable(valorIssInput);
+            disable(valorIrrfInput);
+        } else if (selected === 'ISS') {
+            show(sectionIss);
+            hide(sectionIrrf);
+            enable(valorIssInput);
+            disable(valorIrrfInput);
+            setZero(valorIrrfInput);
+        } else if (selected === 'IRRF') {
+            hide(sectionIss);
+            show(sectionIrrf);
+            disable(valorIssInput);
+            enable(valorIrrfInput);
+            setZero(valorIssInput);
+        } else if (selected === 'ISS_IRRF') {
+            show(sectionIss);
+            show(sectionIrrf);
+            enable(valorIssInput);
+            enable(valorIrrfInput);
+        }
+        calcularValorLiquido();
+    }
+
+    function aplicarRegrasPorTipo() {
+        const tipo = tipoSelect ? tipoSelect.value : '';
+        if (!tipo) return;
+
+        // Mostrar/ocultar opções de desconto conforme o tipo
+        if (tipo === 'NF' || tipo === 'FAT') {
+            // Sem descontos para Nota Fiscal e Fatura
+            hide(descontosContainer);
+            radioNone.checked = true;
+            updateDescontoUI();
+        } else if (tipo === 'NFS' || tipo === 'NFSA') {
+            // Três casos: nenhum, só ISS, só IRRF
+            show(descontosContainer);
+            showRadio('desconto_none', true);
+            showRadio('desconto_iss', true);
+            showRadio('desconto_irrf', true);
+            showRadio('desconto_iss_irrf', false);
+
+            // Se opção atual for inválida, voltar para NONE
+            const current = document.querySelector('input[name="desconto_opcao"]:checked')?.value;
+            if (current === 'ISS_IRRF') radioNone.checked = true;
+            updateDescontoUI();
+        } else if (tipo === 'REC') {
+            // Três casos: nenhum, ISS, ISS+IRRF
+            show(descontosContainer);
+            showRadio('desconto_none', true);
+            showRadio('desconto_iss', true);
+            showRadio('desconto_irrf', false);
+            showRadio('desconto_iss_irrf', true);
+
+            const current = document.querySelector('input[name="desconto_opcao"]:checked')?.value;
+            if (current === 'IRRF') radioNone.checked = true;
+            updateDescontoUI();
+        }
+    }
+
+    // Listeners de desconto
+    [radioNone, radioIss, radioIrrf, radioIssIrrf].forEach(r => {
+        if (r) {
+            r.addEventListener('change', updateDescontoUI);
+        }
+    });
+
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', aplicarRegrasPorTipo);
+        aplicarRegrasPorTipo();
+    }
+
+    // Se em edição, tentar marcar a opção de desconto baseada nos valores atuais
+    if (isEditing) {
+        const issValor = converterParaNumero(valorIssInput.value);
+        const irrfValor = converterParaNumero(valorIrrfInput.value);
+        if ((issValor > 0) && (irrfValor > 0) && radioIssIrrf) {
+            radioIssIrrf.checked = true;
+        } else if (issValor > 0 && radioIss) {
+            radioIss.checked = true;
+        } else if (irrfValor > 0 && radioIrrf) {
+            radioIrrf.checked = true;
+        } else if (radioNone) {
+            radioNone.checked = true;
+        }
+        updateDescontoUI();
+    }
+
     // Função para buscar fornecedor por CPF/CNPJ
     function buscarFornecedor(cpfCnpj) {
         fetch(`/documentos/api/buscar-fornecedor/?cnpj_cpf=${cpfCnpj}`)

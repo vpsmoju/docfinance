@@ -9,7 +9,7 @@
     {% endif %}
 {% endblock title %}
 {% block content %}
-    <div class="container py-4">
+    <div class="container py-3">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0 text-white">
@@ -24,17 +24,17 @@
                     <i class="bi bi-arrow-left me-1"></i>Voltar para lista
                 </a>
             </div>
-            <div class="card-body">
+            <div class="card-body p-3">
                 <form method="post" id="documentoForm">
                     {% csrf_token %}
                     <!-- Removido justify-content-around que estava criando as margens laterais -->
-                    <div class="row">
+                    <div class="row g-2">
                         <!-- LADO ESQUERDO: Informações Básicas -->
                         <div class="col-md-8 lado-esquerdo" id="lado-esquerdo">
                             <h5>.:: Informações Básicas ::.</h5>
-                            <hr class="mt-1 mb-3">
+                            <hr class="mt-1 mb-2">
                             <!-- Número e Data de Protocolo na mesma linha -->
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-6">
                                     <label for="{{ form.numero.id_for_label }}" class="form-label">Número do Protocolo</label>
                                     <div class="input-group">
@@ -78,7 +78,7 @@
                             </div>
                             <!-- Secretaria e Recurso na mesma linha -->
                             <!-- Secretaria e Recurso na mesma linha -->
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-6">
                                     <label for="{{ form.secretaria.id_for_label }}" class="form-label">Secretaria</label>
                                     <div class="input-group">
@@ -111,7 +111,7 @@
                                 </div>
                             </div>
                             <!-- Tipo, Data do Documento e CPF/CNPJ na mesma linha -->
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo</label>
                                     <div class="input-group">
@@ -158,7 +158,7 @@
                                 </div>
                             </div>
                             <!-- Número do Documento e Fornecedor na mesma linha -->
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4" id="div_numero_documento">
                                     {% if form.numero_documento %}
                                         <label for="{{ form.numero_documento.id_for_label }}" class="form-label">Documento nº</label>
@@ -198,7 +198,7 @@
                                 </div>
                             </div>
                             <!-- Descrição com altura reduzida -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-card-text"></i></span>
@@ -206,12 +206,12 @@
                                         <textarea name="descricao"
                                                   id="{{ form.descricao.id_for_label }}"
                                                   class="form-control campo-descricao-reduzida"
-                                                  rows="3">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
+                                                  rows="2">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
                                     {% else %}
                                         <textarea name="descricao"
                                                   id="{{ form.descricao.id_for_label }}"
                                                   class="form-control campo-descricao-reduzida"
-                                                  rows="3">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
+                                                  rows="2">{% if form.instance.descricao %}{{ form.instance.descricao }}{% endif %}</textarea>
                                     {% endif %}
                                 </div>
                                 {% if form.descricao.errors %}<div class="invalid-feedback d-block">{{ form.descricao.errors }}</div>{% endif %}
@@ -220,7 +220,7 @@
                         <!-- LADO DIREITO: Valores -->
                         <div class="col-md-4 lado-direito" id="lado-direito">
                             <h5>.:: Valores Financeiro ::.</h5>
-                            <hr class="mt-1 mb-3">
+                            <hr class="mt-1 mb-2">
                             <div class="mb-3">
                                 <label for="{{ form.valor_documento.id_for_label }}" class="form-label">Valor Bruto</label>
                                 <div class="input-group input-group-valores">
@@ -231,23 +231,41 @@
                                 </div>
                                 {{ form.valor_documento.as_hidden }}
                             </div>
-                            <div class="mb-3">
-                                <label for="{{ form.valor_iss.id_for_label }}" class="form-label">Valor ISS</label>
-                                <div class="input-group input-group-valores">
+                            <!-- Controle de descontos por tipo de documento -->
+                            <div class="mb-2" id="descontos_container">
+                                <label class="form-label">Descontos de impostos</label>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Descontos de impostos">
+                                    <input type="radio" class="btn-check" name="desconto_opcao" id="desconto_none" value="NONE" autocomplete="off" checked>
+                                    <label class="btn btn-outline-secondary" for="desconto_none">Nenhum</label>
+
+                                    <input type="radio" class="btn-check" name="desconto_opcao" id="desconto_iss" value="ISS" autocomplete="off">
+                                    <label class="btn btn-outline-danger" for="desconto_iss">ISS</label>
+
+                                    <input type="radio" class="btn-check" name="desconto_opcao" id="desconto_irrf" value="IRRF" autocomplete="off">
+                                    <label class="btn btn-outline-danger" for="desconto_irrf">IRRF</label>
+
+                                    <input type="radio" class="btn-check" name="desconto_opcao" id="desconto_iss_irrf" value="ISS_IRRF" autocomplete="off">
+                                    <label class="btn btn-outline-danger" for="desconto_iss_irrf">ISS + IRRF</label>
+                                </div>
+                                <div class="form-text">marque o(s) desconto(s) a ser feito.</div>
+                            </div>
+                            <div class="mb-2" id="section_iss">
+                                <label for="{{ form.valor_iss.id_for_label }}" class="form-label" id="label_iss">Valor ISS</label>
+                                <div class="input-group input-group-valores" id="grupo_iss">
                                     <span class="input-group-text text-danger">R$</span>
                                     <input type="text" id="valor_iss" class="form-control text-danger text-end">
                                 </div>
                                 {{ form.valor_iss.as_hidden }}
                             </div>
-                            <div class="mb-3">
-                                <label for="{{ form.valor_irrf.id_for_label }}" class="form-label">Valor IRRF</label>
-                                <div class="input-group input-group-valores">
+                            <div class="mb-2" id="section_irrf">
+                                <label for="{{ form.valor_irrf.id_for_label }}" class="form-label" id="label_irrf">Valor IRRF</label>
+                                <div class="input-group input-group-valores" id="grupo_irrf">
                                     <span class="input-group-text text-danger">R$</span>
                                     <input type="text" id="valor_irrf" class="form-control text-danger text-end">
                                 </div>
                                 {{ form.valor_irrf.as_hidden }}
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 <label for="{{ form.valor_liquido.id_for_label }}" class="form-label">Valor Líquido</label>
                                 <div class="input-group input-group-valores">
                                     <span class="input-group-text text-primary fw-bold">R$</span>
@@ -284,7 +302,7 @@
                            name="status"
                            value="{% if form.instance.status %}{{ form.instance.status }}{% else %}PEN{% endif %}">
                     {{ form.status.as_hidden }}
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                         <a href="{% url 'documentos:list' %}" class="btn btn-secondary">Cancelar</a>
                         <button type="submit" class="btn btn-primary">Salvar</button>
                     </div>
@@ -308,10 +326,10 @@
         </div>
     </div>
     <!-- Carregando os arquivos JavaScript -->
-    <script src="{% static 'documentos/js/documento_form.js' %}"></script>
+    <script src="{% static 'documentos/js/documento_form.js' %}?v=2"></script>
     <script src="{% static 'js/documento_validacao.js' %}"></script>
-    <script src="{% static 'documentos/js/documento_data.js' %}"></script>
-    <script src="{% static 'documentos/js/documento_tipo.js' %}"></script>
+    <script src="{% static 'documentos/js/documento_data.js' %}?v=2"></script>
+    <script src="{% static 'documentos/js/documento_tipo.js' %}?v=2"></script>
     <script src="{% static 'js/documento_fornecedor.js' %}?v=2"></script>
     <script src="{% static 'js/documento_recursos.js' %}?v=3"></script>
     <div class="alert alert-danger form-errors d-none" id="form-errors">
@@ -347,7 +365,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <iframe id="iframeCadastroFornecedor" src="" style="width: 100%; height: 70vh; border: 0;" title="Cadastro de Fornecedor"></iframe>
+                    <iframe id="iframeCadastroFornecedor" src="" class="w-100 border-0 h-70vh" title="Cadastro de Fornecedor"></iframe>
                 </div>
             </div>
         </div>
@@ -360,8 +378,11 @@
     .row > div {
         background-color: transparent !important;
     }
-    .card-body {
-        background-color: #fff;
-    }
+    .card-body { background-color: #fff; }
+    /* Compactação adicional específica desta página */
+    .lado-esquerdo h5, .lado-direito h5 { font-size: 1rem; margin-bottom: .25rem; }
+    .input-group-text { padding: .25rem .5rem; }
+    .form-control { padding: .375rem .5rem; }
+    .campo-descricao-reduzida { min-height: 60px; height: 60px !important; }
     </style>
 {% endblock extra_css %}
