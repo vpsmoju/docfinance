@@ -145,7 +145,11 @@
                                         let label = context.label || '';
                                         if (label) { label += ': '; }
                                         const value = context.raw;
-                                        return label + new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+                                        const total = (context.dataset && Array.isArray(context.dataset.data))
+                                            ? context.dataset.data.reduce((sum, v) => sum + v, 0)
+                                            : 0;
+                                        const percent = total ? (value / total) * 100 : 0;
+                                        return `${label}${value} documentos (${percent.toFixed(1)}%)`;
                                     }
                                 }
                             }
@@ -168,12 +172,21 @@
         }
         // Gráfico de Status (torta)
         const statusCtx = document.getElementById('statusChart').getContext('2d');
-        configurarGraficoTorta(
-            statusCtx,
-            ['Pendentes', 'Pagos', 'Atrasados'],
-            [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
-            'Documentos por Status'
-        );
+        if (typeof configurarGraficoTortaContagemPercentual === 'function') {
+            configurarGraficoTortaContagemPercentual(
+                statusCtx,
+                ['Pendentes', 'Pagos', 'Atrasados'],
+                [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
+                'Documentos por Status'
+            );
+        } else {
+            configurarGraficoTorta(
+                statusCtx,
+                ['Pendentes', 'Pagos', 'Atrasados'],
+                [{{ total_pendentes }}, {{ total_pagos }}, {{ total_atrasados }}],
+                'Documentos por Status'
+            );
+        }
 
         // Gráfico de Valores (barra) com valores não localizados e BRL nos tooltips
         const valoresCtx = document.getElementById('valoresChart').getContext('2d');

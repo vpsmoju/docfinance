@@ -104,15 +104,15 @@ function configurarGraficoTorta(ctx, labels, valores, titulo) {
                     callbacks: {
                         label: function(context) {
                             let label = context.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
+                            if (label) { label += ': '; }
                             const value = context.raw;
-                            label += new Intl.NumberFormat('pt-BR', { 
-                                style: 'currency', 
-                                currency: 'BRL' 
-                            }).format(value);
-                            return label;
+                            // Para gráfico de status, "valores" são contagens, não moeda
+                            // Exibe contagem formatada e porcentagem relativa
+                            const total = (context.dataset && Array.isArray(context.dataset.data))
+                                ? context.dataset.data.reduce((sum, v) => sum + v, 0)
+                                : 0;
+                            const percent = total ? (value / total) * 100 : 0;
+                            return `${label}${value} documentos (${percent.toFixed(1)}%)`;
                         }
                     }
                 }
