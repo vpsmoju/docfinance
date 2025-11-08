@@ -1,0 +1,145 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load fornecedor_filters %}
+{% block title %}
+    {{ fornecedor.nome }} | DocFinance
+{% endblock title %}
+{% block content %}
+    <!-- Backdrop flutuante -->
+    <div id="floating-backdrop" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 z-1050"></div>
+
+    <!-- Painel flutuante centralizado e compacto -->
+    <div class="position-fixed top-50 start-50 translate-middle w-100 z-1055" style="max-width: 860px; width: 92vw;">
+        <div class="card fornecedor-card shadow-lg">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-375">
+                <h6 class="mb-0">
+                    <i class="bi bi-person-vcard me-2"></i>Detalhes do Fornecedor
+                </h6>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'fornecedores:fornecedor_update' fornecedor.id %}"
+                       class="btn btn-outline-light btn-sm" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'fornecedores:fornecedor_delete' fornecedor.id %}"
+                       class="btn btn-outline-light btn-sm" title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                    <a href="{% url 'fornecedores:fornecedor_list' %}"
+                       class="btn btn-outline-light btn-sm" title="Sair">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-2 overflow-hidden">
+                <div class="floating-detail small d-flex flex-column" style="max-height: 58vh; overflow-y: auto; overflow-x: hidden;">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <h6 class="section-title border-bottom pb-1 mb-2">Informações Básicas</h6>
+                            <div class="mb-2">
+                                <p class="mb-1"><strong>Nome:</strong></p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.nome }}</p>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Tipo:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.get_tipo_display }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>CNPJ/CPF:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.cnpj_cpf|format_cnpj_cpf }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="section-title border-bottom pb-1 mb-2">Informações de Contato</h6>
+                            <div class="row g-2 mb-2 align-items-start">
+                                <div class="col-12 col-md-7 col-lg-8">
+                                    <p class="mb-1"><strong>Email:</strong></p>
+                                    <p class="bg-light p-2 rounded email-value">{{ fornecedor.email|default:"Não informado" }}</p>
+                                </div>
+                                <div class="col-12 col-md-5 col-lg-4">
+                                    <p class="mb-1"><strong>Telefone:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.telefone|format_telefone|default:"Não informado" }}</p>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <p class="mb-1"><strong>Endereço:</strong></p>
+                                <p class="bg-light p-2 rounded">{{ fornecedor.endereco|default:"Não informado"|linebreaksbr }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <h6 class="section-title border-bottom pb-1 mb-2">Dados Bancários</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Banco:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.banco|default:"Não informado" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Tipo de Conta:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.get_tipo_conta_display|default:"Não informado" }}</p>
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-1">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Agência:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.agencia|format_agencia|default:"Não informado" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Conta:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.conta|format_conta|default:"Não informado" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-12">
+                            <h6 class="section-title border-bottom pb-1 mb-2">Informações do Sistema</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Data de Cadastro:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.created_at|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Última Atualização:</strong></p>
+                                    <p class="bg-light p-2 rounded">{{ fornecedor.updated_at|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const backdrop = document.getElementById('floating-backdrop');
+            const closeUrl = "{% url 'fornecedores:fornecedor_list' %}";
+            if (backdrop) {
+                backdrop.addEventListener('click', function () { window.location.href = closeUrl; });
+            }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { window.location.href = closeUrl; }
+            });
+        });
+    </script>
+{% endblock content %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'fornecedores/css/fornecedores.css' %}">
+    <style>
+        /* Ajustes de tipografia e espaçamento para caber sem barra de rolagem */
+        .fornecedor-card .card-header h6 { font-size: 0.95rem; }
+        .floating-detail { font-size: 0.83rem; line-height: 1.25; }
+        .floating-detail .section-title { font-size: 0.95rem; }
+        .floating-detail .bg-light { padding: .275rem .45rem !important; }
+        .floating-detail p { margin-bottom: .3rem; }
+        .floating-detail .row.g-2 > [class*="col-"] { margin-bottom: .15rem; }
+        .floating-detail .row { margin-left: 0; margin-right: 0; }
+        .email-value { white-space: normal; overflow-wrap: anywhere; }
+    </style>
+{% endblock extra_css %}

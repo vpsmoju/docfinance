@@ -192,7 +192,15 @@ class DocumentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateVie
             logger.debug("Erros do formulário: %s", form.errors)
 
             logger.info("Chamando super().form_valid(form)")
-            return super().form_valid(form)
+            result = super().form_valid(form)
+            # Após salvar, se for recibo, redireciona para o prompt de geração de PDF
+            if getattr(self, "object", None) and self.object.tipo == "REC":
+                logger.info(
+                    "Documento salvo como REC. Redirecionando para prompt de recibo (pk=%s)",
+                    self.object.pk,
+                )
+                return redirect("documentos:recibo_prompt", pk=self.object.pk)
+            return result
         except ValidationError as e:
             logger.error("Erro de validação ao salvar formulário: %s", e)
             messages.error(self.request, f"Erro de validação: {e}")
@@ -401,6 +409,23 @@ class DarBaixaDocumentoView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(
             request, self.template_name, {"form": form, "documento": documento}
         )
+
+
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def recibo_prompt(request, pk):
+    """Exibe um painel flutuante perguntando se deseja gerar o recibo em PDF."""
+    documento = get_object_or_404(Documento, pk=pk)
+    return render(request, "documentos/recibo_prompt.html", {"documento": documento})
+
+
+@login_required
+def recibo_preview(request, pk):
+    """Exibe uma página de visualização do recibo com estilo para impressão."""
+    documento = get_object_or_404(Documento, pk=pk)
+    return render(request, "documentos/recibo_preview.html", {"documento": documento})
 
     def post(self, request, pk):
         """Processa a requisição POST para dar baixa em um documento."""

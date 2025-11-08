@@ -31,6 +31,11 @@
                     <a href="{% url 'documentos:update' object.pk %}" class="btn btn-dark">
                         <i class="bi bi-pencil me-1"></i><span class="d-none d-sm-inline">Editar</span>
                     </a>
+                    {% if object.tipo == 'REC' %}
+                    <a href="{% url 'documentos:recibo_preview' object.pk %}" class="btn btn-dark" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-printer me-1"></i><span class="d-none d-sm-inline">Imprimir Recibo</span>
+                    </a>
+                    {% endif %}
                     {% if perms.documentos.delete_documento %}
                         <a href="{% url 'documentos:delete' object.pk %}" class="btn btn-dark">
                             <i class="bi bi-trash me-1"></i><span class="d-none d-sm-inline">Excluir</span>
@@ -43,6 +48,11 @@
                     <a href="{% url 'documentos:update' object.pk %}" class="btn btn-outline-light">
                         <i class="bi bi-pencil me-1"></i><span class="d-none d-sm-inline">Editar</span>
                     </a>
+                    {% if object.tipo == 'REC' %}
+                    <a href="{% url 'documentos:recibo_preview' object.pk %}" class="btn btn-outline-light" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-printer me-1"></i><span class="d-none d-sm-inline">Imprimir Recibo</span>
+                    </a>
+                    {% endif %}
                     {% if perms.documentos.delete_documento %}
                         <a href="{% url 'documentos:delete' object.pk %}" class="btn btn-outline-light">
                             <i class="bi bi-trash me-1"></i><span class="d-none d-sm-inline">Excluir</span>

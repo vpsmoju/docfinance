@@ -1,0 +1,212 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% load fornecedor_filters %}
+{% block title %}Recibo - {{ documento.numero }}{% endblock title %}
+{% block content %}
+<div class="container py-3 print-container">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0 text-white"><i class="bi bi-receipt me-2"></i>Recibo</h3>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-light btn-sm" id="btnPrint"><i class="bi bi-printer me-1"></i>Imprimir</button>
+        <a href="{% url 'documentos:list' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left me-1"></i>Voltar</a>
+      </div>
+    </div>
+    <div class="card-body p-3">
+      <div class="recibo-a4">
+        <!-- Cabeçalho: título à esquerda e valor em destaque à direita -->
+        <div class="recibo-top">
+          <div class="titulo">RECIBO</div>
+          <div class="valor-destaque">
+            <span class="prefixo">R$</span>
+            <span class="valor">{{ documento.valor_liquido|currency_br }}</span>
+          </div>
+        </div>
+
+        <!-- Meta compacta: número de recibo e secretaria -->
+        <div class="meta-compact small">
+          <div><strong>Recibo Nº:</strong> {{ documento.numero }}</div>
+          <div><strong>Secretaria:</strong> {{ documento.secretaria.nome|default:'—' }}</div>
+        </div>
+
+        <!-- Valor por extenso -->
+        <div class="extenso text-center">
+          <div class="label">Valor Total por Extenso</div>
+          <div class="texto">{{ documento.valor_liquido|extenso_br|upper }}</div>
+        </div>
+
+        <!-- Layout em uma coluna: dados, histórico, encargos e identificação -->
+        <div class="recibo-layout">
+          <div>
+            <!-- Dados bancários em chips amarelos -->
+          <div class="banco-chips small">
+            <div class="chip banco"><span>Banco:</span> {{ documento.fornecedor.banco|default:'-' }}</div>
+            <div class="chip agencia"><span>Agência:</span> {{ documento.fornecedor.agencia|format_agencia|default:'-' }}</div>
+            <div class="chip conta"><span>
+              {% if documento.fornecedor.tipo_conta == 'CC' %}conta corrente{% elif documento.fornecedor.tipo_conta == 'PP' %}conta poupança{% else %}conta{% endif %}:
+            </span> {{ documento.fornecedor.conta|format_conta|default:'-' }}</div>
+          </div>
+
+            <!-- Histórico e assinatura -->
+            <div class="secao">
+              <div class="secao-titulo">Histórico e Assinatura:</div>
+              <div class="secao-corpo secao-corpo--historico">
+                <p class="indent">
+                  Recebi da Tesouraria da Prefeitura Municipal de Moju, Estado do Pará, a importância abaixo referida, a título de
+                  {% if documento.descricao %}
+                    {{ documento.descricao }}
+                  {% else %}
+                    ajuda de custo referente ao documento nº {{ documento.numero_documento|default:documento.numero }}, emitido pelo(a) {{ documento.fornecedor.nome }}.
+                  {% endif %}
+                </p>
+                <p class="sem-indent">
+                  {% if documento.secretaria %}
+                    Aos encargos da {{ documento.secretaria.nome }} — Moju/PA.
+                  {% else %}
+                    Aos encargos da Tesouraria Municipal — Moju/PA.
+                  {% endif %}
+                </p>
+                <p class="indent">
+                  E por ter(mos) recebido dita importância, firmo(amos) o presente em 2 (duas) vias de igual teor, para um só efeito.
+                </p>
+                <div class="historico-footer">
+                  <div class="historico-data">
+                    {% if documento.status == 'PAG' and documento.data_pagamento %}
+                      Moju(Pa), {{ documento.data_pagamento|date:'d/m/Y' }}
+                    {% else %}
+                      Moju(Pa), _____ de _______________ de ________
+                    {% endif %}
+                  </div>
+                  <div class="assinatura-beneficiario">
+                    <div class="linha-assinatura"></div>
+                    <div class="rotulo-assinatura">Assinatura do Beneficiário</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Encargos do Beneficiário abaixo do histórico -->
+            <div class="totais-tabela">
+              <div class="titulo">Encargos do Beneficiário</div>
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="lbl">Total Bruto</td>
+                    <td class="marca">—</td>
+                    <td class="moeda amarelo">R$</td>
+                    <td class="valor amarelo"><span class="numero">{{ documento.valor_documento|currency_br }}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="lbl">Desconto (INSS)</td>
+                    <td class="marca">—</td>
+                    <td class="moeda amarelo">R$</td>
+                    <td class="valor amarelo"><span class="numero">0,00</span></td>
+                  </tr>
+                  <tr>
+                    <td class="lbl">Desconto (IRRF)</td>
+                    <td class="marca">—</td>
+                    <td class="moeda amarelo">R$</td>
+                    <td class="valor amarelo"><span class="numero">{% if documento.valor_irrf %}{{ documento.valor_irrf|currency_br }}{% else %}0,00{% endif %}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="lbl">Desconto (ISS)</td>
+                    <td class="marca">—</td>
+                    <td class="moeda amarelo">R$</td>
+                    <td class="valor amarelo"><span class="numero">{% if documento.valor_iss %}{{ documento.valor_iss|currency_br }}{% else %}0,00{% endif %}</span></td>
+                  </tr>
+                  <tr>
+                    <td class="lbl total">Pagamento Líquido</td>
+                    <td class="marca">—</td>
+                    <td class="moeda amarelo">R$</td>
+                    <td class="valor amarelo"><span class="numero"><strong>{{ documento.valor_liquido|currency_br }}</strong></span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Identificação do beneficiário -->
+              <div class="secao">
+                <div class="secao-titulo">Identificação do Beneficiário:</div>
+                <div class="secao-corpo small">
+                  <div><strong>Nome/Razão Social:</strong> {{ documento.fornecedor.nome }}</div>
+                  <div><strong>CPF/CNPJ:</strong> {{ documento.fornecedor.cnpj_cpf|format_cnpj_cpf }}</div>
+                  <div><strong>Endereço:</strong> {{ documento.fornecedor.endereco|default:'-' }}</div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Ajuste explícito para página A4 */
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    body { margin: 0 !important; }
+    .navbar, .sidebar, .btn, .card-header { display: none !important; }
+    header, footer { display: none !important; }
+    .container { padding: 0 !important; max-width: none !important; width: auto !important; }
+    .card { margin: 0 !important; border: none !important; box-shadow: none !important; }
+    .card-body { padding: 0 !important; }
+    .recibo-a4 { box-shadow: none; border: 2px solid #000; width: 200mm; height: auto; max-height: 285mm; margin: 0 auto; padding: 8mm; box-sizing: border-box; page-break-inside: avoid; }
+    .secao-corpo--historico .sem-indent { margin-top: 1.25em; }
+  }
+  .recibo-a4 { border: 2px solid #000; padding: .8rem; box-shadow: none; width: min(200mm, 95vw); margin: 10mm auto; box-sizing: border-box; }
+  .secao-corpo--historico .sem-indent { margin-top: 1.25em; }
+  .recibo-top { display: grid; grid-template-columns: 1fr auto; align-items: center; border-bottom: 2px solid #000; padding-bottom: .25rem; margin-bottom: .35rem; }
+  .recibo-top .titulo { justify-self: start; font-size: 2rem; font-weight: 800; letter-spacing: .03em; color: #000; }
+  .valor-destaque { display: inline-flex; align-items: center; gap: .35rem; background: #ffe08a; border: 2px solid #000; padding: .15rem .5rem; font-weight: 800; }
+  .valor-destaque .prefixo { font-size: 1.05rem; }
+  .valor-destaque .valor { font-size: 1.05rem; }
+
+  .meta-compact { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .35rem 0 .5rem; }
+  .meta-compact > div { border: 1px solid #000; border-radius: .15rem; padding: .25rem .5rem; background: #fff; }
+
+  .extenso .label { text-align: center; font-size: .9rem; color: #000; }
+  .extenso .texto { text-align: center; font-weight: 800; background: #ffe08a; display: inline-block; padding: .1rem .4rem; border: 2px solid #000; }
+
+  .recibo-layout { display: grid; grid-template-columns: 1fr; gap: .75rem; align-items: start; }
+  .recibo-layout { gap: .5rem; }
+
+  .banco-chips { display: grid; grid-template-columns: 1fr .7fr 1.3fr; gap: .5rem; margin: .25rem 0; }
+  .banco-chips .chip { background: #ffe08a; border: 2px solid #000; border-radius: .15rem; padding: .2rem .4rem; }
+  .banco-chips .chip span { font-weight: 700; }
+
+  .destaque-amarelo { background: #ffe08a; padding: .05rem .2rem; border: 1px solid #000; }
+
+  .secao { margin-top: .35rem; page-break-inside: avoid; }
+  .secao-titulo { font-size: .9rem; color: #000; font-weight: 700; }
+  .secao-corpo { border: 2px solid #000; border-radius: .15rem; padding: .5rem .6rem; text-align: justify; line-height: 1.25; }
+  .secao-corpo--historico{ min-height: 80px; }
+  .secao-corpo p{ margin: 0 0 .5rem; }
+  .secao-corpo .indent{ text-indent: 15ch; }
+  .secao-corpo .sem-indent{ text-indent: 0; margin-bottom: 1.7rem; }
+  .historico-footer { display: flex; flex-direction: column; align-items: flex-end; gap: 1em; margin-top: 2.6em; text-align: right; }
+  .historico-footer .assinatura-beneficiario .linha-assinatura { border-bottom: 1px solid #000; width: 220px; height: 30px; margin-left: auto; }
+  .historico-footer .rotulo-assinatura { font-size: .85rem; color: #000; font-weight: 700; }
+
+  .totais-tabela { margin-top: .35rem; border: 2px solid #000; border-radius: .15rem; padding: .3rem; width: min(420px, 100%); margin-left: auto; page-break-inside: avoid; }
+  .totais-tabela .titulo { font-weight: 800; margin-bottom: .35rem; }
+  .totais-tabela table { width: 100%; border-collapse: collapse; }
+  .totais-tabela td { border-top: 1px solid #000; padding: .2rem .35rem; }
+  .totais-tabela td.lbl { width: 50%; }
+  .totais-tabela td.marca { width: 10%; text-align: center; }
+  .totais-tabela td.moeda { width: 10%; font-weight: 700; border-left: 1px solid #000; background: #ffe08a; }
+  .totais-tabela td.valor { width: 30%; text-align: right; background: #ffe08a; padding-right: .35rem; }
+  .totais-tabela td.valor .numero { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
+  .totais-tabela .amarelo { background: #ffe08a; font-weight: 700; }
+  .totais-tabela .total { font-weight: 800; }
+</style>
+
+<script>
+  (function(){
+    const btn = document.getElementById('btnPrint');
+    if(btn){ btn.addEventListener('click', function(){ window.print(); }); }
+    // Iniciar impressão automaticamente para agilizar a geração de PDF
+    setTimeout(function(){ window.print(); }, 300);
+  })();
+</script>
+{% endblock content %}

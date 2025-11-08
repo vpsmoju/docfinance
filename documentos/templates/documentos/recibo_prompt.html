@@ -1,0 +1,43 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Gerar Recibo | DocFinance{% endblock title %}
+{% block content %}
+<div id="floating-backdrop" class="floating-backdrop"></div>
+<div class="floating-panel" role="dialog" aria-modal="true" aria-labelledby="reciboPromptTitle">
+  <div class="floating-header d-flex justify-content-between align-items-center">
+    <h5 id="reciboPromptTitle" class="mb-0">Gerar recibo em PDF?</h5>
+    <a href="{% url 'documentos:list' %}" class="btn btn-sm btn-outline-secondary" title="Fechar">
+      <i class="bi bi-x-lg"></i>
+    </a>
+  </div>
+  <div class="floating-body">
+    <p class="mb-2">Documento <strong>{{ documento.numero }}</strong> do fornecedor <strong>{{ documento.fornecedor.nome }}</strong> está salvo como <strong>Recibo</strong>.</p>
+    <p class="mb-2">Deseja gerar o recibo em PDF com os dados do documento e do fornecedor?</p>
+  </div>
+  <div class="floating-actions d-flex gap-2 justify-content-end">
+    <a class="btn btn-primary" href="{% url 'documentos:recibo_preview' documento.pk %}">
+      <i class="bi bi-filetype-pdf me-1"></i>Gerar PDF
+    </a>
+    <a class="btn btn-outline-secondary" href="{% url 'documentos:list' %}">Agora não</a>
+  </div>
+</div>
+
+<style>
+  .floating-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:saturate(130%) blur(1px);z-index:1040}
+  .floating-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:.5rem;box-shadow:0 0.75rem 1.5rem rgba(0,0,0,.2);width:min(680px,92vw);max-width:92vw;z-index:1050}
+  .floating-header{padding:.5rem .75rem;border-bottom:1px solid rgba(0,0,0,.075);background:#f8f9fa}
+  .floating-body{padding:.75rem}
+  .floating-actions{padding:.5rem .75rem;border-top:1px solid rgba(0,0,0,.075);background:#f8f9fa}
+</style>
+
+<script>
+  // Fechar ao clicar fora do painel ou pressionar Esc
+  (function(){
+    const backdrop = document.getElementById('floating-backdrop');
+    const panel = document.querySelector('.floating-panel');
+    function closeToList(){ window.location.href = '{% url 'documentos:list' %}'; }
+    backdrop.addEventListener('click', closeToList);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeToList(); }});
+  })();
+</script>
+{% endblock content %}

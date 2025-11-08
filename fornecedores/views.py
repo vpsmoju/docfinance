@@ -51,14 +51,21 @@ class FornecedorListView(LoginRequiredMixin, ListView):
     ordering = ["nome"]
 
     def get_queryset(self):
-        """Retorna o queryset de fornecedores filtrado por parâmetros de busca."""
+        """Retorna o queryset de fornecedores filtrado por parâmetros de busca.
+
+        Critérios:
+        - nome e email: busca textual com icontains
+        - cnpj_cpf e telefone: normaliza a busca para dígitos e compara com icontains
+        """
         queryset = super().get_queryset()
         busca = self.request.GET.get("search")
 
         if busca:
-            queryset = queryset.filter(
-                Q(nome__icontains=busca) | Q(cnpj_cpf__icontains=busca)
-            )
+            busca_digits = "".join(filter(str.isdigit, busca))
+            cond = Q(nome__icontains=busca) | Q(email__icontains=busca)
+            if busca_digits:
+                cond |= Q(cnpj_cpf__icontains=busca_digits) | Q(telefone__icontains=busca_digits)
+            queryset = queryset.filter(cond)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -75,6 +82,10 @@ class FornecedorDetailView(LoginRequiredMixin, DetailView):
     """Exibe os detalhes de um fornecedor específico."""
 
     model = Fornecedor
+    
+    def get_template_names(self):
+        """Usa o template padronizado flutuante para visualização de detalhes."""
+        return ["fornecedores/fornecedor_detail_floating.html"]
 
     def get_queryset(self):
         """Retorna o queryset de fornecedores filtrado por permissões do usuário."""
