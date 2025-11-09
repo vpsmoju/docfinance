@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from urllib.parse import urlencode
 
 # Importações locais
 from django.http import Http404
@@ -207,6 +208,12 @@ def editar_perfil(request):
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
             form.save()
+            # Registrar edição de perfil
+            registrar_atividade(
+                request,
+                "Edição de perfil",
+                f"Usuário {request.user.username} editou dados do perfil",
+            )
             messages.success(request, "Perfil atualizado com sucesso!")
             return redirect("perfil")
     else:
@@ -562,14 +569,47 @@ def listar_logs(request):
     if data_fim:
         logs = logs.filter(data_hora__lte=data_fim)
 
+    # Tamanho de página dinâmico
+    try:
+        page_size = int(request.GET.get("page_size", 10))
+    except ValueError:
+        page_size = 10
+    if page_size not in {10, 20, 50, 100}:
+        page_size = 10
+
     # Paginação
-    paginator = Paginator(logs, 20)  # 20 logs por página
+    paginator = Paginator(logs, page_size)
     page = request.GET.get("page")
     logs_paginados = paginator.get_page(page)
+
+    # Preservar filtros na paginação
+    params = request.GET.copy()
+    if "page" in params:
+        params.pop("page")
+    querystring = params.urlencode()
+
+    # Intervalo de páginas mais intuitivo (janela em torno da atual)
+    current = logs_paginados.number
+    num_pages = paginator.num_pages
+    start = max(1, current - 2)
+    end = min(num_pages, current + 2)
+    page_range = list(range(start, end + 1))
+    show_first_ellipsis = start > 1
+    show_last_ellipsis = end < num_pages
 
     context = {
         "logs": logs_paginados,
         "usuarios": User.objects.all(),
+        "page_range": page_range,
+        "show_first_ellipsis": show_first_ellipsis,
+        "show_last_ellipsis": show_last_ellipsis,
+        "querystring": querystring,
+        "page_size": page_size,
+        "page_size_options": [10, 20, 50, 100],
+        "tipo": tipo,
+        "usuario_id": usuario_id,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
     }
 
     return render(request, "usuarios/listar_logs.html", context)

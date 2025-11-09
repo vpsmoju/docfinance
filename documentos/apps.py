@@ -4,3 +4,8 @@ from django.apps import AppConfig
 class DocumentosConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "documentos"
+    verbose_name = "Documentos"
+
+    def ready(self):
+        # Importa os signals para ativá-los
+        from . import signals  # noqa: F401

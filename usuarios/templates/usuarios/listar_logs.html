@@ -8,6 +8,21 @@
             <h2 class="mb-0">Logs de Atividades</h2>
         </div>
         <div class="card-body">
+            <div class="d-flex justify-content-end mb-3">
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <label for="page_size" class="mb-0">Itens por página:</label>
+                    <select id="page_size" name="page_size" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+                        {% for opt in page_size_options %}
+                            <option value="{{ opt }}" {% if opt == page_size %}selected{% endif %}>{{ opt }}</option>
+                        {% endfor %}
+                    </select>
+                    {# Preservar filtros atuais ao trocar o tamanho da página #}
+                    {% if tipo %}<input type="hidden" name="tipo" value="{{ tipo }}">{% endif %}
+                    {% if usuario_id %}<input type="hidden" name="usuario" value="{{ usuario_id }}">{% endif %}
+                    {% if data_inicio %}<input type="hidden" name="data_inicio" value="{{ data_inicio }}">{% endif %}
+                    {% if data_fim %}<input type="hidden" name="data_fim" value="{{ data_fim }}">{% endif %}
+                </form>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -43,5 +58,70 @@
                 </table>
             </div>
         </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <div class="text-muted">
+            Exibindo {{ logs.start_index }}–{{ logs.end_index }} de {{ logs.paginator.count }}
+        </div>
+        {% if logs.paginator.num_pages > 1 %}
+            <nav aria-label="Paginação de logs">
+                <ul class="pagination mb-0">
+                    {# Primeiro #}
+                    {% if logs.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">Primeira</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Primeira</span></li>
+                    {% endif %}
+
+                    {# Anterior #}
+                    {% if logs.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ logs.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="Anterior">&laquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+
+                    {# Janela com reticências #}
+                    {% if show_first_ellipsis %}
+                            <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">1</a></li>
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+
+                    {% for num in page_range %}
+                        {% if num == logs.number %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if show_last_ellipsis %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ logs.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">{{ logs.paginator.num_pages }}</a></li>
+                    {% endif %}
+
+                    {# Próxima #}
+                    {% if logs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ logs.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="Próxima">&raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+
+                    {# Última #}
+                    {% if logs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ logs.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Última</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Última</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 {% endblock content %}
