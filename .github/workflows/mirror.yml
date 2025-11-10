@@ -15,6 +15,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify MIRROR_PAT access to mirror repo
+        run: |
+          set -e
+          echo "Checking access to kinhomoju/docfinance_copia with MIRROR_PAT..."
+          STATUS=$(curl -s -H "Authorization: token ${{ secrets.MIRROR_PAT }}" https://api.github.com/repos/kinhomoju/docfinance_copia -o /tmp/repo.json -w "%{http_code}")
+          if [ "$STATUS" != "200" ]; then
+            echo "GitHub API responded with HTTP $STATUS. Token likely missing access or repository not found."
+            cat /tmp/repo.json || true
+            exit 1
+          fi
+          echo "API access OK (200). Inspecting permissions..."
+          python3 - <<'PY'
+import json, sys
+with open('/tmp/repo.json','r', encoding='utf-8') as f:
+    data = json.load(f)
+perms = data.get('permissions', {})
+print(f"permissions: {perms}")
+has_push = bool(perms.get('push'))
+print(f"has_push={has_push}")
+if not has_push:
+    print('Token does not have write (push) permission on the mirror repository.')
+    sys.exit(1)
+PY
+
       - name: Push to mirror repository
         uses: ad-m/github-push-action@v0.8.0
         with:
@@ -23,4 +47,3 @@ jobs:
           branch: main
           tags: true
           force: false
-
