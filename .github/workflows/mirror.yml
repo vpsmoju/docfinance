@@ -1,0 +1,26 @@
+name: Mirror to kinhomoju/docfinance_copia
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to mirror repository
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.MIRROR_PAT }}
+          repository: kinhomoju/docfinance_copia
+          branch: main
+          tags: true
+          force: false
+
