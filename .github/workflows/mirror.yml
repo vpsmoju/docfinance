@@ -16,28 +16,20 @@ jobs:
           fetch-depth: 0
 
       - name: Verify MIRROR_PAT access to mirror repo
+        shell: bash
         run: |
-          set -e
-          echo "Checking access to kinhomoju/docfinance_copia with MIRROR_PAT..."
-          STATUS=$(curl -s -H "Authorization: token ${{ secrets.MIRROR_PAT }}" https://api.github.com/repos/kinhomoju/docfinance_copia -o /tmp/repo.json -w "%{http_code}")
-          if [ "$STATUS" != "200" ]; then
-            echo "GitHub API responded with HTTP $STATUS. Token likely missing access or repository not found."
-            cat /tmp/repo.json || true
+          set -euo pipefail
+          if [ -z "${{ secrets.MIRROR_PAT }}" ]; then
+            echo "Secret MIRROR_PAT not defined. Add it in Settings > Secrets and variables > Actions." >&2
             exit 1
           fi
-          echo "API access OK (200). Inspecting permissions..."
-          python3 - <<'PY'
-import json, sys
-with open('/tmp/repo.json','r', encoding='utf-8') as f:
-    data = json.load(f)
-perms = data.get('permissions', {})
-print(f"permissions: {perms}")
-has_push = bool(perms.get('push'))
-print(f"has_push={has_push}")
-if not has_push:
-    print('Token does not have write (push) permission on the mirror repository.')
-    sys.exit(1)
-PY
+          echo "Checking API access to kinhomoju/docfinance_copia with MIRROR_PAT..."
+          STATUS=$(curl -sS -H "Authorization: token ${{ secrets.MIRROR_PAT }}" -o /dev/null -w "%{http_code}" https://api.github.com/repos/kinhomoju/docfinance_copia)
+          if [ "$STATUS" != "200" ]; then
+            echo "Access check failed (HTTP $STATUS). Ensure PAT has repo (write) and workflow scopes or fine-grained Actions+Contents write." >&2
+            exit 1
+          fi
+          echo "API access OK (200). Proceeding to push."
 
       - name: Push to mirror repository
         uses: ad-m/github-push-action@v0.8.0
