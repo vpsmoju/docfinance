@@ -14,8 +14,8 @@
 
 param(
   [string]$Host = 'github.com',
-  [string]$DefaultRepoOwner = 'kinhomoju',
-  [string]$DefaultRepoName = 'docfinance_copia'
+  [string]$DefaultRepoOwner = 'vpsmoju',
+  [string]$DefaultRepoName = 'docfinance'
 )
 
 Write-Host "GitHub PAT storage helper (host: $Host)" -ForegroundColor Cyan
@@ -98,7 +98,7 @@ if ($users.Count -eq 0) {
 foreach ($u in $users) { Store-PAT -Username $u }
 
 # Pergunta se deve validar acesso ao repositório alvo
-$validateInput = Read-Host "Deseja validar acesso via API ao repositório espelho? (s/N)"
+$validateInput = Read-Host "Deseja validar acesso via API ao repositório alvo? (s/N)"
 if ($validateInput -match '^(s|S|y|Y)') {
   $Global:DoValidate = $true
   $owner = Read-Host "Owner do repositório (Enter para '$DefaultRepoOwner')"
