@@ -18,6 +18,16 @@ jobs:
           # garantindo que o push use o MIRROR_PAT fornecido abaixo.
           persist-credentials: false
 
+      - name: Clear residual credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Remove headers/credenciais que poderiam forçar uso do GITHUB_TOKEN
+          git config --global --unset-all http.https://github.com/.extraheader || true
+          git config --global --unset-all credential.helper || true
+          git config --global --unset-all url.https://github.com/.insteadof || true
+          echo "Credential helpers e extraheaders limpos."
+
       - name: Verify MIRROR_PAT access to mirror repo
         shell: bash
         run: |
