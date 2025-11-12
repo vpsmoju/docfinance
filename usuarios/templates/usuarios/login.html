@@ -10,100 +10,186 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="{% static 'usuarios/css/home.css' %}" rel="stylesheet">
     <style>
+        :root { --brand:#007e33; --brand-dark:#006128; }
+        html, body { height: 100%; }
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
         }
-        .login-container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 500px;
-            padding: 0;
-            overflow: hidden;
-            margin: 0 auto;
+
+        /* Layout dividido: imagem à esquerda, login à direita */
+        .split-layout { display: flex; flex: 1; min-height: 100vh; }
+        .image-panel {
+            flex: 1 1 auto;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
         }
-        .card-header {
-            background-color: #007e33;
-            color: white;
-            padding: 15px;
-            text-align: center;
+        .image-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)); }
+
+        .login-panel { flex: 0 0 440px; display: flex; align-items: center; justify-content: center; padding: 2rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); }
+        .login-card { width: 100%; max-width: 420px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+        .card-header { background-color: var(--brand); color: white; padding: 15px; text-align: center; }
+        .card-body { padding: 24px; }
+        .btn-primary { background-color: var(--brand); border-color: var(--brand); }
+        .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); }
+        a { color: var(--brand); }
+        a:hover { color: var(--brand-dark); }
+
+        /* Responsivo: abaixo de 992px, empilha; abaixo de 576px, foca no login */
+        @media (max-width: 992px) {
+            .split-layout { flex-direction: column; }
+            .image-panel { height: 40vh; }
+            .login-panel { flex: 0 0 auto; box-shadow: none; }
         }
-        .card-body {
-            padding: 30px;
-        }
-        .btn-primary {
-            background-color: #007e33;
-            border-color: #007e33;
-        }
-        .btn-primary:hover {
-            background-color: #006128;
-            border-color: #006128;
-        }
-        a {
-            color: #007e33;
-        }
-        a:hover {
-            color: #006128;
+        @media (max-width: 576px) {
+            .image-panel { display: none; }
+            .login-panel { padding: 1.25rem; }
+            .card-body { padding: 18px; }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="card-header">
-            <h2>Login</h2>
+    <div class="split-layout">
+        <!-- Painel de imagem rotativa -->
+        <div class="image-panel" id="splashImage">
+            <div class="image-overlay"></div>
         </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        <!-- Painel de login à direita -->
+        <div class="login-panel">
+            <div class="login-card">
+                <div class="card-header">
+                    <h2>Login</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Nome de usuário</label>
+                            {{ form.username|add_class:"form-control" }}
+                            {% if form.username.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.username.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Senha</label>
+                            {{ form.password|add_class:"form-control" }}
+                            {% if form.password.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <p>
+                            Esqueceu sua senha? <a href="{% url 'password_reset' %}">Clique aqui</a> para recuperá-la.
+                        </p>
+                        <p>
+                            Não tem uma conta? <a href="{% url 'registro' %}">Registre-se</a>
+                        </p>
+                        <p>
+                            <a href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Voltar para a tela inicial</a>
+                        </p>
                     </div>
-                {% endif %}
-                <div class="mb-3">
-                    <label for="{{ form.username.id_for_label }}" class="form-label">Nome de usuário</label>
-                    {{ form.username|add_class:"form-control" }}
-                    {% if form.username.errors %}
-                        <div class="text-danger">
-                            {% for error in form.username.errors %}{{ error }}{% endfor %}
-                        </div>
-                    {% endif %}
                 </div>
-                <div class="mb-3">
-                    <label for="{{ form.password.id_for_label }}" class="form-label">Senha</label>
-                    {{ form.password|add_class:"form-control" }}
-                    {% if form.password.errors %}
-                        <div class="text-danger">
-                            {% for error in form.password.errors %}{{ error }}{% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
-            <div class="mt-3 text-center">
-                <p>
-                    Esqueceu sua senha? <a href="{% url 'password_reset' %}">Clique aqui</a> para recuperá-la.
-                </p>
-                <p>
-                    Não tem uma conta? <a href="{% url 'registro' %}">Registre-se</a>
-                </p>
-                <p>
-                    <a href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Voltar para a tela inicial</a>
-                </p>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuração automática de imagens por faixa de horário
+        (function() {
+            const morningImages = [
+                '{% static "img/DocFinance.png" %}',
+                '{% static "img/DocFinance2.png" %}',
+                '{% static "img/DocFinance3.png" %}'
+            ];
+            const afternoonImages = [
+                '{% static "img/DocFinance_transp.png" %}',
+                '{% static "img/DocFinance_transp.svg" %}',
+                '{% static "img/DocFinance.svg" %}'
+            ];
+            const eveningImage = '{% static "img/logo_moju.png" %}';
+
+            // Pré-carregar imagens
+            [...morningImages, ...afternoonImages, eveningImage].forEach(src => { const img = new Image(); img.src = src; });
+
+            const splash = document.getElementById('splashImage');
+            let currentPhase = null;
+            let rotationTimer = null;
+            let checkTimer = null;
+            let idx = 0;
+
+            function getPhase(dt) {
+                const h = dt.getHours();
+                if (h >= 6 && h < 12) return 'morning';
+                if (h >= 12 && h < 18) return 'afternoon';
+                return 'evening';
+            }
+            function getIntervalMs(phase) {
+                if (phase === 'morning') return 30 * 60 * 1000; // 30min
+                if (phase === 'afternoon') return 60 * 60 * 1000; // 1h
+                return null; // evening: sem rotação
+            }
+            function imagesFor(phase) {
+                if (phase === 'morning') return morningImages;
+                if (phase === 'afternoon') return afternoonImages;
+                return [eveningImage];
+            }
+            function setBackground(src) {
+                splash.style.backgroundImage = `url('${src}')`;
+            }
+            function applyPhase(phase, initial=false) {
+                const imgs = imagesFor(phase);
+                if (initial) idx = 0; else idx = (idx + 1) % imgs.length;
+                setBackground(imgs[idx]);
+                const interval = getIntervalMs(phase);
+                if (rotationTimer) { clearInterval(rotationTimer); rotationTimer = null; }
+                if (interval) {
+                    rotationTimer = setInterval(() => {
+                        const nowPhase = getPhase(new Date());
+                        if (nowPhase !== phase) { // fase mudou
+                            currentPhase = nowPhase;
+                            applyPhase(currentPhase, true);
+                            return;
+                        }
+                        const imgs2 = imagesFor(phase);
+                        idx = (idx + 1) % imgs2.length;
+                        setBackground(imgs2[idx]);
+                    }, interval);
+                }
+            }
+            function init() {
+                currentPhase = getPhase(new Date());
+                applyPhase(currentPhase, true);
+                // verificação de mudança de fase a cada minuto
+                checkTimer = setInterval(() => {
+                    const ph = getPhase(new Date());
+                    if (ph !== currentPhase) {
+                        currentPhase = ph;
+                        applyPhase(currentPhase, true);
+                    }
+                }, 60 * 1000);
+            }
+            init();
+        })();
+    </script>
 </body>
 </html>
