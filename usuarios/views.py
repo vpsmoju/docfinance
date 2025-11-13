@@ -23,7 +23,10 @@ from .models import LogAtividade, Perfil
 
 
 def home(request):
-    return render(request, "usuarios/home.html")
+    # Página inicial: se autenticado, ir ao dashboard; caso contrário, ir ao login
+    if request.user.is_authenticated:
+        return redirect("documentos:dashboard")
+    return redirect("login")
 
 
 def registro(request):
