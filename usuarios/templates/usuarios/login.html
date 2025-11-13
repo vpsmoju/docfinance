@@ -39,6 +39,7 @@
         .card-header { background-color: var(--brand); color: white; padding: 12px; text-align: center; }
         .card-body { padding: 20px; }
         .logo-prefeitura { height: 48px; object-fit: contain; margin-bottom: 6px; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); }
+        .logo-top { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         a { color: var(--brand); }
@@ -65,9 +66,11 @@
         </div>
         <!-- Painel de login à direita -->
         <div class="login-panel">
+            <div class="logo-top">
+                <img src="{% static 'img/logo_prefeitura.png' %}" alt="Prefeitura Municipal de Moju" class="logo-prefeitura">
+            </div>
             <div class="login-card">
                 <div class="card-header">
-                    <img src="{% static 'img/logo_prefeitura.png' %}" alt="Prefeitura Municipal de Moju" class="logo-prefeitura">
                     <h2>Login</h2>
                 </div>
                 <div class="card-body">
