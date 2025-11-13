@@ -1,0 +1,39 @@
+name: Optimize Home Images
+
+on:
+  push:
+    paths:
+      - 'static/img/home/**'
+      - 'usuarios/templates/usuarios/login.html'
+      - 'Optimize-HomeImages.ps1'
+  workflow_dispatch:
+
+jobs:
+  optimize:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Optimize images
+        shell: pwsh
+        run: |
+          Write-Host "Running optimizer..."
+          $src = "static/img/home"
+          $dst = "static/img/home/optimized"
+          powershell -ExecutionPolicy Bypass -File .\Optimize-HomeImages.ps1 -SourceDir $src -TargetDir $dst -MaxWidth 1920 -Quality 82 -Overwrite
+
+      - name: Commit optimized assets if changed
+        shell: pwsh
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add static/img/home/optimized/*.jpg
+          if (-not (git diff --cached --quiet)) {
+            git commit -m "ci: optimize home images via workflow"
+            git push
+          } else {
+            Write-Host "No changes to commit"
+          }
