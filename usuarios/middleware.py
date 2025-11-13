@@ -1,7 +1,9 @@
 import logging
 import threading
 
-from django.urls import resolve
+from django.conf import settings
+from django.shortcuts import redirect
+from django.urls import resolve, reverse
 
 from .views import registrar_atividade
 
@@ -60,3 +62,50 @@ class LogAtividadeMiddleware:
                 pass  # Ignorar erros de resolução de URL
 
         return response
+
+
+class RequireLoginMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+        # Views liberadas sem autenticação
+        self.allowed_names = {
+            "home",
+            "login",
+            "logout",
+            "registro",
+            "ativar_conta",
+            "password_reset",
+            "password_reset_done",
+            "password_reset_confirm",
+            "password_reset_complete",
+        }
+
+    def __call__(self, request):
+        # Permitir estáticos, mídia e admin
+        path = request.path
+        if (
+            path.startswith("/static/")
+            or path.startswith("/media/")
+            or path.startswith("/admin/")
+        ):
+            return self.get_response(request)
+
+        # Já autenticado
+        if request.user.is_authenticated:
+            return self.get_response(request)
+
+        # Resolver nome da rota; em caso de 404, forçar login
+        try:
+            match = resolve(path)
+            url_name = match.url_name
+        except Exception:
+            url_name = None
+
+        # Se a rota não estiver liberada, redirecionar para login com next
+        if url_name not in self.allowed_names:
+            login_url = reverse(getattr(settings, "LOGIN_URL", "login"))
+            next_param = request.get_full_path()
+            return redirect(f"{login_url}?next={next_param}")
+
+        return self.get_response(request)
