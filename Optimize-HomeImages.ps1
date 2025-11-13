@@ -19,7 +19,8 @@ param(
   [string]$TargetDir = "static/img/home/optimized",
   [int]$MaxWidth = 1920,
   [int]$Quality = 82,
-  [switch]$Overwrite
+  [switch]$Overwrite,
+  [int]$FallbackMaxWidth = 1280
 )
 
 Set-StrictMode -Version Latest
@@ -94,7 +95,37 @@ foreach ($f in $files) {
     Write-Host ("OK: {0} -> {1} ({2:N1} MB -> {3:N1} MB)" -f $f.Name, $destName, ($origSize/1MB), ($newSize/1MB))
     $processed++
   } catch {
-    Write-Warning "Falha ao otimizar '$($f.Name)': $($_.Exception.Message)"
+    Write-Warning "Falha ao otimizar '$($f.Name)' (primário): $($_.Exception.Message)"
+    # Tenta fallback com largura menor e thumbnail para reduzir memória
+    try {
+      $img2 = [System.Drawing.Image]::FromFile($f.FullName)
+      try {
+        $ratio2 = $img2.Height / [double]$img2.Width
+        $fw = $FallbackMaxWidth
+        $fh = [int][Math]::Round($fw * $ratio2)
+        $thumb = $img2.GetThumbnailImage($fw, $fh, $null, [IntPtr]::Zero)
+        try {
+          $bmp2 = New-Object System.Drawing.Bitmap($thumb.Width, $thumb.Height)
+          try {
+            $g2 = [System.Drawing.Graphics]::FromImage($bmp2)
+            try {
+              $g2.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+              $g2.InterpolationMode  = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+              $g2.SmoothingMode      = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+              $g2.DrawImage($thumb, 0, 0, $thumb.Width, $thumb.Height)
+            } finally { $g2.Dispose() }
+            Save-Jpeg -bitmap $bmp2 -outPath $destPath -quality $Quality
+          } finally { $bmp2.Dispose() }
+        } finally { $thumb.Dispose() }
+      } finally { $img2.Dispose() }
+
+      $origSize2 = (Get-Item $f.FullName).Length
+      $newSize2  = (Get-Item $destPath).Length
+      Write-Host ("OK(fallback {0}px): {1} -> {2} ({3:N1} MB -> {4:N1} MB)" -f $FallbackMaxWidth, $f.Name, $destName, ($origSize2/1MB), ($newSize2/1MB))
+      $processed++
+    } catch {
+      Write-Warning "Falha ao otimizar '$($f.Name)' (fallback): $($_.Exception.Message)"
+    }
   }
 }
 
