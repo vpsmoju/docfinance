@@ -26,6 +26,11 @@ def home(request):
     # Página inicial: se autenticado, ir ao dashboard; caso contrário, ir ao login
     if request.user.is_authenticated:
         return redirect("documentos:dashboard")
+    # Preserva 'next' ao encaminhar para o login
+    next_param = request.GET.get("next")
+    if next_param:
+        from django.urls import reverse
+        return redirect(f"{reverse('login')}?next={next_param}")
     return redirect("login")
 
 
