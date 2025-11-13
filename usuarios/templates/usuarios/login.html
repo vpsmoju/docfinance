@@ -21,7 +21,7 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
-            font-size: 0.95rem;
+            font-size: 0.90rem;
         }
 
         /* Layout dividido: imagem à esquerda, login à direita */
@@ -35,16 +35,23 @@
         }
         .image-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)); }
 
-        .login-panel { flex: 0 0 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 1.75rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); }
-        .login-card { width: 100%; max-width: 400px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+        .login-panel { flex: 0 0 460px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 1.9rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); }
+        .login-card { width: 100%; max-width: 440px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
         .card-header { background-color: var(--brand); color: white; padding: 12px; text-align: center; }
         .card-body { padding: 20px; }
         .logo-prefeitura { height: 56px; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); }
         .logo-top { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-        .card-header h2 { font-size: 1.25rem; margin: 0; }
-        .form-label { font-size: 0.95rem; }
-        .form-control { font-size: 0.95rem; padding: 0.5rem 0.75rem; }
-        .btn { font-size: 0.95rem; }
+        .card-header h2 { font-size: 1.15rem; margin: 0; }
+        .form-label { font-size: 0.90rem; }
+        .form-control { font-size: 0.90rem; padding: 0.5rem 0.75rem; }
+        .btn { font-size: 0.92rem; }
+
+        /* Rodapé com logo e texto de boas-vindas (lado de fora do card) */
+        .login-footer { width: 100%; display: flex; justify-content: flex-end; }
+        .login-footer .footer-content { text-align: right; color: #374151; }
+        .login-footer .brand-logo { height: 36px; object-fit: contain; display: inline-block; margin-bottom: 4px; }
+        .login-footer .brand-title { font-size: 0.95rem; font-weight: 600; color: #111827; line-height: 1.2; }
+        .login-footer .brand-sub { font-size: 0.85rem; color: #6b7280; }
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         a { color: var(--brand); }
@@ -119,6 +126,13 @@
                             <a href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Voltar para a tela inicial</a>
                         </p>
                     </div>
+                </div>
+            </div>
+            <div class="login-footer">
+                <div class="footer-content">
+                    <img class="brand-logo" src="{% static 'img/DocFinance_transp.svg' %}" alt="DocFinance">
+                    <div class="brand-title">Bem-vindo ao DocFinance</div>
+                    <div class="brand-sub">Sistema de gerenciamento de documentos financeiros</div>
                 </div>
             </div>
         </div>
