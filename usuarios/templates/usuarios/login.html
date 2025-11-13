@@ -34,10 +34,11 @@
         }
         .image-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)); }
 
-        .login-panel { flex: 0 0 440px; display: flex; align-items: center; justify-content: center; padding: 2rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); }
-        .login-card { width: 100%; max-width: 420px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
-        .card-header { background-color: var(--brand); color: white; padding: 15px; text-align: center; }
-        .card-body { padding: 24px; }
+        .login-panel { flex: 0 0 360px; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); }
+        .login-card { width: 100%; max-width: 360px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+        .card-header { background-color: var(--brand); color: white; padding: 12px; text-align: center; }
+        .card-body { padding: 20px; }
+        .logo-prefeitura { height: 48px; object-fit: contain; margin-bottom: 6px; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); }
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         a { color: var(--brand); }
@@ -66,6 +67,7 @@
         <div class="login-panel">
             <div class="login-card">
                 <div class="card-header">
+                    <img src="{% static 'img/logo_prefeitura.png' %}" alt="Prefeitura Municipal de Moju" class="logo-prefeitura">
                     <h2>Login</h2>
                 </div>
                 <div class="card-body">
