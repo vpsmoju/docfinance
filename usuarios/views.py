@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from django.urls import reverse
 from urllib.parse import urlencode
 
 # Importações locais
@@ -26,11 +27,7 @@ def home(request):
     # Página inicial: se autenticado, ir ao dashboard; caso contrário, ir ao login
     if request.user.is_authenticated:
         return redirect("documentos:dashboard")
-    # Preserva 'next' ao encaminhar para o login
-    next_param = request.GET.get("next")
-    if next_param:
-        from django.urls import reverse
-        return redirect(f"{reverse('login')}?next={next_param}")
+    # Não repassar 'next': sempre levar ao login simples
     return redirect("login")
 
 
@@ -476,6 +473,10 @@ class CustomLoginView(LoginView):
             f"Usuário {self.request.user.username} fez login no sistema",
         )
         return response
+
+    def get_success_url(self):
+        # Ignorar qualquer 'next' e sempre enviar para o dashboard
+        return reverse("documentos:dashboard")
 
     def form_invalid(self, form):
         # Obter o nome de usuário que tentou fazer login

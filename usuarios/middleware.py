@@ -104,10 +104,8 @@ class RequireLoginMiddleware:
 
         # Se a rota não estiver liberada, redirecionar para login com next
         if url_name not in self.allowed_names:
-            # Redireciona sempre para a tela inicial (home);
-            # o view 'home' encaminha não autenticados ao login.
+            # Redireciona sempre para a tela inicial (home) sem repassar 'next'
             home_url = reverse("home")
-            next_param = request.get_full_path()
-            return redirect(f"{home_url}?next={next_param}")
+            return redirect(home_url)
 
         return self.get_response(request)
