@@ -117,22 +117,21 @@
         // Configuração automática de imagens por faixa de horário
         (function() {
             const morningImages = [
-                '{% static "img/home/manha1.JPG" %}',
-                '{% static "img/home/manha2.jpg" %}',
-                '{% static "img/home/manha3.JPG" %}',
-                '{% static "img/home/manha4.JPG" %}',
-                '{% static "img/home/manha5.JPG" %}',
-                '{% static "img/home/manha6.jpg" %}'
+                '{% static "img/home/optimized/manha1.jpg" %}',
+                '{% static "img/home/optimized/manha3.jpg" %}',
+                '{% static "img/home/optimized/manha4.jpg" %}',
+                '{% static "img/home/optimized/manha5.jpg" %}',
+                '{% static "img/home/optimized/manha6.jpg" %}'
             ];
             const afternoonImages = [
-                '{% static "img/home/tarde1.jpg" %}',
-                '{% static "img/home/tarde2.jpg" %}',
-                '{% static "img/home/tarde3.jpg" %}',
-                '{% static "img/home/tarde4.jpg" %}',
-                '{% static "img/home/tarde5.jpg" %}',
-                '{% static "img/home/tarde6.jpg" %}'
+                '{% static "img/home/optimized/tarde1.jpg" %}',
+                '{% static "img/home/optimized/tarde2.jpg" %}',
+                '{% static "img/home/optimized/tarde3.jpg" %}',
+                '{% static "img/home/optimized/tarde4.jpg" %}',
+                '{% static "img/home/optimized/tarde5.jpg" %}',
+                '{% static "img/home/optimized/tarde6.jpg" %}'
             ];
-            const eveningImage = '{% static "img/home/noite.jpg" %}';
+            const eveningImage = '{% static "img/home/optimized/noite.jpg" %}';
 
             // Pré-carregar imagens
             [...morningImages, ...afternoonImages, eveningImage].forEach(src => { const img = new Image(); img.src = src; });
