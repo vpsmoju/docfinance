@@ -180,6 +180,7 @@ footer p {
 .h-70vh {
     height: 70vh;
 }
+.h-60vh { height: 60vh; }
 .max-w-50vw { max-width: 50vw; }
 .max-w-680 { max-width: 680px; }
 .max-h-60vh { max-height: 60vh; }

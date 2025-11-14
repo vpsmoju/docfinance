@@ -47,7 +47,7 @@
             <aside class="sidebar">
                 <div class="sidebar-brand d-flex flex-column align-items-center p-3">
                     <a class="d-flex align-items-center justify-content-center gap-2" href="{% if user.is_authenticated %}{% url 'documentos:dashboard' %}{% else %}{% url 'home' %}{% endif %}">
-                        <img src="{% static 'img/DocFinance3.png' %}?v=2" alt="DocFinance">
+                        <img src="{% static 'img/DocFinance3.png' %}?v=2" alt="DocFinance" width="32" height="32">
                         <span class="fw-semibold">DocFinance</span>
                     </a>
                     <div class="mt-2 brand-subtitle">Gerenciador de Documentos Financeiros</div>

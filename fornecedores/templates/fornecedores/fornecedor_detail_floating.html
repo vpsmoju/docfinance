@@ -9,7 +9,7 @@
     <div id="floating-backdrop" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 z-1050"></div>
 
     <!-- Painel flutuante centralizado e compacto -->
-    <div class="position-fixed top-50 start-50 translate-middle w-100 z-1055" style="max-width: 860px; width: 92vw;">
+    <div class="position-fixed top-50 start-50 translate-middle w-100 z-1055 floating-panel">
         <div class="card fornecedor-card shadow-lg">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-375">
                 <h6 class="mb-0">
@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="card-body p-2 overflow-hidden">
-                <div class="floating-detail small d-flex flex-column" style="max-height: 58vh; overflow-y: auto; overflow-x: hidden;">
+                <div class="floating-detail small d-flex flex-column floating-scroll">
                     <div class="row g-2">
                         <div class="col-md-6">
                             <h6 class="section-title border-bottom pb-1 mb-2">Informações Básicas</h6>
@@ -141,5 +141,7 @@
         .floating-detail .row.g-2 > [class*="col-"] { margin-bottom: .15rem; }
         .floating-detail .row { margin-left: 0; margin-right: 0; }
         .email-value { white-space: normal; overflow-wrap: anywhere; }
+        .floating-panel { max-width: 860px; width: 92vw; }
+        .floating-scroll { max-height: 58vh; overflow-y: auto; overflow-x: hidden; }
     </style>
 {% endblock extra_css %}

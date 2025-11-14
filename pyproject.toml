@@ -71,3 +71,6 @@ line-ending = "auto"    # Detectar automaticamente
 [tool.isort]
 skip_gitignore = true
 skip = ["notebooks", "resources", "data"]
+
+[tool.djlint]
+ignore = ["H030", "H031"]
