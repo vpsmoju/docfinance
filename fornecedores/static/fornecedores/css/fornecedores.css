@@ -37,47 +37,37 @@
 .fornecedor-container {
     max-width: 860px;
 }
-
 .fornecedor-card .card-body {
     padding: 1rem !important;
 }
-
 .fornecedor-card .row.g-3 {
     --bs-gutter-x: .75rem;
     --bs-gutter-y: .75rem;
 }
-
 .fornecedor-card .mb-3 {
     margin-bottom: .5rem !important;
 }
-
 .fornecedor-card .section-title {
     font-size: 1rem;
 }
-
 .fornecedor-card .form-label {
     margin-bottom: .25rem;
     font-size: .95rem;
 }
-
 .fornecedor-card .input-group-text {
     padding: .3rem .5rem;
 }
-
 .fornecedor-card .form-text {
     margin-top: .25rem;
     font-size: .8rem;
 }
-
 .fornecedor-card .form-control {
     padding: .35rem .6rem;
     font-size: .95rem;
 }
-
 .fornecedor-card .card-header {
     padding: .5rem .75rem;
 }
-
 .fornecedor-card h3.mb-0 {
     font-size: 1.15rem;
 }
@@ -126,3 +116,106 @@
         padding: 0;
     }
 }
+
+/* Compactação específica quando usado em iframe dentro do modal */
+body.embed-compact { overflow-x: hidden; }
+body.embed-compact .fornecedor-container { max-width: 560px !important; padding-top: .18rem !important; padding-bottom: .35rem !important; }
+
+/* Aparar topo/rodapé do card e reduzir gutters */
+body.embed-compact .fornecedor-card .card-header { padding: .38rem .55rem !important; }
+body.embed-compact .fornecedor-card .card-body { padding: .55rem .55rem !important; }
+body.embed-compact .fornecedor-card .row,
+body.embed-compact .fornecedor-card .row.g-2,
+body.embed-compact .fornecedor-card .row.g-3 { --bs-gutter-x: .3rem; --bs-gutter-y: .3rem; }
+
+/* Ícones ao lado da label */
+body.embed-compact .fornecedor-card .form-label.label-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-bottom: .12rem !important;
+    font-size: .85rem !important;
+}
+body.embed-compact .fornecedor-card .form-label.label-with-icon i {
+    font-size: .9rem;
+    opacity: .75;
+}
+
+/* Oculta o ícone dentro do input-group para evitar espaço extra */
+body.embed-compact .fornecedor-card .input-group-text { display: none !important; }
+
+/* Inputs/selects mais compactos */
+body.embed-compact .fornecedor-card .input-group .form-control,
+body.embed-compact .fornecedor-card .input-group .form-select { flex: 1 1 auto; width: 100%; min-width: 0; }
+
+body.embed-compact .fornecedor-card .form-control,
+body.embed-compact .fornecedor-card .form-select {
+    padding: .24rem .48rem !important;
+    font-size: .84rem !important;
+    line-height: 1.15 !important;
+}
+
+/* Espaçamento vertical dos grupos e títulos */
+body.embed-compact .fornecedor-card .mb-3 { margin-bottom: .28rem !important; }
+body.embed-compact .fornecedor-card .section-title { font-size: .88rem !important; margin-bottom: .24rem !important; padding-bottom: .12rem !important; }
+
+/* Ajustes finais */
+body.embed-compact .fornecedor-card .form-text { margin-top: .14rem !important; font-size: .75rem !important; }
+body.embed-compact .fornecedor-card form .mt-3 { margin-top: .35rem !important; }
+body.embed-compact .fornecedor-card .card-header h3 { font-size: .95rem !important; }
+.embed-compact .fornecedor-card .card-header h3 { font-size: .98rem; }
+
+/* Evita “estouro” lateral nas colunas */
+.embed-compact .row > [class^="col-"],
+.embed-compact .row > [class*=" col-"] { min-width: 0; }
+
+.embed-compact .fornecedor-card .card-body { padding: .7rem !important; }
+.embed-compact .fornecedor-card .row.g-2,
+.embed-compact .fornecedor-card .row.g-3 { --bs-gutter-x: .45rem; --bs-gutter-y: .45rem; }
+.embed-compact .fornecedor-card .mb-3 { margin-bottom: .4rem !important; }
+
+/* Títulos e labels ainda mais enxutos */
+.embed-compact .fornecedor-card .section-title { font-size: .92rem; margin-bottom: .28rem !important; padding-bottom: .15rem !important; }
+.embed-compact .fornecedor-card .form-label { margin-bottom: .15rem; font-size: .88rem; }
+.embed-compact .fornecedor-card .input-group-text { padding: .25rem .45rem; font-size: .88rem; }
+
+/* Inputs/selects menores e sem overflow */
+.embed-compact .fornecedor-card .input-group .form-control,
+.embed-compact .fornecedor-card .input-group .form-select { flex: 1 1 auto; width: 100%; min-width: 0; }
+
+.embed-compact .fornecedor-card .form-control,
+.embed-compact .fornecedor-card .form-select { padding: .32rem .55rem; font-size: .88rem; line-height: 1.25; }
+
+/* Textos auxiliares e espaçamentos finais */
+.embed-compact .fornecedor-card .form-text { margin-top: .18rem; font-size: .76rem; }
+.embed-compact .fornecedor-card form .mt-3 { margin-top: .5rem !important; }
+.embed-compact .fornecedor-card .card-header h3 { font-size: 1.05rem; }
+
+/* Ajuste do acordeão "Dados Bancários" para aparência de seção (sem fundo azul e sem seta) */
+body.embed-compact .fornecedor-card .accordion {
+    --bs-accordion-btn-bg: transparent;
+    --bs-accordion-bg: transparent;
+    --bs-accordion-border-color: var(--bs-border-color);
+    --bs-accordion-btn-padding-x: 0;
+    --bs-accordion-btn-padding-y: .22rem;
+    --bs-accordion-border-radius: 0;
+}
+body.embed-compact .fornecedor-card .accordion-item { border: 0 !important; }
+body.embed-compact .fornecedor-card .accordion-header {
+    border-bottom: 1px solid var(--bs-border-color);
+    margin-bottom: .26rem !important;
+    padding-bottom: .16rem !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+}
+body.embed-compact .fornecedor-card .accordion-button {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+    padding: 0 !important;
+    pointer-events: none !important; /* desativa clique, vira título de seção */
+    font-size: .86rem !important;
+    font-weight: 500;
+}
+body.embed-compact .fornecedor-card .accordion-button::after { display: none !important; }
+body.embed-compact .fornecedor-card .accordion-body { padding: 0 !important; }
