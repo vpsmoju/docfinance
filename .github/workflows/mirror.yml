@@ -44,11 +44,14 @@ jobs:
           fi
           echo "API access OK (200). Proceeding to push."
 
-      - name: Push to mirror repository
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          github_token: ${{ secrets.MIRROR_PAT }}
-          repository: vpsmoju/docfinance_copia
-          branch: main
-          tags: true
-          force: true
+      - name: Push to mirror repository with lease
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global user.name "DocFinance Mirror Bot"
+          git config --global user.email "actions@users.noreply.github.com"
+          git remote remove mirror || true
+          git remote add mirror https://vpsmoju:${{ secrets.MIRROR_PAT }}@github.com/vpsmoju/docfinance_copia.git
+          git fetch mirror main || true
+          git push --force-with-lease mirror main:main
+          git push mirror --tags
