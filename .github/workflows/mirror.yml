@@ -1,4 +1,4 @@
-name: Mirror to kinhomoju/docfinance_copia
+name: Mirror to vpsmoju/docfinance_copia
 
 on:
   push:
@@ -36,8 +36,8 @@ jobs:
             echo "Secret MIRROR_PAT not defined. Add it in Settings > Secrets and variables > Actions." >&2
             exit 1
           fi
-          echo "Checking API access to kinhomoju/docfinance_copia with MIRROR_PAT..."
-          STATUS=$(curl -sS -H "Authorization: token ${{ secrets.MIRROR_PAT }}" -o /dev/null -w "%{http_code}" https://api.github.com/repos/kinhomoju/docfinance_copia)
+          echo "Checking API access to vpsmoju/docfinance_copia with MIRROR_PAT..."
+          STATUS=$(curl -sS -H "Authorization: token ${{ secrets.MIRROR_PAT }}" -o /dev/null -w "%{http_code}" https://api.github.com/repos/vpsmoju/docfinance_copia)
           if [ "$STATUS" != "200" ]; then
             echo "Access check failed (HTTP $STATUS). Ensure PAT has repo (write) and workflow scopes or fine-grained Actions+Contents write." >&2
             exit 1
@@ -48,7 +48,7 @@ jobs:
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.MIRROR_PAT }}
-          repository: kinhomoju/docfinance_copia
+          repository: vpsmoju/docfinance_copia
           branch: main
           tags: true
-          force: false
+          force: true
