@@ -10,7 +10,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
@@ -97,11 +97,10 @@ class DocumentoDetailView(LoginRequiredMixin, DetailView):
     model = Documento
 
 
-class DocumentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class DocumentoCreateView(LoginRequiredMixin, CreateView):
     """Cria um novo documento financeiro com validação de permissões."""
 
     model = Documento
-    permission_required = "documentos.add_documento"
     form_class = DocumentoForm  # Usar o formulário personalizado
     success_url = reverse_lazy("documentos:list")
 
@@ -236,11 +235,10 @@ class DocumentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateVie
         return super().form_invalid(form)
 
 
-class DocumentoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class DocumentoUpdateView(LoginRequiredMixin, UpdateView):
     """Atualiza um documento financeiro existente com validação de permissões."""
 
     model = Documento
-    permission_required = "documentos.change_documento"
     form_class = DocumentoForm
     success_url = reverse_lazy("documentos:list")
 
@@ -365,7 +363,7 @@ class DocumentoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVie
 buscar_fornecedor = buscar_fornecedor_por_cnpj_cpf
 
 
-class DocumentoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class DocumentoDeleteView(LoginRequiredMixin, DeleteView):
     """Remove um documento financeiro com validação de permissões."""
 
     def get_success_url(self):
@@ -387,15 +385,13 @@ class DocumentoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVie
             return redirect("documentos:list")
 
     model = Documento
-    permission_required = "documentos.delete_documento"
     success_url = reverse_lazy("documentos:list")
     template_name = "documentos/documento_confirm_delete.html"
 
 
-class DarBaixaDocumentoView(LoginRequiredMixin, PermissionRequiredMixin, View):
+class DarBaixaDocumentoView(LoginRequiredMixin, View):
     """Realiza a baixa de um documento financeiro, alterando seu status para pago."""
 
-    permission_required = "documentos.dar_baixa_documento"
     template_name = "documentos/dar_baixa_form.html"
 
     def get(self, request, pk):

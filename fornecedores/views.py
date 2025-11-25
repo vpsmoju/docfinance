@@ -25,7 +25,7 @@ Dependências:
 """
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -99,7 +99,7 @@ class FornecedorDetailView(LoginRequiredMixin, DetailView):
 
 
 @method_decorator(xframe_options_sameorigin, name="dispatch")
-class FornecedorCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class FornecedorCreateView(LoginRequiredMixin, CreateView):
     """Cria um novo fornecedor com validação de permissões."""
 
     def get_form(self, form_class=None):
@@ -148,12 +148,11 @@ class FornecedorCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateVi
 
     model = Fornecedor
     form_class = FornecedorForm
-    permission_required = "fornecedores.add_fornecedor"
     success_url = reverse_lazy("fornecedores:fornecedor_list")
 
 
 @method_decorator(xframe_options_sameorigin, name="dispatch")
-class FornecedorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class FornecedorUpdateView(LoginRequiredMixin, UpdateView):
     """Atualiza um fornecedor existente com validação de permissões."""
 
     def get_template_names(self):
@@ -185,11 +184,10 @@ class FornecedorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVi
 
     model = Fornecedor
     form_class = FornecedorForm
-    permission_required = "fornecedores.change_fornecedor"
     success_url = reverse_lazy("fornecedores:fornecedor_list")
 
 
-class FornecedorDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class FornecedorDeleteView(LoginRequiredMixin, DeleteView):
     """Remove um fornecedor existente com validação de permissões."""
 
     def get_queryset(self):
@@ -197,7 +195,6 @@ class FornecedorDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
         return Fornecedor.objects.all()
 
     model = Fornecedor
-    permission_required = "fornecedores.delete_fornecedor"
     template_name = "fornecedores/fornecedor_confirm_delete.html"
     success_url = reverse_lazy("fornecedores:fornecedor_list")
 
