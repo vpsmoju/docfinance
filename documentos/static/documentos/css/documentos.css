@@ -48,3 +48,10 @@
     padding-right: 0;
     padding-left: 25px;
 }
+
+/* Tabelas compactas para listagens de documentos */
+.table-compact { font-size: 0.75rem; }
+.table-compact th,
+.table-compact td { padding: .125rem .25rem; }
+.table-compact .badge { font-size: .65rem; }
+.table-compact .btn { font-size: .65rem; padding: .125rem .25rem; }
