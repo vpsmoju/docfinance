@@ -143,9 +143,22 @@ WSGI_APPLICATION = "api.config.wsgi.application"
 #     }
 # }
 
-DATABASES = {
-    'default': dj_database_url.config(default=config('DATABASE_URL'))
-}
+# Banco de dados com fallback seguro: PostgreSQL via DATABASE_URL, senão SQLite
+DATABASE_URL = config('DATABASE_URL', default=None)
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# Garantir transações por request para integridade ao usar PostgreSQL
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 # DATABASES = {
 #     "default": {
