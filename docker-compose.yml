@@ -1,23 +1,21 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  web:
-    build: .
-    command: >
-      bash -c "python manage.py migrate &&
-              python manage.py collectstatic --noinput &&
-              python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
-      - static_volume:/app/staticfiles
-    ports:
-      - "8000:8000"
+  postgres:
+    image: postgres:16-alpine
+    container_name: docfinance-postgres
     environment:
-      - DEBUG=1
-      - SECRET_KEY=django-insecure-ph@vzy_yjsoit21lemcmm5ea(j!ql#g3b7ruggu$losdkk6rwo
-      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-      - STATIC_URL=/static/
-      - STATIC_ROOT=/app/staticfiles
-
+      - POSTGRES_DB=docfinance
+      - POSTGRES_USER=docfinance
+      - POSTGRES_PASSWORD=docfinance
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docfinance"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 volumes:
-  static_volume:
+  pg_data:
