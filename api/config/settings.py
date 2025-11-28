@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
-from decouple import config
+from decouple import config, Csv
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Configurações de segurança para produção (desativadas para desenvolvimento local)
@@ -242,3 +241,8 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 # Permitir incorporação de páginas em iframes da mesma origem (necessário para modais com iframe)
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
