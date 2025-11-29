@@ -267,3 +267,4 @@ pyrightconfig.json
 .vercel
 
 staticfiles_build/
+backups/
