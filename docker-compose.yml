@@ -1,4 +1,18 @@
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docfinance-backend
+    environment:
+      - SECRET_KEY=dev-secret-key-change-in-prod
+      - DATABASE_URL=postgresql://docfinance:docfinance@postgres:5432/docfinance
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
   postgres:
     image: postgres:16-alpine
     container_name: docfinance-postgres
