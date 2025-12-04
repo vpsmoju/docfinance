@@ -17,10 +17,14 @@ import dj_database_url
 from decouple import config, Csv
 from dotenv import load_dotenv
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+_dotenv_path = BASE_DIR / ".django.env"
+if _dotenv_path.exists():
+    load_dotenv(_dotenv_path)
+else:
+    load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")

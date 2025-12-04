@@ -268,3 +268,4 @@ pyrightconfig.json
 
 staticfiles_build/
 backups/
+.django.env
