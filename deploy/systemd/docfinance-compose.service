@@ -1,0 +1,14 @@
+[Unit]
+Description=DocFinance Compose
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/sefaz/docfinance
+ExecStart=/usr/bin/docker compose --env-file compose.env up -d --build postgres pgadmin backend
+ExecStop=/usr/bin/docker compose down
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
