@@ -1,12 +1,14 @@
 services:
   backend:
     build:
+      context: .
       dockerfile: Dockerfile.prod
     command: gunicorn api.config.wsgi:application --bind 0.0.0.0:8000
     restart: unless-stopped
+    env_file:
+      - .django.env
+    depends_on:
+      - postgres
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
-volumes:
-  static_volume:
-  media_volume:
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
