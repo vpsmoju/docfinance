@@ -121,4 +121,8 @@ if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
   fi
 fi
 
-notify "✅🎉 Deploy concluído: ${AFTER} (antes: ${BEFORE}). Stack atualizado."
+if [ "$UPDATED" = "1" ]; then
+  notify "✅🎉 Deploy concluído: ${AFTER} (antes: ${BEFORE}; aplicado: ${REMOTE}). Stack atualizado."
+else
+  notify "✅🎉 Deploy concluído: ${AFTER} (sem alterações; remoto: ${REMOTE}). Stack validado."
+fi
