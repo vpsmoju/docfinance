@@ -34,6 +34,8 @@ mkdir -p "$BACKUP_DIR"
 STAMP=$(date +"%Y-%m-%d_%H%M")
 INCOMING_DIR="${BACKUP_DIR}/incoming"
 mkdir -p "$INCOMING_DIR"
+sudo chown -R sefaz:sefaz "$BACKUP_DIR"
+sudo chmod -R 755 "$BACKUP_DIR"
 
 sudo mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media"
 sudo chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media"
