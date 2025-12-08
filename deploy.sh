@@ -18,16 +18,28 @@ notify() {
 
 cd "$APP_DIR"
 
-CURRENT_COMMIT=$(git rev-parse --short HEAD || echo "unknown")
-notify "🚀 Iniciando deploy do *docfinance* (commit atual: ${CURRENT_COMMIT})..."
+BEFORE=$(git rev-parse --short HEAD || echo "unknown")
+REMOTE=$(git rev-parse --short origin/main 2>/dev/null || echo "unknown")
+notify "🚀 Iniciando deploy do *docfinance* (local: ${BEFORE}; remoto: ${REMOTE})..."
 
-if git fetch --all && git reset --hard origin/main; then
-  notify "✅ Código atualizado com sucesso."
+UPDATED=0
+if git fetch --all; then
+  REMOTE=$(git rev-parse --short origin/main || echo "unknown")
+  if [ "$BEFORE" != "$REMOTE" ]; then
+    if git reset --hard origin/main; then
+      UPDATED=1
+      notify "✅ Código atualizado para ${REMOTE} (antes: ${BEFORE})."
+    else
+      notify "❌ Falha ao aplicar atualização para ${REMOTE}."
+    fi
+  else
+    notify "ℹ️ Código já está em ${BEFORE}."
+  fi
 else
-  notify "❌ Falha ao atualizar código."
+  notify "❌ Falha ao buscar remotos."
 fi
 
-NEW_COMMIT=$(git rev-parse --short HEAD)
+AFTER=$(git rev-parse --short HEAD || echo "unknown")
 
 BACKUP_DIR="${APP_DIR}/backups"
 mkdir -p "$BACKUP_DIR"
@@ -109,4 +121,4 @@ if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
   fi
 fi
 
-notify "✅🎉 Deploy concluído: ${NEW_COMMIT} (antes: ${CURRENT_COMMIT}). Stack atualizado."
+notify "✅🎉 Deploy concluído: ${AFTER} (antes: ${BEFORE}). Stack atualizado."
