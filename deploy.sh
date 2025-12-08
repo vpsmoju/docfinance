@@ -33,6 +33,10 @@ BACKUP_DIR="${APP_DIR}/backups"
 mkdir -p "$BACKUP_DIR"
 STAMP=$(date +"%Y-%m-%d_%H%M")
 
+sudo mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media"
+sudo chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media"
+sudo chmod -R 755 "${APP_DIR}/staticfiles" "${APP_DIR}/media"
+
 sudo $COMPOSE up -d postgres
 
 sudo docker exec docfinance-postgres sh -lc "pg_dump -U docfinance -d docfinance -Fc -Z 9 -f /tmp/docfinance_${STAMP}.dump && pg_dump -U docfinance -d docfinance -f /tmp/docfinance_${STAMP}.sql" || true
@@ -63,6 +67,12 @@ if sudo $COMPOSE exec -T backend python manage.py collectstatic --noinput; then
   notify "✅ Arquivos estáticos coletados."
 else
   notify "❌ Erro ao coletar estáticos."
+fi
+
+COUNT=$(sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
+if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
+  sudo $COMPOSE exec -T backend python manage.py loaddata /app/backup_docfinance_2025-11-29_0054.json || true
+  notify "✅ Dados iniciais carregados."
 fi
 
 notify "✅🎉 Deploy concluído: ${NEW_COMMIT} (antes: ${CURRENT_COMMIT}). Stack atualizado."
