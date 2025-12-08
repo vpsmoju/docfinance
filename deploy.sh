@@ -74,6 +74,9 @@ if [ -n "$INC_DUMP" ] || [ -n "$INC_SQL" ]; then
   sudo $COMPOSE up -d backend
 fi
 
+ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
+ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
+
 if sudo systemctl restart "${SERVICE_NAME}"; then
   notify "✅ Stack atualizado pelo systemd."
 else
