@@ -61,10 +61,14 @@ if [ -n "$INC_DUMP" ] || [ -n "$INC_SQL" ]; then
   if [ -n "$INC_DUMP" ]; then
     sudo docker cp "$INC_DUMP" docfinance-postgres:/tmp/incoming.dump
     sudo docker exec docfinance-postgres sh -lc "pg_restore -U docfinance -d docfinance --clean --if-exists -j 2 /tmp/incoming.dump"
+    sudo docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.dump"
+    sudo rm -f "$INC_DUMP"
     notify "✅ Banco restaurado a partir do dump (custom)."
   elif [ -n "$INC_SQL" ]; then
     sudo docker cp "$INC_SQL" docfinance-postgres:/tmp/incoming.sql
     sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -f /tmp/incoming.sql"
+    sudo docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.sql"
+    sudo rm -f "$INC_SQL"
     notify "✅ Banco restaurado a partir do SQL."
   fi
   sudo $COMPOSE up -d backend
