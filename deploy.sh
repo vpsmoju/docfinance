@@ -71,8 +71,14 @@ fi
 
 COUNT=$(sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
 if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
-  sudo $COMPOSE exec -T backend python manage.py loaddata /app/backup_docfinance_2025-11-29_0054.json || true
-  notify "✅ Dados iniciais carregados."
+  FIX="${APP_DIR}/backup_docfinance_2025-11-29_0054.json"
+  if [ -f "$FIX" ]; then
+    sudo docker cp "$FIX" docfinance-backend:/tmp/fixture.json || true
+    sudo $COMPOSE exec -T backend python manage.py loaddata /tmp/fixture.json || true
+    notify "✅ Dados iniciais carregados."
+  else
+    notify "ℹ️ Fixture não encontrada em $FIX; pulando carga."
+  fi
 fi
 
 notify "✅🎉 Deploy concluído: ${NEW_COMMIT} (antes: ${CURRENT_COMMIT}). Stack atualizado."
