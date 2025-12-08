@@ -32,6 +32,8 @@ NEW_COMMIT=$(git rev-parse --short HEAD)
 BACKUP_DIR="${APP_DIR}/backups"
 mkdir -p "$BACKUP_DIR"
 STAMP=$(date +"%Y-%m-%d_%H%M")
+INCOMING_DIR="${BACKUP_DIR}/incoming"
+mkdir -p "$INCOMING_DIR"
 
 sudo mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media"
 sudo chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media"
@@ -50,6 +52,23 @@ sudo docker cp docfinance-backend:/tmp/backup_fixture_${STAMP}.json "$BACKUP_DIR
 ls -t "$BACKUP_DIR"/docfinance_*.dump 2>/dev/null | tail -n +4 | xargs -r rm -f
 ls -t "$BACKUP_DIR"/docfinance_*.sql 2>/dev/null | tail -n +4 | xargs -r rm -f
 ls -t "$BACKUP_DIR"/backup_fixture_*.json 2>/dev/null | tail -n +4 | xargs -r rm -f
+
+# Restauração opcional de dump vindo do ambiente local
+INC_DUMP=$(ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | head -n1 || true)
+INC_SQL=$(ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | head -n1 || true)
+if [ -n "$INC_DUMP" ] || [ -n "$INC_SQL" ]; then
+  sudo $COMPOSE stop backend || true
+  if [ -n "$INC_DUMP" ]; then
+    sudo docker cp "$INC_DUMP" docfinance-postgres:/tmp/incoming.dump
+    sudo docker exec docfinance-postgres sh -lc "pg_restore -U docfinance -d docfinance --clean --if-exists -j 2 /tmp/incoming.dump"
+    notify "✅ Banco restaurado a partir do dump (custom)."
+  elif [ -n "$INC_SQL" ]; then
+    sudo docker cp "$INC_SQL" docfinance-postgres:/tmp/incoming.sql
+    sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -f /tmp/incoming.sql"
+    notify "✅ Banco restaurado a partir do SQL."
+  fi
+  sudo $COMPOSE up -d backend
+fi
 
 if sudo systemctl restart "${SERVICE_NAME}"; then
   notify "✅ Stack atualizado pelo systemd."
