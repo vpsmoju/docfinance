@@ -9,7 +9,9 @@
 .dashboard-cards .card .card-body { display: flex; flex-direction: column; justify-content: space-between; padding: .75rem; }
 .dashboard-cards .card .card-title { font-size: .9rem; font-weight: 500; margin-bottom: .2rem; }
 .dashboard-cards .card p { font-size: .85rem; margin-bottom: 0; }
-.dashboard-cards .card .card-text { font-size: 1.25rem; }
+.dashboard-cards .card .card-text { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+.card-header { padding: .5rem .75rem; }
+.card-header h5 { font-size: .95rem; }
 .table th, .table td { font-size: .85rem; }
 .table td.descricao { font-size: .8rem; max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Gráficos menores para estética */
@@ -172,7 +174,7 @@
             function configurarGraficoBarra(ctx, labels, valores, titulo) {
                 return new Chart(ctx, {
                     type: 'bar',
-                    data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: 'rgba(54, 162, 235, 0.6)' }] },
+                    data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: 'rgba(54, 162, 235, 0.6)', maxBarThickness: 28, borderRadius: 6 }] },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
