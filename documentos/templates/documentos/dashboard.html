@@ -10,6 +10,8 @@
 .dashboard-cards .card .card-title { font-size: .9rem; font-weight: 500; margin-bottom: .2rem; }
 .dashboard-cards .card p { font-size: .85rem; margin-bottom: 0; }
 .dashboard-cards .card .card-text { font-size: 1.25rem; }
+.table th, .table td { font-size: .85rem; }
+.table td.descricao { font-size: .8rem; max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Gráficos menores para estética */
 .dashboard-chart { height: 200px !important; }
 .card-body canvas { max-height: 200px; }
@@ -91,6 +93,7 @@
                         <tr>
                             <th>Número</th>
                             <th>Fornecedor</th>
+                            <th>Descrição</th>
                             <th>Data Pagamento</th>
                             <th>Valor</th>
                             <th>Status</th>
@@ -102,6 +105,7 @@
                             <tr>
                                 <td>{{ doc.numero }}</td>
                                 <td>{{ doc.fornecedor }}</td>
+                                <td class="descricao">{{ doc.descricao|default:"-" }}</td>
                                 <td>{% if doc.data_pagamento %}{{ doc.data_pagamento|date:"d/m/Y" }}{% else %}-{% endif %}</td>
                                 <td>R$ {{ doc.valor_liquido|currency_br }}</td>
                                 <td>
@@ -204,5 +208,5 @@
             [{{ valor_pendente|unlocalize }}, {{ valor_pago|unlocalize }}],
             'Valor Total (R$)'
         );
-     </script>
+</script>
 {% endblock extra_js %}
