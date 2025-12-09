@@ -9,6 +9,9 @@
 .dashboard-cards .card .card-body { display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
 .dashboard-cards .card .card-title { font-size: 0.95rem; font-weight: 500; margin-bottom: .25rem; }
 .dashboard-cards .card p { font-size: .9rem; margin-bottom: 0; }
+/* Gráficos menores para estética */
+.dashboard-chart { height: 200px !important; }
+.card-body canvas { max-height: 200px; }
 </style>
 {% endblock extra_css %}
 {% block title %}
@@ -60,7 +63,7 @@
                     <h5>Documentos por Status</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="statusChart"></canvas>
+                    <canvas id="statusChart" class="dashboard-chart"></canvas>
                 </div>
             </div>
         </div>
@@ -70,7 +73,7 @@
                     <h5>Valores por Status</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="valoresChart"></canvas>
+                    <canvas id="valoresChart" class="dashboard-chart"></canvas>
                 </div>
             </div>
         </div>
@@ -138,6 +141,8 @@
                     type: 'pie',
                     data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: backgroundColors }] },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             tooltip: {
                                 callbacks: {
@@ -164,6 +169,8 @@
                     type: 'bar',
                     data: { labels, datasets: [{ label: titulo, data: valores, backgroundColor: 'rgba(54, 162, 235, 0.6)' }] },
                     options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
                         scales: { y: { beginAtZero: true, ticks: { callback: function(value){ return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value); } } } },
                         plugins: { tooltip: { callbacks: { label: function(context){ let label = context.dataset.label || ''; if(label){ label += ': '; } const value = context.raw; return label + new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value); } } } }
                     }
