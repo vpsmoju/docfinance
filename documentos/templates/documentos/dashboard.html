@@ -5,10 +5,11 @@
 {% block extra_css %}
 <style>
 /* Cards menores e uniformes no dashboard */
-.dashboard-cards .card { min-height: 140px; }
-.dashboard-cards .card .card-body { display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
-.dashboard-cards .card .card-title { font-size: 0.95rem; font-weight: 500; margin-bottom: .25rem; }
-.dashboard-cards .card p { font-size: .9rem; margin-bottom: 0; }
+.dashboard-cards .card { min-height: 100px; }
+.dashboard-cards .card .card-body { display: flex; flex-direction: column; justify-content: space-between; padding: .75rem; }
+.dashboard-cards .card .card-title { font-size: .9rem; font-weight: 500; margin-bottom: .2rem; }
+.dashboard-cards .card p { font-size: .85rem; margin-bottom: 0; }
+.dashboard-cards .card .card-text { font-size: 1.25rem; }
 /* Gráficos menores para estética */
 .dashboard-chart { height: 200px !important; }
 .card-body canvas { max-height: 200px; }
@@ -101,7 +102,7 @@
                             <tr>
                                 <td>{{ doc.numero }}</td>
                                 <td>{{ doc.fornecedor }}</td>
-                                <td>{{ doc.data_pagamento }}</td>
+                                <td>{% if doc.data_pagamento %}{{ doc.data_pagamento|date:"d/m/Y" }}{% else %}-{% endif %}</td>
                                 <td>R$ {{ doc.valor_liquido|currency_br }}</td>
                                 <td>
                                     {% if doc.status == 'PEN' %}
