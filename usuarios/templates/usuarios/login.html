@@ -35,13 +35,13 @@
         }
         .image-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)); }
 
-        .login-panel { flex: 0 0 460px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 1.9rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); position: relative; }
+        .login-panel { flex: 0 0 460px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; padding: 1.9rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); position: relative; }
         .login-card { width: 100%; max-width: 440px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
         .card-header { background-color: var(--brand); color: white; padding: 12px; text-align: center; }
         .card-body { padding: 20px; }
         .logo-prefeitura { height: 56px; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); }
-        .logo-top { display: flex; align-items: flex-start; justify-content: flex-start; width: 100%; margin-bottom: 12px; }
-        .welcome-text { width: 100%; text-align: left; margin: 6px 0 12px; }
+        .logo-top { display: flex; align-items: flex-start; justify-content: flex-start; width: 100%; margin: 4px 0 8px; }
+        .welcome-text { width: 100%; text-align: center; margin: 6px 0 12px; }
         .welcome-text .brand-title { font-size: 1rem; font-weight: 600; color: #111827; line-height: 1.2; }
         .welcome-text .brand-sub { font-size: .9rem; color: #6b7280; }
         .card-header h2 { font-size: 1.15rem; margin: 0; }
@@ -54,7 +54,7 @@
         /* Rodapé com logo e texto de boas-vindas (lado de fora do card) */
         .login-footer { position: absolute; right: 16px; bottom: 12px; display: flex; justify-content: flex-end; width: auto; }
         .login-footer .footer-content { text-align: right; color: #374151; }
-        .login-footer .brand-logo { height: 36px; object-fit: contain; display: inline-block; }
+        .login-footer .brand-logo { height: 44px; object-fit: contain; display: inline-block; }
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         a { color: var(--brand); }
@@ -135,9 +135,7 @@
             </div>
             <div class="login-footer">
                 <div class="footer-content">
-            <img class="brand-logo" src="{% static 'img/DocFinance3.png' %}" alt="DocFinance" width="140" height="36">
-                    <div class="brand-title">Bem-vindo ao DocFinance</div>
-                    <div class="brand-sub">Sistema de gerenciamento de documentos financeiros</div>
+                    <img class="brand-logo" src="{% static 'img/DocFinance3.png' %}" alt="DocFinance" width="160" height="44">
                 </div>
             </div>
         </div>
