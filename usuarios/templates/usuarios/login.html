@@ -35,7 +35,7 @@
         }
         .image-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)); }
 
-        .login-panel { flex: 0 0 460px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 1.9rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); min-height: 100vh; }
+        .login-panel { flex: 0 0 460px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px; padding: 1.9rem; background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,.05); min-height: 100vh; }
         .login-content { width: 100%; max-width: 440px; display: flex; flex-direction: column; }
         .login-card { width: 100%; max-width: 440px; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
         .card-header { background-color: var(--brand); color: white; padding: 12px; text-align: center; }
@@ -53,7 +53,7 @@
         .compact-links p { margin: 0.25rem 0; }
 
         /* Rodapé com logo e texto de boas-vindas (lado de fora do card) */
-        .login-footer { display: flex; justify-content: flex-end; width: 100%; }
+        .login-footer { margin-top: auto; display: flex; justify-content: flex-end; width: 100%; padding-right: 0; }
         .login-footer .footer-content { text-align: right; color: #374151; width: auto; }
         .login-footer .brand-logo { height: 44px; object-fit: contain; display: inline-block; }
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
