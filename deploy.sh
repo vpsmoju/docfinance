@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
+set -o pipefail
 
 APP_DIR="/home/sefaz/docfinance"
 SERVICE_NAME="docfinance-compose.service"
@@ -9,7 +10,13 @@ BOT_TOKEN="8370580581:AAHUgDfmCxk5s1Tkt2fOjgOb0IfRcGCFfjk"
 CHAT_ID="6118776516"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 CURL_BIN="$(command -v curl || echo /usr/bin/curl)"
-HAS_ERROR=0
+SUDO_BIN="$(command -v sudo || true)"
+SUDO_OPTS="-n"
+if [ -n "${SUDO_BIN:-}" ]; then
+  SUDO="${SUDO_BIN} ${SUDO_OPTS}"
+else
+  SUDO=""
+fi
 
 notify() {
   local msg="$1"
@@ -59,21 +66,31 @@ mkdir -p "$INCOMING_DIR"
 sudo chown -R sefaz:sefaz "$BACKUP_DIR"
 sudo chmod -R 755 "$BACKUP_DIR"
 
-sudo mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media"
-sudo chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media"
-sudo chmod -R 755 "${APP_DIR}/staticfiles" "${APP_DIR}/media"
+${SUDO} mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
+${SUDO} chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
+${SUDO} chmod -R 755 "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
 
-sudo $COMPOSE up -d postgres
+if ${SUDO} ${COMPOSE} up -d postgres; then
+  notify "✅ Serviço postgres disponível."
+else
+  notify "❌ Erro ao iniciar postgres."
+  HAS_ERROR=1
+fi
 
 BK_TS="$(date +%s)"
-sudo docker exec docfinance-postgres sh -lc "pg_dump -U docfinance -d docfinance -Fc -Z 9 -f /tmp/docfinance_${STAMP}.dump && pg_dump -U docfinance -d docfinance -f /tmp/docfinance_${STAMP}.sql" || true
-sudo docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.dump "$BACKUP_DIR/docfinance_${STAMP}.dump" || true
-sudo docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.sql "$BACKUP_DIR/docfinance_${STAMP}.sql" || true
+${SUDO} docker exec docfinance-postgres sh -lc "pg_dump -U docfinance -d docfinance -Fc -Z 9 -f /tmp/docfinance_${STAMP}.dump && pg_dump -U docfinance -d docfinance -f /tmp/docfinance_${STAMP}.sql" || true
+${SUDO} docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.dump "$BACKUP_DIR/docfinance_${STAMP}.dump" || true
+${SUDO} docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.sql "$BACKUP_DIR/docfinance_${STAMP}.sql" || true
 notify "🗄️ Backup gerado: ${STAMP} em $(( $(date +%s) - BK_TS ))s."
 
-sudo $COMPOSE up -d backend
-sudo $COMPOSE exec -T backend python manage.py dumpdata --natural-foreign --natural-primary --indent 2 --output /tmp/backup_fixture_${STAMP}.json || true
-sudo docker cp docfinance-backend:/tmp/backup_fixture_${STAMP}.json "$BACKUP_DIR/backup_fixture_${STAMP}.json" || true
+if ${SUDO} ${COMPOSE} up -d backend; then
+  :
+else
+  notify "❌ Erro ao iniciar backend."
+  HAS_ERROR=1
+fi
+${SUDO} ${COMPOSE} exec -T backend python manage.py dumpdata --natural-foreign --natural-primary --indent 2 --output /tmp/backup_fixture_${STAMP}.json || true
+${SUDO} docker cp docfinance-backend:/tmp/backup_fixture_${STAMP}.json "$BACKUP_DIR/backup_fixture_${STAMP}.json" || true
 notify "🧾 Fixture gerada: backup_fixture_${STAMP}.json."
 
 ls -t "$BACKUP_DIR"/docfinance_*.dump 2>/dev/null | tail -n +4 | xargs -r rm -f
@@ -105,7 +122,8 @@ ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
 ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
 
 SYS_TS="$(date +%s)"
-if sudo systemctl restart "${SERVICE_NAME}"; then
+SYS_TS="$(date +%s)"
+if ${SUDO} systemctl restart "${SERVICE_NAME}"; then
   notify "✅ Stack atualizado pelo systemd em $(( $(date +%s) - SYS_TS ))s."
 else
   notify "❌ Falha ao atualizar stack pelo systemd."
@@ -113,7 +131,7 @@ else
 fi
 
 MIG_TS="$(date +%s)"
-if sudo $COMPOSE exec -T backend python manage.py migrate --noinput; then
+if ${SUDO} ${COMPOSE} exec -T backend python manage.py migrate --noinput; then
   notify "✅ Migrações aplicadas em $(( $(date +%s) - MIG_TS ))s."
 else
   notify "❌ Erro ao aplicar migrações."
@@ -121,7 +139,7 @@ else
 fi
 
 COL_TS="$(date +%s)"
-if sudo $COMPOSE exec -T backend python manage.py collectstatic --noinput; then
+if ${SUDO} ${COMPOSE} exec -T backend python manage.py collectstatic --noinput; then
   notify "✅ Arquivos estáticos coletados em $(( $(date +%s) - COL_TS ))s."
 else
   notify "❌ Erro ao coletar estáticos."
@@ -133,15 +151,15 @@ if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
   FIX="${APP_DIR}/backup_docfinance_2025-11-29_0054.json"
   if [ -f "$FIX" ]; then
     sudo docker cp "$FIX" docfinance-backend:/tmp/fixture.json || true
-    sudo $COMPOSE exec -T backend python manage.py loaddata /tmp/fixture.json || true
-    notify "✅ Dados iniciais carregados."
+  sudo $COMPOSE exec -T backend python manage.py loaddata /tmp/fixture.json || true
+  notify "✅ Dados iniciais carregados."
   else
     notify "ℹ️ Fixture não encontrada em $FIX; pulando carga."
   fi
 fi
 
 TOTAL="$(( $(date +%s) - START_TS ))"
-UP_COUNT="$(sudo docker ps --format '{{.Names}}' | wc -l | tr -d '[:space:]')"
+UP_COUNT="$(${SUDO} docker ps --format '{{.Names}}' | wc -l | tr -d '[:space:]')"
 if [ "$UPDATED" = "1" ]; then
   notify "✅🎉 Deploy concluído: ${AFTER} (antes: ${BEFORE}; aplicado: ${REMOTE}). Tempo: ${TOTAL}s. Contêineres ativos: ${UP_COUNT}."
 else
