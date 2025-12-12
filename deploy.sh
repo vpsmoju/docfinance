@@ -32,6 +32,9 @@ BEFORE=$(git rev-parse --short HEAD || echo "unknown")
 REMOTE=$(git rev-parse --short origin/main 2>/dev/null || echo "unknown")
 HOSTNAME="$(hostname -f 2>/dev/null || hostname 2>/dev/null || echo "unknown")"
 START_TS="$(date +%s)"
+HAS_ERROR=0
+WARN_ON=0
+export l7=""
 notify "🚀 Iniciando deploy do *docfinance* em *${HOSTNAME}* (local: ${BEFORE}; remoto: ${REMOTE})..."
 
 UPDATED=0
@@ -131,6 +134,7 @@ if ${SUDO} systemctl restart "${SERVICE_NAME}"; then
 else
   HAS_ERROR=1
 fi
+SYS_DUR="$(( $(date +%s) - SYS_TS ))"
 
 MIG_TS="$(date +%s)"
 MIG_OK=0
@@ -139,6 +143,7 @@ if ${SUDO} ${COMPOSE} exec -T backend python manage.py migrate --noinput; then
 else
   HAS_ERROR=1
 fi
+MIG_DUR="$(( $(date +%s) - MIG_TS ))"
 
 COL_TS="$(date +%s)"
 COL_OK=0
@@ -147,7 +152,8 @@ if ${SUDO} ${COMPOSE} exec -T backend python manage.py collectstatic --noinput; 
 else
   WARN_ON=1
 fi
-APP_MSG="🧩 App: backend $( [ \"$BACKEND_OK\" = \"1\" ] && echo 'ok' || echo 'erro' ); systemd $([ \"$RESTART_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - SYS_TS ))}s\" || echo 'falhou'); migrações $([ \"$MIG_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - MIG_TS ))}s\" || echo 'falharam'); estáticos $([ \"$COL_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - COL_TS ))}s\" || echo 'falharam'); fixture ${FIXTURE_NAME}."
+COL_DUR="$(( $(date +%s) - COL_TS ))"
+APP_MSG="🧩 App: backend $( [ \"$BACKEND_OK\" = \"1\" ] && echo 'ok' || echo 'erro' ); systemd $( [ \"$RESTART_OK\" = \"1\" ] && echo \"${SYS_DUR}s\" || echo 'falhou' ); migrações $( [ \"$MIG_OK\" = \"1\" ] && echo \"${MIG_DUR}s\" || echo 'falharam' ); estáticos $( [ \"$COL_OK\" = \"1\" ] && echo \"${COL_DUR}s\" || echo 'falharam' ); fixture ${FIXTURE_NAME}."
 notify "${APP_MSG}"
 
 COUNT=$(${SUDO} docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
