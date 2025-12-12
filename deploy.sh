@@ -36,25 +36,27 @@ notify "🚀 Iniciando deploy do *docfinance* em *${HOSTNAME}* (local: ${BEFORE}
 
 UPDATED=0
 FETCH_TS="$(date +%s)"
+CODE_MSG=""
 if git fetch --all; then
   REMOTE=$(git rev-parse --short origin/main || echo "unknown")
   if [ "$BEFORE" != "$REMOTE" ]; then
     if git reset --hard origin/main; then
       UPDATED=1
       DUR="$(( $(date +%s) - FETCH_TS ))"
-      notify "✅ Código atualizado para ${REMOTE} (antes: ${BEFORE}) em ${DUR}s."
+      CODE_MSG="✅ Código atualizado para ${REMOTE} (antes: ${BEFORE}) em ${DUR}s."
     else
-      notify "❌ Falha ao aplicar atualização para ${REMOTE}."
+      CODE_MSG="❌ Falha ao aplicar atualização para ${REMOTE}."
       HAS_ERROR=1
     fi
   else
     DUR="$(( $(date +%s) - FETCH_TS ))"
-    notify "ℹ️ Código já está em ${BEFORE} em ${DUR}s."
+    CODE_MSG="ℹ️ Código já está em ${BEFORE} em ${DUR}s."
   fi
 else
-  notify "❌ Falha ao buscar remotos."
+  CODE_MSG="❌ Falha ao buscar remotos."
   HAS_ERROR=1
 fi
+notify "${CODE_MSG}"
 
 AFTER=$(git rev-parse --short HEAD || echo "unknown")
 
@@ -70,10 +72,10 @@ ${SUDO} mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
 ${SUDO} chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
 ${SUDO} chmod -R 755 "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
 
+POSTGRES_OK=0
 if ${SUDO} ${COMPOSE} up -d postgres; then
-  notify "✅ Serviço postgres disponível."
+  POSTGRES_OK=1
 else
-  notify "❌ Erro ao iniciar postgres."
   HAS_ERROR=1
 fi
 
@@ -81,17 +83,18 @@ BK_TS="$(date +%s)"
 ${SUDO} docker exec docfinance-postgres sh -lc "pg_dump -U docfinance -d docfinance -Fc -Z 9 -f /tmp/docfinance_${STAMP}.dump && pg_dump -U docfinance -d docfinance -f /tmp/docfinance_${STAMP}.sql" || true
 ${SUDO} docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.dump "$BACKUP_DIR/docfinance_${STAMP}.dump" || true
 ${SUDO} docker cp docfinance-postgres:/tmp/docfinance_${STAMP}.sql "$BACKUP_DIR/docfinance_${STAMP}.sql" || true
-notify "🗄️ Backup gerado: ${STAMP} em $(( $(date +%s) - BK_TS ))s."
+DB_MSG="🗄️ Banco: postgres $( [ \"$POSTGRES_OK\" = \"1\" ] && echo 'ok' || echo 'erro' ); backup ${STAMP} em $(( $(date +%s) - BK_TS ))s."
+notify "${DB_MSG}"
 
+BACKEND_OK=0
 if ${SUDO} ${COMPOSE} up -d backend; then
-  :
+  BACKEND_OK=1
 else
-  notify "❌ Erro ao iniciar backend."
   HAS_ERROR=1
 fi
 ${SUDO} ${COMPOSE} exec -T backend python manage.py dumpdata --natural-foreign --natural-primary --indent 2 --output /tmp/backup_fixture_${STAMP}.json || true
 ${SUDO} docker cp docfinance-backend:/tmp/backup_fixture_${STAMP}.json "$BACKUP_DIR/backup_fixture_${STAMP}.json" || true
-notify "🧾 Fixture gerada: backup_fixture_${STAMP}.json."
+FIXTURE_NAME="backup_fixture_${STAMP}.json"
 
 ls -t "$BACKUP_DIR"/docfinance_*.dump 2>/dev/null | tail -n +4 | xargs -r rm -f
 ls -t "$BACKUP_DIR"/docfinance_*.sql 2>/dev/null | tail -n +4 | xargs -r rm -f
@@ -122,29 +125,30 @@ ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | tail -n +2 | xargs -r ${SUDO} rm -f
 ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | tail -n +2 | xargs -r ${SUDO} rm -f
 
 SYS_TS="$(date +%s)"
-SYS_TS="$(date +%s)"
+RESTART_OK=0
 if ${SUDO} systemctl restart "${SERVICE_NAME}"; then
-  notify "✅ Stack atualizado pelo systemd em $(( $(date +%s) - SYS_TS ))s."
+  RESTART_OK=1
 else
-  notify "❌ Falha ao atualizar stack pelo systemd."
   HAS_ERROR=1
 fi
 
 MIG_TS="$(date +%s)"
+MIG_OK=0
 if ${SUDO} ${COMPOSE} exec -T backend python manage.py migrate --noinput; then
-  notify "✅ Migrações aplicadas em $(( $(date +%s) - MIG_TS ))s."
+  MIG_OK=1
 else
-  notify "❌ Erro ao aplicar migrações."
   HAS_ERROR=1
 fi
 
 COL_TS="$(date +%s)"
+COL_OK=0
 if ${SUDO} ${COMPOSE} exec -T backend python manage.py collectstatic --noinput; then
-  notify "✅ Arquivos estáticos coletados em $(( $(date +%s) - COL_TS ))s."
+  COL_OK=1
 else
-  notify "❌ Erro ao coletar estáticos."
-  HAS_ERROR=1
+  WARN_ON=1
 fi
+APP_MSG="🧩 App: backend $( [ \"$BACKEND_OK\" = \"1\" ] && echo 'ok' || echo 'erro' ); systemd $([ \"$RESTART_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - SYS_TS ))}s\" || echo 'falhou'); migrações $([ \"$MIG_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - MIG_TS ))}s\" || echo 'falharam'); estáticos $([ \"$COL_OK\" = \"1\" ] && echo \"${$(( $(date +%s) - COL_TS ))}s\" || echo 'falharam'); fixture ${FIXTURE_NAME}."
+notify "${APP_MSG}"
 
 COUNT=$(${SUDO} docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
 if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
@@ -169,7 +173,7 @@ fi
 # Resumo estilo template (similar ao Alertmanager)
 END_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z')"
 START_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z' -d @${START_TS} 2>/dev/null || date +'%Y-%m-%d %H:%M:%S %Z')"
-SEVERITY="$( [ \"$HAS_ERROR\" = \"1\" ] && echo critical || echo info )"
+SEVERITY="$( [ \"$HAS_ERROR\" = \"1\" ] && echo critical || ( [ \"${WARN_ON:-0}\" = \"1\" ] && echo warning || echo info ) )"
 SUMMARY="Deploy do docfinance em ${HOSTNAME}"
 DESCRIPTION=$(cat <<EOF
 Local: ${BEFORE}; Remoto: ${REMOTE}; Final: ${AFTER}
