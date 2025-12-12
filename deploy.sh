@@ -11,7 +11,7 @@ CHAT_ID="6118776516"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 CURL_BIN="$(command -v curl || echo /usr/bin/curl)"
 SUDO_BIN="$(command -v sudo || true)"
-SUDO_OPTS="-n"
+SUDO_OPTS="-nE"
 if [ -n "${SUDO_BIN:-}" ]; then
   SUDO="${SUDO_BIN} ${SUDO_OPTS}"
 else
