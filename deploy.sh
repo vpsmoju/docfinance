@@ -9,6 +9,7 @@ BOT_TOKEN="8370580581:AAHUgDfmCxk5s1Tkt2fOjgOb0IfRcGCFfjk"
 CHAT_ID="6118776516"
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 CURL_BIN="$(command -v curl || echo /usr/bin/curl)"
+HAS_ERROR=0
 
 notify() {
   local msg="$1"
@@ -37,6 +38,7 @@ if git fetch --all; then
       notify "✅ Código atualizado para ${REMOTE} (antes: ${BEFORE}) em ${DUR}s."
     else
       notify "❌ Falha ao aplicar atualização para ${REMOTE}."
+      HAS_ERROR=1
     fi
   else
     DUR="$(( $(date +%s) - FETCH_TS ))"
@@ -44,6 +46,7 @@ if git fetch --all; then
   fi
 else
   notify "❌ Falha ao buscar remotos."
+  HAS_ERROR=1
 fi
 
 AFTER=$(git rev-parse --short HEAD || echo "unknown")
@@ -106,6 +109,7 @@ if sudo systemctl restart "${SERVICE_NAME}"; then
   notify "✅ Stack atualizado pelo systemd em $(( $(date +%s) - SYS_TS ))s."
 else
   notify "❌ Falha ao atualizar stack pelo systemd."
+  HAS_ERROR=1
 fi
 
 MIG_TS="$(date +%s)"
@@ -113,6 +117,7 @@ if sudo $COMPOSE exec -T backend python manage.py migrate --noinput; then
   notify "✅ Migrações aplicadas em $(( $(date +%s) - MIG_TS ))s."
 else
   notify "❌ Erro ao aplicar migrações."
+  HAS_ERROR=1
 fi
 
 COL_TS="$(date +%s)"
@@ -120,6 +125,7 @@ if sudo $COMPOSE exec -T backend python manage.py collectstatic --noinput; then
   notify "✅ Arquivos estáticos coletados em $(( $(date +%s) - COL_TS ))s."
 else
   notify "❌ Erro ao coletar estáticos."
+  HAS_ERROR=1
 fi
 
 COUNT=$(sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
@@ -141,3 +147,27 @@ if [ "$UPDATED" = "1" ]; then
 else
   notify "✅🎉 Deploy concluído: ${AFTER} (sem alterações; remoto: ${REMOTE}). Tempo: ${TOTAL}s. Contêineres ativos: ${UP_COUNT}."
 fi
+
+# Resumo estilo template (similar ao Alertmanager)
+END_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z')"
+START_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z' -d @${START_TS} 2>/dev/null || date +'%Y-%m-%d %H:%M:%S %Z')"
+SEVERITY="$( [ \"$HAS_ERROR\" = \"1\" ] && echo critical || echo info )"
+SUMMARY="Deploy do docfinance em ${HOSTNAME}"
+DESCRIPTION=$(cat <<EOF
+Local: ${BEFORE}; Remoto: ${REMOTE}; Final: ${AFTER}
+Tempo total: ${TOTAL}s; Containers ativos: ${UP_COUNT}
+Backup: ${STAMP}; Fixture: backup_fixture_${STAMP}.json
+EOF
+)
+MSG=$(cat <<EOF
+🚨 *Alerta*: Deploy do docfinance
+📍 *Instância*: ${HOSTNAME}
+⚡ *Severidade*: ${SEVERITY}
+🕒 *Início*: ${START_HUMAN}
+🕒 *Fim*: ${END_HUMAN}
+
+📝 *Resumo*: ${SUMMARY}
+📖 *Descrição*: ${DESCRIPTION}
+EOF
+)
+notify "${MSG}"
