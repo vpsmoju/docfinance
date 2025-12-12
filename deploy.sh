@@ -63,8 +63,8 @@ mkdir -p "$BACKUP_DIR"
 STAMP=$(date +"%Y-%m-%d_%H%M")
 INCOMING_DIR="${BACKUP_DIR}/incoming"
 mkdir -p "$INCOMING_DIR"
-sudo chown -R sefaz:sefaz "$BACKUP_DIR"
-sudo chmod -R 755 "$BACKUP_DIR"
+${SUDO} chown -R sefaz:sefaz "$BACKUP_DIR" || true
+${SUDO} chmod -R 755 "$BACKUP_DIR" || true
 
 ${SUDO} mkdir -p "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
 ${SUDO} chown -R sefaz:sefaz "${APP_DIR}/staticfiles" "${APP_DIR}/media" || true
@@ -101,25 +101,25 @@ ls -t "$BACKUP_DIR"/backup_fixture_*.json 2>/dev/null | tail -n +4 | xargs -r rm
 INC_DUMP=$(ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | head -n1 || true)
 INC_SQL=$(ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | head -n1 || true)
 if [ -n "$INC_DUMP" ] || [ -n "$INC_SQL" ]; then
-  sudo $COMPOSE stop backend || true
+  ${SUDO} ${COMPOSE} stop backend || true
   if [ -n "$INC_DUMP" ]; then
-    sudo docker cp "$INC_DUMP" docfinance-postgres:/tmp/incoming.dump
-    sudo docker exec docfinance-postgres sh -lc "pg_restore -U docfinance -d docfinance --clean --if-exists -j 2 /tmp/incoming.dump"
-    sudo docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.dump"
-    sudo rm -f "$INC_DUMP"
+    ${SUDO} docker cp "$INC_DUMP" docfinance-postgres:/tmp/incoming.dump
+    ${SUDO} docker exec docfinance-postgres sh -lc "pg_restore -U docfinance -d docfinance --clean --if-exists -j 2 /tmp/incoming.dump"
+    ${SUDO} docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.dump"
+    ${SUDO} rm -f "$INC_DUMP"
     notify "✅ Banco restaurado a partir do dump (custom)."
   elif [ -n "$INC_SQL" ]; then
-    sudo docker cp "$INC_SQL" docfinance-postgres:/tmp/incoming.sql
-    sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -f /tmp/incoming.sql"
-    sudo docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.sql"
-    sudo rm -f "$INC_SQL"
+    ${SUDO} docker cp "$INC_SQL" docfinance-postgres:/tmp/incoming.sql
+    ${SUDO} docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -f /tmp/incoming.sql"
+    ${SUDO} docker exec docfinance-postgres sh -lc "rm -f /tmp/incoming.sql"
+    ${SUDO} rm -f "$INC_SQL"
     notify "✅ Banco restaurado a partir do SQL."
   fi
-  sudo $COMPOSE up -d backend
+  ${SUDO} ${COMPOSE} up -d backend
 fi
 
-ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
-ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | tail -n +2 | xargs -r sudo rm -f
+ls -t "$INCOMING_DIR"/*.dump 2>/dev/null | tail -n +2 | xargs -r ${SUDO} rm -f
+ls -t "$INCOMING_DIR"/*.sql 2>/dev/null | tail -n +2 | xargs -r ${SUDO} rm -f
 
 SYS_TS="$(date +%s)"
 SYS_TS="$(date +%s)"
@@ -146,12 +146,12 @@ else
   HAS_ERROR=1
 fi
 
-COUNT=$(sudo docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
+COUNT=$(${SUDO} docker exec docfinance-postgres sh -lc "psql -U docfinance -d docfinance -t -c 'SELECT COUNT(*) FROM auth_user;'" | tr -d '[:space:]')
 if [ -z "$COUNT" ] || [ "$COUNT" = "0" ]; then
   FIX="${APP_DIR}/backup_docfinance_2025-11-29_0054.json"
   if [ -f "$FIX" ]; then
-    sudo docker cp "$FIX" docfinance-backend:/tmp/fixture.json || true
-  sudo $COMPOSE exec -T backend python manage.py loaddata /tmp/fixture.json || true
+    ${SUDO} docker cp "$FIX" docfinance-backend:/tmp/fixture.json || true
+  ${SUDO} ${COMPOSE} exec -T backend python manage.py loaddata /tmp/fixture.json || true
   notify "✅ Dados iniciais carregados."
   else
     notify "ℹ️ Fixture não encontrada em $FIX; pulando carga."
