@@ -179,7 +179,7 @@ fi
 # Resumo estilo template (similar ao Alertmanager)
 END_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z')"
 START_HUMAN="$(date +'%Y-%m-%d %H:%M:%S %Z' -d @${START_TS} 2>/dev/null || date +'%Y-%m-%d %H:%M:%S %Z')"
-SEVERITY="$( [ \"$HAS_ERROR\" = \"1\" ] && echo critical || ( [ \"${WARN_ON:-0}\" = \"1\" ] && echo warning || echo info ) )"
+SEVERITY="$( [ \"${HAS_ERROR:-0}\" = \"1\" ] && echo critical || ( [ \"${WARN_ON:-0}\" = \"1\" ] && echo warning || echo info ) )"
 SUMMARY="Deploy do docfinance em ${HOSTNAME}"
 DESCRIPTION=$(cat <<EOF
 Local: ${BEFORE}; Remoto: ${REMOTE}; Final: ${AFTER}
