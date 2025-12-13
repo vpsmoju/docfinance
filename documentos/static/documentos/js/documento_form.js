@@ -171,6 +171,61 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Máscara e preenchimento automático para Processo (0000/AAAA)
+    const processoInput = document.getElementById('id_processo');
+    function aplicarMascaraProcesso(raw) {
+        let digits = (raw || '').replace(/\D/g, '');
+        if (digits.length === 0) return '';
+        // Se houver 5-8 dígitos, tentar interpretar como numero + ano (últimos 4)
+        if (digits.length >= 5) {
+            const anoCand = digits.slice(-4);
+            if (/^(19|20)\d{2}$/.test(anoCand)) {
+                const numeroPart = digits.slice(0, Math.min(digits.length - 4, 4));
+                return numeroPart + '/' + anoCand;
+            }
+        }
+        // Caso contrário, manter até 4 dígitos e sugerir barra
+        const numero = digits.slice(0, 4);
+        const ano = digits.slice(4, 8);
+        if (ano.length === 0) return numero + '/';
+        return numero + '/' + ano;
+    }
+    function completarAnoSeNecessario(el) {
+        if (!el) return;
+        const val = (el.value || '').trim();
+        const onlyDigits = val.replace(/\D/g, '');
+        // Se 7-8 dígitos com ano no final, formatar numero/ano
+        if (onlyDigits.length >= 7 && onlyDigits.length <= 8) {
+            const anoCand = onlyDigits.slice(-4);
+            if (/^(19|20)\d{2}$/.test(anoCand)) {
+                const numeroPart = onlyDigits.slice(0, Math.min(onlyDigits.length - 4, 4));
+                el.value = numeroPart + '/' + anoCand;
+                return;
+            }
+        }
+        // Se apenas número (1-4 dígitos), completar com ano atual
+        const numero = onlyDigits.slice(0, 4);
+        const anoDigits = onlyDigits.slice(4, 8);
+        if (numero.length >= 1 && numero.length <= 4 && anoDigits.length === 0) {
+            const currentYear = new Date().getFullYear();
+            el.value = numero + '/' + currentYear;
+        }
+    }
+    if (processoInput) {
+        processoInput.addEventListener('input', function(e) {
+            const caretPos = e.target.selectionStart;
+            const oldLen = e.target.value.length;
+            e.target.value = aplicarMascaraProcesso(e.target.value);
+            // Ajuste simples de caret
+            const newLen = e.target.value.length;
+            const diff = newLen - oldLen;
+            e.target.selectionStart = e.target.selectionEnd = Math.max(0, caretPos + diff);
+        });
+        processoInput.addEventListener('blur', function(e) {
+            completarAnoSeNecessario(e.target);
+        });
+    }
+
     // =============================
     // Regras de descontos por tipo
     // =============================

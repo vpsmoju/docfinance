@@ -96,6 +96,7 @@ class DocumentoForm(forms.ModelForm):
         model = Documento
         fields = [
             "numero_documento",
+            "processo",
             "tipo",
             "fornecedor",
             "data_documento",
@@ -113,12 +114,38 @@ class DocumentoForm(forms.ModelForm):
             "data_documento": DateInputBR(),
             "data_pagamento": DateInputBR(),
             "status": forms.Select(attrs={"class": "form-control"}),
+            "processo": forms.TextInput(attrs={"class": "form-control"}),
             "descricao": forms.Textarea(
                 attrs={"class": "form-control campo-descricao-reduzida"}
             ),
             "secretaria": forms.Select(attrs={"class": "form-control"}),
             "recurso": forms.Select(attrs={"class": "form-control"}),
         }
+
+    def clean_processo(self):
+        value = self.cleaned_data.get("processo")
+        if not value:
+            return value
+        v = str(value).strip()
+        import re as _re
+        # Completar automaticamente o ano atual se ausente
+        if _re.fullmatch(r"[0-9]{1,4}", v) or _re.fullmatch(r"[0-9]{1,4}/", v):
+            from django.utils import timezone as _tz
+            ano_atual = _tz.now().year
+            v = f"{v.split('/')[0]}/{ano_atual}"
+        # Converter entrada compacta sem barra (numero+ano) para numero/ano
+        elif _re.fullmatch(r"[0-9]{5,8}", v):
+            ano_cand = v[-4:]
+            numero_part = v[:-4]
+            if _re.fullmatch(r"(19|20)[0-9]{2}", ano_cand) and _re.fullmatch(r"[0-9]{1,4}", numero_part):
+                v = f"{numero_part}/{ano_cand}"
+        m = _re.fullmatch(r"([0-9]{1,4})/((?:19|20)[0-9]{2})", v)
+        if not m:
+            raise forms.ValidationError("Formato inválido. Use 0000/AAAA com ano entre 1900 e 2099.")
+        ano = int(m.group(2))
+        if ano < 1900 or ano > 2099:
+            raise forms.ValidationError("Ano inválido. Use entre 1900 e 2099.")
+        return v
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

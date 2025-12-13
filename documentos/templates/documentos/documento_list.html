@@ -41,6 +41,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Número</th>
+                                <th>Processo</th>
                                 <th>Secretaria</th>
                                 <th>Fornecedor</th>
                                 <th>Data Doc.</th>
@@ -54,6 +55,7 @@
                             {% for documento in object_list %}
                                 <tr>
                                     <td>{{ documento.numero }}</td>
+                                    <td>{{ documento.processo|default:"-" }}</td>
                                     <td>{{ documento.secretaria.nome|default:"-" }}</td>
                                     <td>
                                         <a href="{% url 'fornecedores:fornecedor_detail' documento.fornecedor.id %}">{{ documento.fornecedor }}</a>

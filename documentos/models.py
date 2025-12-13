@@ -90,6 +90,9 @@ class Documento(models.Model):
     numero_documento = models.CharField(
         max_length=50, blank=True, null=True, verbose_name="Número do Documento"
     )
+    processo = models.CharField(
+        max_length=50, blank=True, null=True, verbose_name="Processo"
+    )
     tipo = models.CharField(max_length=4, choices=TIPO_CHOICES, verbose_name="Tipo")
     data_documento = models.DateField(verbose_name="Data do Documento")
     data_pagamento = models.DateField(
