@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(
                 auto_now_add=True,
                 default=datetime.datetime(
-                    2025, 5, 13, 0, 56, 4, 910233, tzinfo=datetime.UTC
+                    2025, 5, 13, 0, 56, 4, 910233, tzinfo=datetime.timezone.utc
                 ),
             ),
             preserve_default=False,
