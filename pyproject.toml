@@ -16,7 +16,11 @@ dependencies = [
     "xlsxwriter",
     "django-widget-tweaks",
     "pillow",
-    "django-filter"
+    "django-filter",
+    "django-chartjs",
+    "djlint",
+    "reportlab",
+    "gunicorn"
 ]
 
 [tool.setuptools]

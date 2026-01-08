@@ -90,7 +90,8 @@ DB_MSG="🗄️ Banco: postgres $( [ \"$POSTGRES_OK\" = \"1\" ] && echo 'ok' || 
 notify "${DB_MSG}"
 
 BACKEND_OK=0
-if ${SUDO} ${COMPOSE} up -d backend; then
+# Força o rebuild para garantir que novas dependências do pyproject.toml sejam instaladas
+if ${SUDO} ${COMPOSE} up -d --build backend; then
   BACKEND_OK=1
 else
   HAS_ERROR=1
