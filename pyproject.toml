@@ -9,7 +9,14 @@ dependencies = [
     "Django>=5.2.1",
     "django-crispy-forms>=2.0",
     "crispy-bootstrap5>=0.7",
-    "python-dotenv>=1.0.0"
+    "python-dotenv>=1.0.0",
+    "python-decouple",
+    "dj-database-url",
+    "psycopg2-binary",
+    "xlsxwriter",
+    "django-widget-tweaks",
+    "pillow",
+    "django-filter"
 ]
 
 [tool.setuptools]
