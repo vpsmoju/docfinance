@@ -101,3 +101,10 @@ target/
 # Backups (ignora arquivos, mantem a pasta)
 backups/*
 !backups/.gitkeep
+
+# Environment files
+.django.env
+
+# Vercel
+.vercel/
+staticfiles_build/

@@ -29,7 +29,7 @@ packages = [
     "documentos",
     "relatorios",
     "fornecedores",
-    "config"
+    "api"
 ]
 
 [build-system]
