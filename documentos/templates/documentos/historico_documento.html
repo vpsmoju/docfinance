@@ -33,8 +33,18 @@
                             <div class="col-12 d-none" id="devolucao_field">
                                 <label class="form-label">Motivo da devolução</label>
                                 <div class="row g-2">
-                                    <div class="col-md-5">{{ form.motivo_tipo }}</div>
-                                    <div class="col-md-7">{{ form.motivo_livre }}</div>
+                                    <div class="col-md-5">
+                                        {{ form.motivo_tipo }}
+                                        {% if form.motivo_tipo.errors %}
+                                            <div class="text-danger small">{{ form.motivo_tipo.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        {{ form.motivo_livre }}
+                                        {% if form.motivo_livre.errors %}
+                                            <div class="text-danger small">{{ form.motivo_livre.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 <div class="form-text text-muted">Escolha um motivo e, se necessário, detalhe no campo ao lado.</div>
                             </div>
@@ -43,30 +53,49 @@
                             </div>
                         </form>
                     </div>
-                    {% if ultimo_historico %}
-                        <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 px-3">
-                            <div>
-                                {% if ultimo_historico.etapa == 'ABERTURA' %}
-                                    <span class="badge bg-secondary me-2"><i class="bi bi-journal-plus"></i>Abertura de Documento</span>
-                                {% elif ultimo_historico.etapa == 'CONTROLE_INTERNO' %}
-                                    <span class="badge bg-info text-dark me-2"><i class="bi bi-shield-check"></i>Controle Interno</span>
-                                {% elif ultimo_historico.etapa == 'EMPENHO' %}
-                                    <span class="badge bg-warning text-dark me-2"><i class="bi bi-clipboard-check"></i>Empenho</span>
-                                {% elif ultimo_historico.etapa == 'PAGAMENTO' %}
-                                    <span class="badge bg-primary me-2"><i class="bi bi-credit-card"></i>Pagamento</span>
-                                {% elif ultimo_historico.etapa == 'BAIXA' %}
-                                    <span class="badge bg-success me-2"><i class="bi bi-check-circle"></i>Baixa</span>
-                                {% endif %}
-                                <span class="text-muted small">{{ ultimo_historico.descricao|default:"" }}</span>
-                            </div>
-                            <div class="text-end text-muted small">
-                                {{ ultimo_historico.data_hora|date:"d/m/Y H:i:s" }}<br>
-                                {% if ultimo_historico.usuario %}{{ ultimo_historico.usuario.get_full_name|default:ultimo_historico.usuario.username }}{% else %}Sistema{% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
-                <!-- Lista completa removida para edição mínima conforme figura 2 -->
+                
+                <!-- Lista completa de histórico -->
+                <div class="overflow-auto mt-2 flex-grow-1">
+                    <table class="table table-sm table-striped table-hover mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Etapa</th>
+                                <th>Descrição</th>
+                                <th>Usuário</th>
+                                <th>Data/Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in historicos reversed %}
+                                <tr>
+                                    <td>
+                                        {% if h.etapa == 'ABERTURA' %}
+                                            <span class="badge bg-secondary">Abertura</span>
+                                        {% elif h.etapa == 'CONTROLE_INTERNO' %}
+                                            <span class="badge bg-info text-dark">Controle Interno</span>
+                                        {% elif h.etapa == 'EMPENHO' %}
+                                            <span class="badge bg-warning text-dark">Empenho</span>
+                                        {% elif h.etapa == 'PAGAMENTO' %}
+                                            <span class="badge bg-primary">Pagamento</span>
+                                        {% elif h.etapa == 'BAIXA' %}
+                                            <span class="badge bg-success">Baixa</span>
+                                        {% else %}
+                                            {{ h.get_etapa_display }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ h.descricao|default:"-" }}</td>
+                                    <td>{% if h.usuario %}{{ h.usuario.get_full_name|default:h.usuario.username }}{% else %}Sistema{% endif %}</td>
+                                    <td>{{ h.data_hora|date:"d/m/Y H:i:s" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Nenhum histórico registrado.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -88,14 +117,23 @@
                 const idxNova = indexOfEtapa(nova);
                 const idxAtual = indexOfEtapa(currentEtapa);
                 const retrocede = idxNova > -1 && idxAtual > -1 && idxNova < idxAtual;
-                campo.style.display = retrocede ? '' : 'none';
-                if (motivoTipo) motivoTipo.required = retrocede;
-                if (!retrocede && motivoTipo) motivoTipo.value = '';
-                if (!retrocede && motivoLivre) motivoLivre.value = '';
+                
+                if (retrocede) {
+                    campo.classList.remove('d-none');
+                    if (motivoTipo) motivoTipo.required = true;
+                } else {
+                    campo.classList.add('d-none');
+                    if (motivoTipo) {
+                        motivoTipo.required = false;
+                        motivoTipo.value = '';
+                    }
+                    if (motivoLivre) motivoLivre.value = '';
+                }
             }
 
             if (select){
                 select.addEventListener('change', updateVisibilidade);
+                // Executar na carga da página caso já venha com erro de validação e valor selecionado
                 updateVisibilidade();
             }
         })();

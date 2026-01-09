@@ -52,6 +52,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Documento</th>
+                                <th>Processo</th>
                                 <th>Fornecedor</th>
                                 <th>Secretaria</th>
                                 <th>Valor</th>
@@ -64,6 +65,7 @@
                             {% for d in documentos %}
                                 <tr>
                                     <td>{{ d.numero }}</td>
+                                    <td>{{ d.processo|default:"-" }}</td>
                                     <td><a href="{% url 'fornecedores:fornecedor_detail' d.fornecedor.id %}">{{ d.fornecedor }}</a></td>
                                     <td>{{ d.secretaria.nome|default:"-" }}</td>
                                     <td>R$ {{ d.valor_documento|currency_br }}</td>
@@ -90,7 +92,7 @@
                                     </td>
                                 </tr>
                             {% empty %}
-                                <tr><td colspan="7" class="text-center">Nenhum documento encontrado.</td></tr>
+                                <tr><td colspan="8" class="text-center">Nenhum documento encontrado.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
