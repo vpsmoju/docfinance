@@ -101,19 +101,19 @@
                     <td class="lbl">Desconto (INSS)</td>
                     <td class="marca">—</td>
                     <td class="moeda amarelo">R$</td>
-                    <td class="valor amarelo"><span class="numero">0,00</span></td>
+                    <td class="valor amarelo"><span class="numero numero-desconto">0,00</span></td>
                   </tr>
                   <tr>
                     <td class="lbl">Desconto (IRRF)</td>
                     <td class="marca">—</td>
                     <td class="moeda amarelo">R$</td>
-                    <td class="valor amarelo"><span class="numero">{% if documento.valor_irrf %}{{ documento.valor_irrf|currency_br }}{% else %}0,00{% endif %}</span></td>
+                    <td class="valor amarelo"><span class="numero numero-desconto">{% if documento.valor_irrf %}{{ documento.valor_irrf|currency_br }}{% else %}0,00{% endif %}</span></td>
                   </tr>
                   <tr>
                     <td class="lbl">Desconto (ISS)</td>
                     <td class="marca">—</td>
                     <td class="moeda amarelo">R$</td>
-                    <td class="valor amarelo"><span class="numero">{% if documento.valor_iss %}{{ documento.valor_iss|currency_br }}{% else %}0,00{% endif %}</span></td>
+                    <td class="valor amarelo"><span class="numero numero-desconto">{% if documento.valor_iss %}{{ documento.valor_iss|currency_br }}{% else %}0,00{% endif %}</span></td>
                   </tr>
                   <tr>
                     <td class="lbl total">Pagamento Líquido</td>
@@ -199,6 +199,7 @@
   .totais-tabela td.valor .numero { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
   .totais-tabela .amarelo { background: #ffe08a; font-weight: 700; }
   .totais-tabela .total { font-weight: 800; }
+  .totais-tabela td.valor .numero-desconto { color: #cc0000; }
 </style>
 
 <script>

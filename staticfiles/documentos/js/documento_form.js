@@ -246,27 +246,22 @@ document.addEventListener('DOMContentLoaded', function() {
             radioNone.checked = true;
             updateDescontoUI();
         } else if (tipo === 'NFS' || tipo === 'NFSA') {
-            // Três casos: nenhum, só ISS, só IRRF
+            // Quatro casos: nenhum, ISS, IRRF, ISS+IRRF
             show(descontosContainer);
             showRadio('desconto_none', true);
             showRadio('desconto_iss', true);
             showRadio('desconto_irrf', true);
-            showRadio('desconto_iss_irrf', false);
+            showRadio('desconto_iss_irrf', true);
 
-            // Se opção atual for inválida, voltar para NONE
-            const current = document.querySelector('input[name="desconto_opcao"]:checked')?.value;
-            if (current === 'ISS_IRRF') radioNone.checked = true;
             updateDescontoUI();
         } else if (tipo === 'REC') {
-            // Três casos: nenhum, ISS, ISS+IRRF
+            // Quatro casos: nenhum, ISS, IRRF, ISS+IRRF
             show(descontosContainer);
             showRadio('desconto_none', true);
             showRadio('desconto_iss', true);
-            showRadio('desconto_irrf', false);
+            showRadio('desconto_irrf', true);
             showRadio('desconto_iss_irrf', true);
 
-            const current = document.querySelector('input[name="desconto_opcao"]:checked')?.value;
-            if (current === 'IRRF') radioNone.checked = true;
             updateDescontoUI();
         }
     }
