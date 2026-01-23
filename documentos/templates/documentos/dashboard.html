@@ -101,6 +101,7 @@
                     <thead>
                         <tr>
                             <th>Número</th>
+                            <th>Processo</th>
                             <th>Fornecedor</th>
                             <th>Descrição</th>
                             <th>Data Pagamento</th>
@@ -113,6 +114,7 @@
                         {% for doc in ultimos_documentos %}
                             <tr>
                                 <td>{{ doc.numero }}</td>
+                                <td>{{ doc.processo|default:"-" }}</td>
                                 <td>{{ doc.fornecedor }}</td>
                                 <td class="descricao">{{ doc.descricao|default:"-" }}</td>
                                 <td>{% if doc.data_pagamento %}{{ doc.data_pagamento|date:"d/m/Y" }}{% else %}-{% endif %}</td>
